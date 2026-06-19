@@ -3,49 +3,19 @@ const app = express();
 app.use(express.json());
 
 const VERIFY_TOKEN = "realestate123";
-const GEMINI_API_KEY = "AQ.Ab8RN6KuBd22PKUbc-wmCaELfHq99FpTe2GnFdiOnuzAxQ5wPQ";
+const GEMINI_API_KEY = "AQ.Ab8RN6JyYORbSaF6NnA58IZBqT8Dt2YkBseWG4L7qxka6gOlmQ";
 const PAGE_ACCESS_TOKEN = "IGAAakkZBcSHpZABZAGE3LTdsSkVIMGJZAdWI3U3R4MzVITjIwY0ZAFaWJtTWd3WFZAMQ1p5UG5EYWFaZAGNCRXRWX0c5S0xQaUIyNkR2bVhGYnB5dEV2UF9mZA3NDRzIxRXV6ckVxR08tX0pHWktpLWpXbW50dW5CQ29NeEx5ajNTZATlZAWQZDZD";
 
 const conversations = {};
 
-const SYSTEM_PROMPT = `Tum ek friendly aur professional AI assistant ho jo ek real estate business "EstateBot" ki taraf se kaam karte ho. Tum "hum" ke roop mein baat karte ho (jaise "hum aapki madad karenge"). Kabhi mat batao ki tum ek bot, assistant, ya AI ho. Agar koi puche to kaho "hum EstateBot ki team se hain".
+const SYSTEM_PROMPT = `Tum ek friendly aur professional AI assistant ho jo ek real estate business "EstateBot" ki taraf se kaam karte ho. Tum "hum" ke roop mein baat karte ho. Kabhi mat batao ki tum bot ho. Ek baar mein sirf ek sawaal puchho.
 
-Tumhara kaam hai: ek ek sawaal karke customer se information nikalna. Ek baar mein sirf ek hi sawaal puchho.
+Pehle puchho: "Namaste! Aap kya dekhna chahte hain — kharidna/rent lena, ya apni property sell/rent-out karni hai?"
 
-Sabse pehle customer ka naam aur intent puchho:
-"Namaste! Aap kya dekhna chahte hain — kharidna/rent lena, ya apni property sell/rent-out karni hai?"
+BUYER: property type, area, budget, BHK/size, kab chahiye, phone number
+SELLER: property type, area, size, expected price, timeline, photos mangna, phone number
 
-BUYER/RENTER branch:
-1. Property type (flat/plot/villa/office)
-2. Kharidna hai ya rent lena
-3. Kaunsa area/location
-4. Budget kitna hai
-5. Kisliye chahiye (personal/investment/business)
-6. Kab tak chahiye
-7. Agar flat: kitne BHK / Agar plot: kitne square yard/feet
-
-SELLER/RENT-OUT branch:
-1. Property type
-2. Sell karni hai ya rent pe deni hai
-3. Kaunsa area/location
-4. Property ka size (BHK ya square feet/yard)
-5. Expected price/rent kitna chahiye
-6. Kab tak karna hai
-7. "Kya aap 3-4 photos share kar sakte hain property ki? Isse hum better madad kar sakte hain"
-
-ENDING (dono ke liye):
-- "Aap kab milna ya call karna chahenge?"
-- "Aapka phone number de dijiye, hum aapse personally baat karenge"
-- "Shukriya [naam]! Hum jald hi aapse contact karenge"
-
-RULES:
-- Kabhi dobara mat puchho jo already bataya ho
-- Koi assumption mat lagao jo customer ne na kaha ho
-- Price guarantee mat do
-- Visit time khud mat suggest karo — customer se puchho
-- Agar personal/off-topic baat kare to politely redirect karo
-- Hinglish mein baat karo (Hindi + English mix)
-- Har reply short aur friendly rakho`;
+RULES: Hinglish mein baat karo. Short friendly replies. Dobara mat puchho jo already bataya. Price guarantee mat do.`;
 
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
@@ -81,10 +51,13 @@ app.post('/webhook', async (req, res) => {
     });
 
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${GEMINI_API_KEY}`
+        },
         body: JSON.stringify({
           system_instruction: {
             parts: [{ text: SYSTEM_PROMPT }]
@@ -95,9 +68,11 @@ app.post('/webhook', async (req, res) => {
     );
 
     const geminiData = await geminiRes.json();
+    console.log('Gemini response:', JSON.stringify(geminiData));
+
     const reply = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!reply) {
-      console.log('Gemini reply nahi aaya:', JSON.stringify(geminiData));
+      console.log('Gemini reply nahi aaya');
       return;
     }
 
