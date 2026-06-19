@@ -4,7 +4,7 @@ app.use(express.json());
 
 const VERIFY_TOKEN = "realestate123";
 const GROQ_API_KEY = "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";
-const PAGE_ACCESS_TOKEN = "IGAAakkZBcSHpZABZAGE3LTdsSkVIMGJZAdWI3U3R4MzVITjIwY0ZAFaWJtTWd3WFZAMQ1p5UG5EYWFaZAGNCRXRWX0c5S0xQaUIyNkR2bVhGYnB5dEV2UF9mZA3NDRzIxRXV6ckVxR08tX0pHWktpLWpXbW50dW5CQ29NeEx5ajNTZATlZAWQZDZD";
+const PAGE_ACCESS_TOKEN = "IGAAakkZBcSHpZABZAFpzOENqMmdCMHJNYi1mNTlHMUhlQ2FBZATdndHR5STJqRWY1bDJYWnJuS3NEM2NaaVQ0V0s2VHVFSGplSzg5eXZAadGlSVGEwd3lOVlcyWUZA0UFE1M0VYWng3dVFrNkM1MHF0WVJJUHBSeERGSmVsQVJDN1ZAKZAwZDZD";
 
 const conversations = {};
 
@@ -99,11 +99,9 @@ app.post('/webhook', async (req, res) => {
     );
 
     const groqData = await groqRes.json();
-    console.log('Groq response:', JSON.stringify(groqData));
-
     const reply = groqData.choices?.[0]?.message?.content;
     if (!reply) {
-      console.log('Groq reply nahi aaya');
+      console.log('Groq reply nahi aaya:', JSON.stringify(groqData));
       return;
     }
 
