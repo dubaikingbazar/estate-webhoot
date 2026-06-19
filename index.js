@@ -113,7 +113,7 @@ app.post('/webhook', async (req, res) => {
     console.log(`Bot reply: ${reply}`);
 
     const igRes = await fetch(
-      `https://graph.facebook.com/v19.0/17841410501080634/messages?access_token=${PAGE_ACCESS_TOKEN}`,
+      `https://graph.facebook.com/v21.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
