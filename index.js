@@ -3,7 +3,7 @@ const app = express();
 app.use(express.json());
 
 const VERIFY_TOKEN = "realestate123";
-const GEMINI_API_KEY = "YAHAN_TERI_GEMINI_KEY_DAL";
+const GEMINI_API_KEY = "AQ.Ab8RN6KuBd22PKUbc-wmCaELfHq99FpTe2GnFdiOnuzAxQ5wPQ";
 const PAGE_ACCESS_TOKEN = "IGAAakkZBcSHpZABZAGE3LTdsSkVIMGJZAdWI3U3R4MzVITjIwY0ZAFaWJtTWd3WFZAMQ1p5UG5EYWFaZAGNCRXRWX0c5S0xQaUIyNkR2bVhGYnB5dEV2UF9mZA3NDRzIxRXV6ckVxR08tX0pHWktpLWpXbW50dW5CQ29NeEx5ajNTZATlZAWQZDZD";
 
 const conversations = {};
@@ -96,7 +96,10 @@ app.post('/webhook', async (req, res) => {
 
     const geminiData = await geminiRes.json();
     const reply = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!reply) return;
+    if (!reply) {
+      console.log('Gemini reply nahi aaya:', JSON.stringify(geminiData));
+      return;
+    }
 
     conversations[senderId].push({
       role: "model",
@@ -105,7 +108,7 @@ app.post('/webhook', async (req, res) => {
 
     console.log(`Bot reply: ${reply}`);
 
-    await fetch(
+    const igRes = await fetch(
       `https://graph.facebook.com/v19.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`,
       {
         method: 'POST',
@@ -117,7 +120,8 @@ app.post('/webhook', async (req, res) => {
       }
     );
 
-    console.log('Reply bhej diya!');
+    const igData = await igRes.json();
+    console.log('Instagram reply result:', JSON.stringify(igData));
 
   } catch (err) {
     console.error('Error:', err);
