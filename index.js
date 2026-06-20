@@ -211,6 +211,16 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   }
 });
 
+// ===== ADMIN PANEL =====
+app.get('/admin', (req, res) => {
+  res.sendFile(__dirname + '/admin.html');
+});
+
+// ===== LANDING PAGE =====
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/landing.html');
+});
+
 // ===== BROKER PAGE =====
 app.get('/:brokerId', async (req, res) => {
   const { brokerId } = req.params;
@@ -223,16 +233,6 @@ app.get('/:brokerId', async (req, res) => {
 
   if (!broker) return res.status(404).send('<h1 style="font-family:Arial;text-align:center;margin-top:100px;">Page not found</h1>');
   res.send(getBrokerHTML(broker, brokerId));
-});
-
-// ===== ADMIN PANEL =====
-app.get('/admin', (req, res) => {
-  res.sendFile(__dirname + '/admin.html');
-});
-
-// ===== LANDING PAGE =====
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/landing.html');
 });
 
 // ===== HTML TEMPLATE =====
