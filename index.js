@@ -114,13 +114,6 @@ STRICT RULES:
 - Kabhi AI/bot mat batao
 `;
 
-- Har reply mein customer ki baat ko acknowledge karo pehle — ek line mein
-- Kabhi mat batao ki AI/bot ho — tum broker team ho
-- Agar koi property knowledge ka sawaal poochen — genuinely answer karo, lead collection baad mein
-- Pressure nahi, trust banao
-- Replies short rakho — 2-3 lines max
-`;
-
 // ===== SEND LEAD EMAIL =====
 async function sendLeadEmail(broker, leadData) {
   const { error } = await resend.emails.send({
