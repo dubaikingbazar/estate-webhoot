@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EstateBot — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#080808;--black2:#0f0f0f;--black3:#161616;--black4:#1e1e1e;
+  --gold:#c8a96e;--gold2:#e2c98a;--gold3:rgba(200,169,110,0.1);
+  --white:#f0ede8;--muted:#6b6b6b;--border:rgba(200,169,110,0.14);
+  --green:#4ade80;--red:#f87171;--blue:#60a5fa;--orange:#fb923c;
+}
+body{font-family:'Inter',sans-serif;background:var(--black);color:var(--white);min-height:100vh;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:var(--gold);}
+
+/* LOGIN */
+.login-wrap{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at top,rgba(200,169,110,0.06) 0%,transparent 60%);
+}
+.login-box{
+  background:var(--black3);border:1px solid var(--border);
+  border-radius:16px;padding:48px 40px;width:100%;max-width:380px;
+  text-align:center;
+}
+.login-logo{font-family:'Playfair Display',serif;font-size:28px;font-weight:800;margin-bottom:6px;}
+.login-logo span{color:var(--gold);}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:36px;}
+.login-input{
+  width:100%;background:var(--black2);border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;padding:14px 16px;font-family:'Inter',sans-serif;
+  font-size:14px;color:var(--white);outline:none;text-align:center;
+  letter-spacing:3px;margin-bottom:16px;transition:border-color 0.2s;
+}
+.login-input:focus{border-color:var(--gold);}
+.login-input::placeholder{letter-spacing:0;color:#333;}
+.login-btn{
+  width:100%;background:var(--gold);color:var(--black);
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:700;
+  padding:14px;border:none;border-radius:8px;cursor:pointer;
+  transition:background 0.2s;
+}
+.login-btn:hover{background:var(--gold2);}
+.login-err{font-size:12px;color:var(--red);margin-top:12px;display:none;}
+
+/* DASHBOARD */
+.dashboard{display:none;}
+
+/* SIDEBAR */
+.layout{display:flex;min-height:100vh;}
+.sidebar{
+  width:220px;background:var(--black2);border-right:1px solid var(--border);
+  padding:24px 0;position:fixed;top:0;left:0;height:100vh;
+  display:flex;flex-direction:column;
+}
+.sb-logo{
+  font-family:'Playfair Display',serif;font-size:20px;font-weight:800;
+  padding:0 24px 24px;border-bottom:1px solid var(--border);
+}
+.sb-logo span{color:var(--gold);}
+.sb-nav{padding:16px 0;flex:1;}
+.sb-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 24px;font-size:13px;font-weight:500;color:var(--muted);
+  cursor:pointer;transition:all 0.2s;border-left:2px solid transparent;
+}
+.sb-item:hover{color:var(--white);background:rgba(255,255,255,0.03);}
+.sb-item.active{color:var(--gold);border-left-color:var(--gold);background:var(--gold3);}
+.sb-item svg{width:16px;height:16px;flex-shrink:0;}
+.sb-bottom{padding:16px 24px;border-top:1px solid var(--border);}
+.sb-logout{
+  font-size:12px;color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;gap:8px;transition:color 0.2s;
+}
+.sb-logout:hover{color:var(--red);}
+
+/* MAIN */
+.main{margin-left:220px;padding:32px;flex:1;}
+.page{display:none;}
+.page.active{display:block;}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;}
+.topbar h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;letter-spacing:-0.5px;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.refresh-btn{
+  background:var(--black3);border:1px solid var(--border);
+  color:var(--muted);font-size:12px;font-weight:500;
+  padding:8px 16px;border-radius:6px;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:all 0.2s;
+  display:flex;align-items:center;gap:6px;
+}
+.refresh-btn:hover{color:var(--white);border-color:var(--gold);}
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:28px;}
+.stat-card{
+  background:var(--black3);border:1px solid rgba(255,255,255,0.06);
+  border-radius:12px;padding:20px;
+}
+.stat-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.stat-val{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:6px;font-weight:300;}
+
+/* TABLE */
+.table-wrap{background:var(--black3);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-bottom:24px;}
+.table-head{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;}
+.table-title{font-size:14px;font-weight:600;}
+.table-count{font-size:12px;color:var(--muted);background:var(--black4);padding:3px 10px;border-radius:20px;}
+table{width:100%;border-collapse:collapse;}
+th{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:12px 20px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.04);}
+td{padding:14px 20px;font-size:13px;font-weight:300;border-bottom:1px solid rgba(255,255,255,0.03);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,0.01);}
+
+/* BADGES */
+.badge{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:3px;}
+.badge-trial{background:rgba(251,146,60,0.1);color:var(--orange);border:1px solid rgba(251,146,60,0.2);}
+.badge-active{background:rgba(74,222,128,0.1);color:var(--green);border:1px solid rgba(74,222,128,0.2);}
+.badge-inactive{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.2);}
+
+/* ACTION BTNS */
+.act-btn{
+  font-size:11px;font-weight:600;padding:5px 12px;border-radius:4px;
+  border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;
+}
+.act-activate{background:rgba(74,222,128,0.1);color:var(--green);border:1px solid rgba(74,222,128,0.2);}
+.act-activate:hover{background:rgba(74,222,128,0.2);}
+.act-deactivate{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.2);}
+.act-deactivate:hover{background:rgba(248,113,113,0.2);}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:48px;color:var(--muted);}
+.empty svg{width:40px;height:40px;margin:0 auto 12px;opacity:0.3;}
+.empty p{font-size:13px;}
+
+/* LOADING */
+.loading{text-align:center;padding:32px;color:var(--muted);font-size:13px;}
+
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{width:100%;height:auto;position:relative;flex-direction:row;padding:12px 0;}
+  .sb-logo{padding:0 16px;border-bottom:none;border-right:1px solid var(--border);font-size:16px;}
+  .sb-nav{display:flex;flex-direction:row;padding:0;overflow-x:auto;}
+  .sb-item{padding:8px 14px;border-left:none;border-bottom:2px solid transparent;white-space:nowrap;}
+  .sb-item.active{border-left:none;border-bottom-color:var(--gold);}
+  .sb-bottom{display:none;}
+  .layout{flex-direction:column;}
+  .main{margin-left:0;padding:16px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  table{font-size:12px;}
+  th,td{padding:10px 12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">Estate<span>Bot</span></div>
+    <div class="login-sub">Admin Panel — Authorized Access Only</div>
+    <input type="password" class="login-input" id="passInput" placeholder="Enter password" onkeypress="if(event.key==='Enter')checkPass()"/>
+    <button class="login-btn" onclick="checkPass()">Access Dashboard</button>
+    <div class="login-err" id="loginErr">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-logo">Estate<span>Bot</span></div>
+      <div class="sb-nav">
+        <div class="sb-item active" onclick="showPage('overview')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Overview
+        </div>
+        <div class="sb-item" onclick="showPage('brokers')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Brokers
+        </div>
+        <div class="sb-item" onclick="showPage('leads')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Leads
+        </div>
+        <div class="sb-item" onclick="showPage('revenue')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          Revenue
+        </div>
+      </div>
+      <div class="sb-bottom">
+        <div class="sb-logout" onclick="logout()">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+      <!-- OVERVIEW -->
+      <div class="page active" id="page-overview">
+        <div class="topbar">
+          <h1>Overview</h1>
+          <div class="topbar-right">
+            <button class="refresh-btn" onclick="loadAll()">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-grid" id="overviewStats">
+          <div class="stat-card"><div class="stat-label">Total Brokers</div><div class="stat-val" id="totalBrokers">—</div><div class="stat-sub">Registered</div></div>
+          <div class="stat-card"><div class="stat-label">Active</div><div class="stat-val" id="activeBrokers" style="color:var(--green)">—</div><div class="stat-sub">Paid subscribers</div></div>
+          <div class="stat-card"><div class="stat-label">Trial</div><div class="stat-val" id="trialBrokers" style="color:var(--orange)">—</div><div class="stat-sub">Free trial</div></div>
+          <div class="stat-card"><div class="stat-label">Total Leads</div><div class="stat-val" id="totalLeads" style="color:var(--gold)">—</div><div class="stat-sub">All time</div></div>
+        </div>
+
+        <!-- Recent Brokers -->
+        <div class="table-wrap">
+          <div class="table-head">
+            <div class="table-title">Recent Brokers</div>
+          </div>
+          <div id="recentBrokersTable"><div class="loading">Loading...</div></div>
+        </div>
+
+        <!-- Recent Leads -->
+        <div class="table-wrap">
+          <div class="table-head">
+            <div class="table-title">Recent Leads</div>
+          </div>
+          <div id="recentLeadsTable"><div class="loading">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- BROKERS -->
+      <div class="page" id="page-brokers">
+        <div class="topbar">
+          <h1>Brokers</h1>
+          <div class="topbar-right">
+            <button class="refresh-btn" onclick="loadBrokers()">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head">
+            <div class="table-title">All Brokers</div>
+            <div class="table-count" id="brokerCount">0</div>
+          </div>
+          <div id="brokersTable"><div class="loading">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- LEADS -->
+      <div class="page" id="page-leads">
+        <div class="topbar">
+          <h1>Leads</h1>
+          <div class="topbar-right">
+            <button class="refresh-btn" onclick="loadLeads()">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head">
+            <div class="table-title">All Leads</div>
+            <div class="table-count" id="leadCount">0</div>
+          </div>
+          <div id="leadsTable"><div class="loading">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- REVENUE -->
+      <div class="page" id="page-revenue">
+        <div class="topbar"><h1>Revenue</h1></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Monthly Cost</div><div class="stat-val" style="color:var(--red)">₹700</div><div class="stat-sub">Render hosting</div></div>
+          <div class="stat-card"><div class="stat-label">Per Broker</div><div class="stat-val" style="color:var(--gold)">₹2,999</div><div class="stat-sub">Monthly plan</div></div>
+          <div class="stat-card"><div class="stat-label">MRR</div><div class="stat-val" style="color:var(--green)" id="mrrVal">₹0</div><div class="stat-sub">Active brokers × ₹2,999</div></div>
+          <div class="stat-card"><div class="stat-label">Net Profit</div><div class="stat-val" style="color:var(--green)" id="profitVal">₹0</div><div class="stat-sub">MRR minus cost</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head"><div class="table-title">Revenue Breakdown</div></div>
+          <table>
+            <thead><tr><th>Plan</th><th>Price</th><th>Brokers</th><th>Revenue</th></tr></thead>
+            <tbody id="revenueTable"><tr><td colspan="4" class="loading">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_PASS = 'Dipanshu123';
+const SUPABASE_URL = 'https://rpswzqgzcautmfjpgohh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc3d6cWd6Y2F1dG1manBnb2hoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTkyMjYzMCwiZXhwIjoyMDk3NDk4NjMwfQ.v48pCXRn0DTb2dUJv8bhBgoB-vxINiWR-wqlDc7vAFQ';
+
+// ── AUTH ──
+function checkPass() {
+  const val = document.getElementById('passInput').value;
+  if (val === ADMIN_PASS) {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadAll();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('passInput').value = '';
+  }
+}
+
+function logout() {
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('passInput').value = '';
+}
+
+// ── NAV ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'brokers') loadBrokers();
+  if (name === 'leads') loadLeads();
+  if (name === 'revenue') loadRevenue();
+}
+
+// ── API ──
+async function sbFetch(table, query = '') {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  return res.json();
+}
+
+async function sbPatch(table, id, data) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?broker_id=eq.${id}`, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(data)
+  });
+  return res.ok;
+}
+
+// ── LOAD ALL ──
+async function loadAll() {
+  const [brokers, leads] = await Promise.all([
+    sbFetch('brokers', 'select=*&order=created_at.desc'),
+    sbFetch('leads', 'select=*&order=created_at.desc')
+  ]);
+
+  // Stats
+  const active = brokers.filter(b => b.status === 'active').length;
+  const trial = brokers.filter(b => b.status === 'trial').length;
+  document.getElementById('totalBrokers').textContent = brokers.length;
+  document.getElementById('activeBrokers').textContent = active;
+  document.getElementById('trialBrokers').textContent = trial;
+  document.getElementById('totalLeads').textContent = leads.length;
+
+  // Recent brokers
+  const rb = brokers.slice(0, 5);
+  document.getElementById('recentBrokersTable').innerHTML = rb.length ? `
+    <table>
+      <thead><tr><th>Business</th><th>City</th><th>Email</th><th>Status</th></tr></thead>
+      <tbody>${rb.map(b => `
+        <tr>
+          <td style="font-weight:500">${b.name}</td>
+          <td style="color:var(--muted)">${b.city || '—'}</td>
+          <td style="color:var(--muted)">${b.email}</td>
+          <td><span class="badge badge-${b.status}">${b.status}</span></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<div class="empty"><p>Koi broker nahi abhi</p></div>';
+
+  // Recent leads
+  const rl = leads.slice(0, 5);
+  document.getElementById('recentLeadsTable').innerHTML = rl.length ? `
+    <table>
+      <thead><tr><th>Naam</th><th>Phone</th><th>Property</th><th>Budget</th><th>Broker</th></tr></thead>
+      <tbody>${rl.map(l => `
+        <tr>
+          <td style="font-weight:500">${l.name}</td>
+          <td style="color:var(--gold)">${l.phone}</td>
+          <td style="color:var(--muted)">${l.property_type || '—'}</td>
+          <td style="color:var(--muted)">${l.budget || '—'}</td>
+          <td style="color:var(--muted)">${l.broker_id}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<div class="empty"><p>Koi lead nahi abhi</p></div>';
+}
+
+// ── LOAD BROKERS ──
+async function loadBrokers() {
+  const brokers = await sbFetch('brokers', 'select=*&order=created_at.desc');
+  document.getElementById('brokerCount').textContent = brokers.length;
+  document.getElementById('brokersTable').innerHTML = brokers.length ? `
+    <table>
+      <thead><tr><th>Business</th><th>City</th><th>Specialty</th><th>Email</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>${brokers.map(b => `
+        <tr>
+          <td>
+            <div style="font-weight:500">${b.name}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">${b.broker_id}</div>
+          </td>
+          <td style="color:var(--muted)">${b.city || '—'}</td>
+          <td style="color:var(--muted)">${b.specialty || '—'}</td>
+          <td style="color:var(--muted)">${b.email}</td>
+          <td style="color:var(--gold)">${b.phone || '—'}</td>
+          <td><span class="badge badge-${b.status}">${b.status}</span></td>
+          <td>
+            ${b.status !== 'active' ? `<button class="act-btn act-activate" onclick="updateStatus('${b.broker_id}','active')">Activate</button>` : ''}
+            ${b.status !== 'inactive' ? `<button class="act-btn act-deactivate" onclick="updateStatus('${b.broker_id}','inactive')" style="margin-left:4px">Deactivate</button>` : ''}
+            ${b.status !== 'trial' ? `<button class="act-btn" onclick="updateStatus('${b.broker_id}','trial')" style="margin-left:4px;background:rgba(251,146,60,0.1);color:var(--orange);border:1px solid rgba(251,146,60,0.2)">Trial</button>` : ''}
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<div class="empty"><p>Koi broker nahi abhi</p></div>';
+}
+
+// ── UPDATE STATUS ──
+async function updateStatus(brokerId, status) {
+  const ok = await sbPatch('brokers', brokerId, { status });
+  if (ok) { loadBrokers(); loadAll(); }
+}
+
+// ── LOAD LEADS ──
+async function loadLeads() {
+  const leads = await sbFetch('leads', 'select=*&order=created_at.desc');
+  document.getElementById('leadCount').textContent = leads.length;
+  document.getElementById('leadsTable').innerHTML = leads.length ? `
+    <table>
+      <thead><tr><th>Naam</th><th>Phone</th><th>Property</th><th>Area</th><th>Budget</th><th>Intent</th><th>Broker</th><th>Date</th></tr></thead>
+      <tbody>${leads.map(l => `
+        <tr>
+          <td style="font-weight:500">${l.name}</td>
+          <td style="color:var(--gold)">${l.phone}</td>
+          <td style="color:var(--muted)">${l.property_type || '—'}</td>
+          <td style="color:var(--muted)">${l.area || '—'}</td>
+          <td style="color:var(--muted)">${l.budget || '—'}</td>
+          <td style="color:var(--muted)">${l.intent || '—'}</td>
+          <td style="color:var(--muted)">${l.broker_id}</td>
+          <td style="color:var(--muted);font-size:11px">${l.created_at ? new Date(l.created_at).toLocaleDateString('en-IN') : '—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<div class="empty"><p>Koi lead nahi abhi</p></div>';
+}
+
+// ── REVENUE ──
+async function loadRevenue() {
+  const brokers = await sbFetch('brokers', 'select=*');
+  const active = brokers.filter(b => b.status === 'active').length;
+  const trial = brokers.filter(b => b.status === 'trial').length;
+  const inactive = brokers.filter(b => b.status === 'inactive').length;
+  const mrr = active * 2999;
+  const profit = mrr - 700;
+
+  document.getElementById('mrrVal').textContent = '₹' + mrr.toLocaleString('en-IN');
+  document.getElementById('profitVal').textContent = '₹' + profit.toLocaleString('en-IN');
+
+  document.getElementById('revenueTable').innerHTML = `
+    <tr><td style="font-weight:500">Active Plan</td><td style="color:var(--gold)">₹2,999/mo</td><td>${active}</td><td style="color:var(--green)">₹${(active*2999).toLocaleString('en-IN')}</td></tr>
+    <tr><td style="font-weight:500">Trial</td><td style="color:var(--orange)">₹0</td><td>${trial}</td><td style="color:var(--muted)">₹0</td></tr>
+    <tr><td style="font-weight:500">Inactive</td><td style="color:var(--muted)">₹0</td><td>${inactive}</td><td style="color:var(--muted)">₹0</td></tr>
+    <tr style="border-top:1px solid var(--border)"><td style="font-weight:600">Total MRR</td><td>—</td><td>${active}</td><td style="color:var(--green);font-weight:600">₹${mrr.toLocaleString('en-IN')}</td></tr>
+  `;
+}
+</script>
+</body>
+</html>
