@@ -257,7 +257,7 @@ async function sendWelcomeEmail(broker) {
 
 // ===== BROKER SIGNUP API =====
 app.post('/api/signup', async (req, res) => {
-  const { name, business, city, specialty, email, phone } = req.body;
+  const { name, business, city, state, specialty, email, phone, experience, properties } = req.body;
   if (!name || !business || !city || !email || !phone) {
     return res.status(400).json({ error: 'Saari details bharo' });
   }
@@ -283,9 +283,13 @@ app.post('/api/signup', async (req, res) => {
     name: business,
     email,
     phone,
-    city,
+    city: city + (state ? ', ' + state : ''),
     specialty: specialty || 'Residential',
-    status: 'trial'
+    status: 'trial',
+    stats: {
+      experience: experience ? experience + ' Yrs' : '5 Yrs',
+      properties: properties || '100+'
+    }
   }]);
 
   if (error) {
