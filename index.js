@@ -16,28 +16,76 @@ const conversations = {};
 
 // ===== AI PROMPT =====
 const getSystemPrompt = (brokerName) => `
-Tum ek friendly AI assistant ho "${brokerName}" real estate ke liye.
-Hinglish mein baat karo (Hindi + English mix). Warm aur professional raho.
-EK BAAR MEIN SIRF EK SAWAAL PUCHHO.
+Tum "${brokerName}" ke senior real estate consultant ho — 15+ saal ka experience hai tumhare paas. Tumhara naam "Rahul Sir" hai. Tum ek trusted advisor ho, na sirf ek agent.
 
-Ye info collect karo step by step:
-1. Intent: "Namaste! 😊 ${brokerName} mein aapka swagat hai. Aap kya dhundh rahe hain — kharidna, rent lena, ya property sell/rent-out karni hai?"
-2. Naam puchho
-3. Property type: flat/plot/villa/office
-4. Area/location
-5. Budget
-6. Timeline
-7. Phone: "Aapka phone number dijiye — hamare team member seedha aapse baat karenge 📞"
+PERSONALITY:
+- Experienced aur trustworthy — log tumpe bharosa karte hain
+- Thoda serious lekin warm — jaise ek bada bhai ya mentor
+- Market ki gehri samajh hai tumhe
+- Customer ki tension samajhte ho aur genuinely help karna chahte ho
+- Kabhi pressure nahi dete — sahi decision lene mein madad karte ho
 
-Jab naam, phone, property type, area, budget sab mil jaye — thank you message ke BILKUL BAAD ye EXACTLY likho:
-|||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE","area":"AREA","budget":"BUDGET","intent":"INTENT"}|||
+LANGUAGE:
+- Hinglish (Hindi + English mix) — natural aur fluent
+- "ji" use karo respect ke liye
+- Short paragraphs — 2-3 lines max per message
+- Kabhi robot jaisa mat lagao
 
-RULES:
-- Ek sawaal ek baar
+REAL ESTATE KNOWLEDGE (use karo naturally):
+- Property types: flat, villa, plot, penthouse, builder floor, studio apartment
+- Legal: registry, stamp duty (5-7%), NOC, RERA registered properties zaroori hain
+- Financial: home loan (SBI, HDFC best hain), EMI calculation, down payment (20%)
+- Market insights: ready to move vs under construction, location appreciation
+- Red flags: builder reputation check karo, title deed verify karo, encumbrance certificate
+- Negotiation: market rate se 10-15% neeche offer karo pehle
+- Investment: rental yield 2-3%, capital appreciation high growth areas mein
+
+EMOTIONAL INTELLIGENCE:
+- Agar customer anxious lage: "Bilkul sahi soch rahe hain aap, property ek badi decision hai — aaram se socho"
+- Agar budget kam ho: "Dekhiye, aapke budget mein bhi achhi options hain — main dhundhta hoon"
+- Agar confused ho: "Ek ek point clear karte hain, koi bhi sawaal chhota nahi hota"
+- Agar urgent ho: "Samajh sakta hoon urgency — jaldi best option nikaalte hain"
+- Agar market doubt ho: "15 saal mein maine dekha hai — sahi property ka value kabhi nahi girta"
+
+CONVINCING (natural, never pushy):
+- Social proof: "Hamare paas isi area mein pichhle mahine 3 families ne khareeda"
+- Urgency (real): "Ye price range mein inventory kam ho rahi hai"
+- Trust: "Main wahi suggest karunga jo mere apne family ke liye karta"
+- Value: "Ek achhi property 10 saal mein apni cost double kar leti hai"
+
+CONVERSATION FLOW — EK BAAR MEIN SIRF EK SAWAAL:
+
+Step 1 — Warm welcome:
+"Namaste ji! ${brokerName} mein aapka swagat hai. Main Rahul hoon, aapka property consultant. Aap kya dhundh rahe hain — kharidna, rent lena, ya apni property sell/rent karni hai?"
+
+Step 2 — Naam lo naturally:
+"Achha ji! [intent pe react karo briefly]. Aapse properly baat karein — aapka naam kya hai?"
+
+Step 3 — Property type:
+"[Naam] ji, kaunsi property mein interest hai — flat, villa, plot, ya kuch aur?"
+
+Step 4 — Location:
+"[Property type] ke liye kaunsa area prefer karenge? Koi specific location hai mann mein?"
+
+Step 5 — Budget (sensitively):
+"Budget range roughly kitni hai? Ye isliye pooch raha hoon taaki aapke liye sahi options filter kar sakoon — koi bhi range ho, options zaroor honge."
+
+Step 6 — Timeline:
+"Kitne time mein lena chahenge? Jaldi hai ya thoda time hai sochne ke liye?"
+
+Step 7 — Phone (warmly):
+"[Naam] ji, ek kaam karein — apna phone number dijiye. Hamare senior property advisor directly call karenge aur aapki requirements ke hisaab se best options dikhayenge. Bilkul free consultation hai."
+
+Jab naam, phone, property type, area, budget sab mil jaye — genuinely thank karo phir BILKUL BAAD ye EXACTLY likho:
+|||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE","area":"AREA","budget":"BUDGET","intent":"INTENT","timeline":"TIMELINE"}|||
+
+STRICT RULES:
+- Ek sawaal ek baar — kabhi 2 sawaal ek saath nahi
 - Jo already bataya wo dobara mat puchho
-- Short friendly replies
-- Kabhi mat batao ki AI/bot ho
-- Hinglish only
+- Har reply mein customer ki baat ko acknowledge karo pehle
+- Kabhi mat batao ki AI/bot ho — tum Rahul ho, ek real consultant
+- Agar koi property knowledge ka sawaal poochen — genuinely answer karo, lead collection baad mein
+- Pressure nahi, trust banao
 `;
 
 // ===== SEND LEAD EMAIL =====
@@ -47,25 +95,70 @@ async function sendLeadEmail(broker, leadData) {
     to: broker.email,
     subject: `Naya Lead — ${leadData.name} | ${broker.name}`,
     html: `
-<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#f8fafc;padding:20px;border-radius:16px;">
-  <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);padding:24px;border-radius:12px;text-align:center;margin-bottom:20px;">
-    <h2 style="color:#fff;margin:0;font-size:24px;">EstateBot</h2>
-    <p style="color:rgba(255,255,255,0.8);margin:6px 0 0;font-size:14px;">Naya Lead Aaya!</p>
+<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;background:#f8fafc;padding:20px;border-radius:16px;">
+  
+  <!-- HEADER -->
+  <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);padding:28px 24px;border-radius:12px;text-align:center;margin-bottom:20px;">
+    <div style="font-size:13px;color:rgba(255,255,255,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">New Lead Alert</div>
+    <h2 style="color:#fff;margin:0;font-size:26px;font-weight:700;">${leadData.name}</h2>
+    <div style="margin-top:10px;">
+      <a href="tel:${leadData.phone}" style="background:#f59e0b;color:#000;padding:10px 28px;border-radius:6px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block;">📞 ${leadData.phone}</a>
+    </div>
   </div>
-  <div style="background:#fff;padding:20px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:16px;">
+
+  <!-- INTENT BADGE -->
+  <div style="text-align:center;margin-bottom:16px;">
+    <span style="background:#dbeafe;color:#1e40af;font-size:12px;font-weight:700;padding:6px 18px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;">
+      ${leadData.intent || 'Property Enquiry'}
+    </span>
+  </div>
+
+  <!-- MAIN DETAILS -->
+  <div style="background:#fff;padding:20px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">Property Requirements</div>
+    
     <table style="width:100%;border-collapse:collapse;">
-      <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0;color:#64748b;font-size:13px;width:40%;">Naam</td><td style="padding:10px 0;font-weight:600;color:#1e293b;">${leadData.name}</td></tr>
-      <tr style="border-bottom:1px solid #f1f5f9;background:#f8fafc;"><td style="padding:10px;color:#64748b;font-size:13px;">Phone</td><td style="padding:10px;font-weight:600;color:#1e293b;font-size:16px;">${leadData.phone}</td></tr>
-      <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0;color:#64748b;font-size:13px;">Property</td><td style="padding:10px 0;font-weight:600;color:#1e293b;">${leadData.type}</td></tr>
-      <tr style="border-bottom:1px solid #f1f5f9;background:#f8fafc;"><td style="padding:10px;color:#64748b;font-size:13px;">Area</td><td style="padding:10px;font-weight:600;color:#1e293b;">${leadData.area}</td></tr>
-      <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0;color:#64748b;font-size:13px;">Budget</td><td style="padding:10px 0;font-weight:600;color:#1e293b;">${leadData.budget}</td></tr>
-      <tr style="background:#f8fafc;"><td style="padding:10px;color:#64748b;font-size:13px;">Intent</td><td style="padding:10px;font-weight:600;color:#1e293b;">${leadData.intent}</td></tr>
+      <tr style="border-bottom:1px solid #f1f5f9;">
+        <td style="padding:12px 0;color:#64748b;font-size:13px;width:45%;">🏡 Property Type</td>
+        <td style="padding:12px 0;font-weight:700;color:#1e293b;font-size:14px;">${leadData.type || '—'}</td>
+      </tr>
+      <tr style="border-bottom:1px solid #f1f5f9;background:#f8fafc;">
+        <td style="padding:12px 8px;color:#64748b;font-size:13px;">📍 Preferred Area</td>
+        <td style="padding:12px 8px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.area || '—'}</td>
+      </tr>
+      <tr style="border-bottom:1px solid #f1f5f9;">
+        <td style="padding:12px 0;color:#64748b;font-size:13px;">💰 Budget</td>
+        <td style="padding:12px 0;font-weight:700;color:#16a34a;font-size:16px;">${leadData.budget || '—'}</td>
+      </tr>
+      <tr style="background:#f8fafc;">
+        <td style="padding:12px 8px;color:#64748b;font-size:13px;">⏰ Timeline</td>
+        <td style="padding:12px 8px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.timeline || 'Not specified'}</td>
+      </tr>
     </table>
   </div>
-  <div style="text-align:center;margin-bottom:16px;">
-    <a href="tel:${leadData.phone}" style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;display:inline-block;">Abhi Call Karein</a>
+
+  <!-- CONTACT -->
+  <div style="background:#fff;padding:20px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">Contact Details</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <tr style="border-bottom:1px solid #f1f5f9;">
+        <td style="padding:12px 0;color:#64748b;font-size:13px;">👤 Name</td>
+        <td style="padding:12px 0;font-weight:700;color:#1e293b;">${leadData.name}</td>
+      </tr>
+      <tr>
+        <td style="padding:12px 0;color:#64748b;font-size:13px;">📱 Phone</td>
+        <td style="padding:12px 0;font-weight:700;color:#1e293b;font-size:18px;">${leadData.phone}</td>
+      </tr>
+    </table>
   </div>
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin:0;">Powered by EstateBot</p>
+
+  <!-- CTA -->
+  <div style="text-align:center;padding:8px 0 16px;">
+    <a href="tel:${leadData.phone}" style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#fff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;">Call Now — ${leadData.phone}</a>
+  </div>
+
+  <!-- FOOTER -->
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin:0;">Lead from ${broker.name} • Powered by EstateBot • estatebotai.in</p>
 </div>`
   });
   if (error) console.error('Email error:', error);
