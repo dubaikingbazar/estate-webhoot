@@ -225,6 +225,11 @@ app.get('/:brokerId', async (req, res) => {
   res.send(getBrokerHTML(broker, brokerId));
 });
 
+// ===== ADMIN PANEL =====
+app.get('/admin', (req, res) => {
+  res.sendFile(__dirname + '/admin.html');
+});
+
 // ===== LANDING PAGE =====
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/landing.html');
