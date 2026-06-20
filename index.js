@@ -57,30 +57,34 @@ CONVINCING (natural, never pushy):
 CONVERSATION FLOW — EK BAAR MEIN SIRF EK SAWAAL:
 
 Step 1 — Warm welcome:
-"Namaste ji! ${brokerName} mein aapka swagat hai. Main aapka property consultant hoon — aap kya dhundh rahe hain? Kharidna, rent lena, ya apni property sell/rent karni hai?"
+"Namaste ji! ${brokerName} mein aapka swagat hai. Aap kya dhundh rahe hain — property kharidni hai, rent pe leni hai, ya apni property sell/rent pe deni hai?"
 
 Step 2 — Naam lo naturally (DOBARA SWAGAT MAT KARO):
-"Achha ji, [intent pe ek line react karo — jaise 'Bilkul, rent pe dena ek achha decision hai']. Aapse properly baat karein — aapka naam kya hai?"
+"[intent pe ek line react karo warmly]. Aapse properly baat karein — aapka naam kya hai?"
 
-Step 3 — Property type:
-"[Naam] ji, kaunsi property mein interest hai — flat, villa, plot, ya kuch aur?"
+Step 3 — Property type + details:
+Pehle puchho: "[Naam] ji, kaunsi property chahiye — flat, villa, plot, ya office space?"
+Agar flat/villa bole toh next message mein puchho: "Kitne BHK chahiye? Aur furnished chahiye ya unfurnished?"
 
 Step 4 — Location:
-"[Property type] ke liye kaunsa area prefer karenge? Koi specific location hai mann mein?"
+"Kaunsa area ya locality prefer karenge? Koi specific jagah hai mann mein?"
 
-Step 5 — Budget (sensitively):
-"Budget range roughly kitni hai? Ye isliye pooch raha hoon taaki aapke liye sahi options filter kar sakoon — koi bhi range ho, options zaroor honge."
+Step 5 — Budget:
+"Budget range roughly kitni hai? Ye isliye pooch raha hoon taaki sahi options filter kar sakoon."
 
 Step 6 — Timeline:
-"Kitne time mein lena chahenge? Jaldi hai ya thoda time hai sochne ke liye?"
+"Kitne time mein lena/dena chahenge — jaldi hai ya thoda time hai?"
 
-Step 7 — Phone (warmly) — YE STEP SKIP MAT KARO KABHI:
-"[Naam] ji, ek kaam karein — apna phone number dijiye. Hamare senior property advisor directly call karenge aur aapki requirements ke hisaab se best options dikhayenge. Bilkul free consultation hai."
+Step 7 — Phone (KABHI SKIP MAT KARO):
+"[Naam] ji, ek kaam karein — apna WhatsApp number dijiye. Hamare advisor directly call karenge aur aapki requirements ke hisaab se best options dikhayenge. Bilkul free hai."
 
-IMPORTANT: Phone number liye BINA lead BILKUL complete mat karna — chahe customer kitna bhi bata de. Phone number aana ZAROORI hai.
+IMPORTANT: Phone number liye BINA lead BILKUL complete mat karna. Phone ZAROORI hai.
 
-Jab naam, phone, property type, area, budget sab mil jaye — genuinely thank karo phir BILKUL BAAD ye EXACTLY likho:
-|||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE","area":"AREA","budget":"BUDGET","intent":"INTENT","timeline":"TIMELINE"}|||
+Jab naam, phone, property type, area, budget sab mil jaye — pehle genuinely thank karo, phir BILKUL BAAD ye EXACTLY likho:
+|||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE_WITH_BHK","area":"AREA","budget":"BUDGET","intent":"RENT_LENA/RENT_DENA/KHARIDNA/SELL","timeline":"TIMELINE","furnished":"FURNISHED/UNFURNISHED/NA"}|||
+
+Thank you message:
+"Bahut shukriya [Naam] ji! Aapki saari details note ho gayi hain. Hamare senior advisor 24 ghante mein aapko call karenge. Tab tak koi sawaal ho toh zaroor poochein!"
 
 STRICT RULES:
 - Ek sawaal ek baar — kabhi 2 sawaal ek saath nahi
@@ -100,70 +104,126 @@ async function sendLeadEmail(broker, leadData) {
     to: broker.email,
     subject: `Naya Lead — ${leadData.name} | ${broker.name}`,
     html: `
-<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;background:#f8fafc;padding:20px;border-radius:16px;">
-  
-  <!-- HEADER -->
-  <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);padding:28px 24px;border-radius:12px;text-align:center;margin-bottom:20px;">
-    <div style="font-size:13px;color:rgba(255,255,255,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">New Lead Alert</div>
-    <h2 style="color:#fff;margin:0;font-size:26px;font-weight:700;">${leadData.name}</h2>
-    <div style="margin-top:10px;">
-      <a href="tel:${leadData.phone}" style="background:#f59e0b;color:#000;padding:10px 28px;border-radius:6px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block;">📞 ${leadData.phone}</a>
+<div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;background:#f0f4f8;padding:20px;border-radius:16px;">
+  <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:32px 24px;border-radius:14px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(245,158,11,0.08);"></div>
+    <div style="position:absolute;bottom:-40px;left:-20px;width:100px;height:100px;border-radius:50%;background:rgba(245,158,11,0.05);"></div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;">${broker.name} · New Lead</div>
+    <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);margin:0 auto 12px;display:inline-flex;align-items:center;justify-content:center;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     </div>
+    <h2 style="color:#fff;margin:0 0 6px;font-size:26px;font-weight:700;">${leadData.name}</h2>
+    <a href="tel:${leadData.phone}" style="background:#f59e0b;color:#000;padding:11px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:8px;margin-top:12px;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+      ${leadData.phone}
+    </a>
   </div>
-
-  <!-- INTENT BADGE -->
-  <div style="text-align:center;margin-bottom:16px;">
-    <span style="background:#dbeafe;color:#1e40af;font-size:12px;font-weight:700;padding:6px 18px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;">
+  <div style="text-align:center;margin-bottom:14px;">
+    <span style="background:#1e40af;color:#fff;font-size:11px;font-weight:700;padding:7px 20px;border-radius:20px;text-transform:uppercase;letter-spacing:2px;display:inline-flex;align-items:center;gap:6px;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       ${leadData.intent || 'Property Enquiry'}
     </span>
   </div>
-
-  <!-- MAIN DETAILS -->
-  <div style="background:#fff;padding:20px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;">
-    <div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">Property Requirements</div>
-    
+  <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;overflow:hidden;">
+    <div style="padding:14px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      <span style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:2px;text-transform:uppercase;">Property Requirements</span>
+    </div>
     <table style="width:100%;border-collapse:collapse;">
       <tr style="border-bottom:1px solid #f1f5f9;">
-        <td style="padding:12px 0;color:#64748b;font-size:13px;width:45%;">🏡 Property Type</td>
-        <td style="padding:12px 0;font-weight:700;color:#1e293b;font-size:14px;">${leadData.type || '—'}</td>
+        <td style="padding:14px 20px;width:44%;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:6px;background:#eff6ff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <span style="color:#64748b;font-size:12px;">Property Type</span>
+          </div>
+        </td>
+        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.type || '—'}</td>
       </tr>
-      <tr style="border-bottom:1px solid #f1f5f9;background:#f8fafc;">
-        <td style="padding:12px 8px;color:#64748b;font-size:13px;">📍 Preferred Area</td>
-        <td style="padding:12px 8px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.area || '—'}</td>
+      <tr style="border-bottom:1px solid #f1f5f9;background:#fafafa;">
+        <td style="padding:14px 20px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:6px;background:#f0fdf4;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            </div>
+            <span style="color:#64748b;font-size:12px;">Furnished</span>
+          </div>
+        </td>
+        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.furnished || 'Not specified'}</td>
       </tr>
       <tr style="border-bottom:1px solid #f1f5f9;">
-        <td style="padding:12px 0;color:#64748b;font-size:13px;">💰 Budget</td>
-        <td style="padding:12px 0;font-weight:700;color:#16a34a;font-size:16px;">${leadData.budget || '—'}</td>
+        <td style="padding:14px 20px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:6px;background:#fef3c7;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <span style="color:#64748b;font-size:12px;">Preferred Area</span>
+          </div>
+        </td>
+        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.area || '—'}</td>
       </tr>
-      <tr style="background:#f8fafc;">
-        <td style="padding:12px 8px;color:#64748b;font-size:13px;">⏰ Timeline</td>
-        <td style="padding:12px 8px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.timeline || 'Not specified'}</td>
-      </tr>
-    </table>
-  </div>
-
-  <!-- CONTACT -->
-  <div style="background:#fff;padding:20px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;">
-    <div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">Contact Details</div>
-    <table style="width:100%;border-collapse:collapse;">
-      <tr style="border-bottom:1px solid #f1f5f9;">
-        <td style="padding:12px 0;color:#64748b;font-size:13px;">👤 Name</td>
-        <td style="padding:12px 0;font-weight:700;color:#1e293b;">${leadData.name}</td>
+      <tr style="border-bottom:1px solid #f1f5f9;background:#fafafa;">
+        <td style="padding:14px 20px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:6px;background:#f0fdf4;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <span style="color:#64748b;font-size:12px;">Budget</span>
+          </div>
+        </td>
+        <td style="padding:14px 20px;font-weight:700;color:#16a34a;font-size:18px;">${leadData.budget || '—'}</td>
       </tr>
       <tr>
-        <td style="padding:12px 0;color:#64748b;font-size:13px;">📱 Phone</td>
-        <td style="padding:12px 0;font-weight:700;color:#1e293b;font-size:18px;">${leadData.phone}</td>
+        <td style="padding:14px 20px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:6px;background:#fdf4ff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <span style="color:#64748b;font-size:12px;">Timeline</span>
+          </div>
+        </td>
+        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.timeline || 'Not specified'}</td>
       </tr>
     </table>
   </div>
-
-  <!-- CTA -->
-  <div style="text-align:center;padding:8px 0 16px;">
-    <a href="tel:${leadData.phone}" style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#fff;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;">Call Now — ${leadData.phone}</a>
+  <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:16px;overflow:hidden;">
+    <div style="padding:14px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:2px;text-transform:uppercase;">Contact Details</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;">
+      <tr style="border-bottom:1px solid #f1f5f9;">
+        <td style="padding:14px 20px;width:44%;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:6px;background:#eff6ff;display:inline-flex;align-items:center;justify-content:center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <span style="color:#64748b;font-size:12px;">Name</span>
+          </div>
+        </td>
+        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:15px;">${leadData.name}</td>
+      </tr>
+      <tr>
+        <td style="padding:14px 20px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:6px;background:#f0fdf4;display:inline-flex;align-items:center;justify-content:center;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+            </div>
+            <span style="color:#64748b;font-size:12px;">Phone / WhatsApp</span>
+          </div>
+        </td>
+        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:20px;">${leadData.phone}</td>
+      </tr>
+    </table>
   </div>
-
-  <!-- FOOTER -->
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin:0;">Lead from ${broker.name} • Powered by EstateBot • estatebotai.in</p>
+  <a href="tel:${leadData.phone}" style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#fff;padding:16px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;display:block;text-align:center;">
+    <span style="display:inline-flex;align-items:center;gap:10px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+      Call Now — ${leadData.phone}
+    </span>
+  </a>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin:14px 0 0;">Lead from ${broker.name} · Powered by EstateBot · estatebotai.in</p>
 </div>`
   });
   if (error) console.error('Email error:', error);
@@ -323,7 +383,8 @@ app.post('/api/chat/:brokerId', async (req, res) => {
               area: leadData.area,
               budget: leadData.budget,
               intent: leadData.intent,
-              timeline: leadData.timeline || null
+              timeline: leadData.timeline || null,
+              furnished: leadData.furnished || null
             }]);
 
             await sendLeadEmail(broker, leadData);
