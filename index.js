@@ -147,6 +147,27 @@ app.post('/api/signup', async (req, res) => {
   res.json({ success: true, broker_id: finalId, url: `https://estate-webhoot.onrender.com/${finalId}` });
 });
 
+// ===== ADMIN API =====
+app.get('/api/admin/brokers', async (req, res) => {
+  const { data, error } = await supabase.from('brokers').select('*').order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error });
+  res.json(data);
+});
+
+app.get('/api/admin/leads', async (req, res) => {
+  const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error });
+  res.json(data);
+});
+
+app.patch('/api/admin/brokers/:brokerId', async (req, res) => {
+  const { brokerId } = req.params;
+  const { status } = req.body;
+  const { error } = await supabase.from('brokers').update({ status }).eq('broker_id', brokerId);
+  if (error) return res.status(500).json({ error });
+  res.json({ success: true });
+});
+
 // ===== CHAT API =====
 app.post('/api/chat/:brokerId', async (req, res) => {
   const { brokerId } = req.params;
