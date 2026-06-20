@@ -470,7 +470,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .spec-card{background:#fff;border:1px solid #f0ede8;border-radius:10px;padding:14px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;}
 .spec-name{font-size:10px;font-weight:600;color:#1e293b;}
 .spec-line{width:24px;height:2px;background:#c8a96e;border-radius:2px;}
-.chat-wrap{width:100%;max-width:480px;background:#F7F4ED;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+.chat-wrap{width:100%;max-width:100%;background:#F7F4ED;display:flex;flex-direction:column;position:relative;overflow:hidden;}
 .chat-wrap-inner{background:#F7F4ED;padding:20px 16px 16px;position:relative;z-index:1;background-image:radial-gradient(circle at 50% 100%,rgba(212,162,76,.07),transparent 60%);}
 .skyline-wm{position:absolute;bottom:0;left:0;right:0;height:130px;opacity:.15;pointer-events:none;z-index:0;}
 .agent-card{background:#fff;border-radius:14px;padding:11px 13px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 16px rgba(14,27,48,.08);border:1px solid #EDE7D8;margin-bottom:16px;position:relative;z-index:1;}
@@ -505,7 +505,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .chat-footer input{flex:1;background:#fff;border:1.5px solid #D4A24C;border-radius:100px;padding:11px 16px;font-family:'Manrope',sans-serif;font-size:11.7px;color:#2A2A2A;outline:none;}
 .chat-footer input:focus{border-color:#0E1B30;}
 .send-btn{width:44px;height:44px;background:#0E1B30;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.powered{width:100%;max-width:480px;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;color:#6B6354;font-weight:700;}
+.powered{width:100%;max-width:100%;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;color:#6B6354;font-weight:700;}
 .chat-body{background:transparent;padding:0;min-height:180px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:360px;}
 .date-label{align-self:center;background:#EDE7D8;color:#6B6354;font-size:10px;padding:5px 14px;border-radius:100px;font-weight:600;}
 </style>
