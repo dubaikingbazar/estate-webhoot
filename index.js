@@ -43,7 +43,7 @@ RULES:
 // ===== SEND LEAD EMAIL =====
 async function sendLeadEmail(broker, leadData) {
   const { error } = await resend.emails.send({
-    from: 'EstateBot <onboarding@resend.dev>',
+    from: 'EstateBot <leads@estatebotai.in>',
     to: broker.email,
     subject: `Naya Lead — ${leadData.name} | ${broker.name}`,
     html: `
@@ -75,9 +75,9 @@ async function sendLeadEmail(broker, leadData) {
 // ===== SEND WELCOME EMAIL TO BROKER =====
 async function sendWelcomeEmail(broker) {
   const { error } = await resend.emails.send({
-    from: 'EstateBot <onboarding@resend.dev>',
+    from: 'EstateBot <welcome@estatebotai.in>',
     to: broker.email,
-    subject: `EstateBot Setup Complete — Aapka Bot Live Hai!`,
+    subject: `EstateBot Setup Complete — ${broker.name} ka Bot Live Hai!`,
     html: `
 <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#f8fafc;padding:20px;border-radius:16px;">
   <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);padding:24px;border-radius:12px;text-align:center;margin-bottom:20px;">
