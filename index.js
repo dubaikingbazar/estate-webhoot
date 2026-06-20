@@ -550,32 +550,43 @@ function addMsg(text,role){
   body.appendChild(d);
   body.scrollTop=body.scrollHeight;
 }
+function showTyping(){
+  const body=document.getElementById('chatBody');
+  const d=document.createElement('div');
+  d.className='msg bot';d.id='typing';
+  d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  body.appendChild(d);
+  body.scrollTop=body.scrollHeight;
+}
+function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
+
 function typeMsg(text, role) {
   const body = document.getElementById('chatBody');
   const d = document.createElement('div');
   d.className = 'msg ' + role;
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
+  bubble.textContent = '';
   const ts = document.createElement('div');
   ts.className = 'ts';
   ts.textContent = getTime();
   d.appendChild(bubble);
   d.appendChild(ts);
   body.appendChild(d);
+  body.scrollTop = body.scrollHeight;
 
   let i = 0;
-  const words = text.split(' ');
+  const chars = text.split('');
   const interval = setInterval(() => {
-    if (i < words.length) {
-      bubble.textContent += (i === 0 ? '' : ' ') + words[i];
+    if (i < chars.length) {
+      bubble.textContent += chars[i];
       i++;
       body.scrollTop = body.scrollHeight;
     } else {
       clearInterval(interval);
     }
-  }, 60);
+  }, 18);
 }
-function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
 async function sendMsg(){
   const input=document.getElementById('msgInput');
   const msg=input.value.trim();if(!msg)return;
