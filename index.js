@@ -130,7 +130,7 @@ app.get('/:brokerId', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send(`<html><body style="font-family:Arial;text-align:center;padding:50px;background:#0f172a;color:#fff;"><h1 style="color:#f59e0b;">🏠 EstateBot</h1><p>AI Lead Assistant for Real Estate</p></body></html>`);
+  res.sendFile(__dirname + '/landing.html');
 });
 
 // ===== HTML TEMPLATE =====
