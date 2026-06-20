@@ -100,7 +100,7 @@ Naya number lo, phir lead complete karo.
 IMPORTANT: Phone number liye BINA lead BILKUL complete mat karna.
 
 Jab naam, phone, property type, area, budget sab mil jaye — warmly thank karo, phir BILKUL BAAD likho:
-|||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE_WITH_BHK","area":"AREA","budget":"BUDGET","intent":"RENT_LENA/RENT_DENA/KHARIDNA/SELL","timeline":"TIMELINE","furnished":"FURNISHED/UNFURNISHED/NA","parking":"YES/NO/NA","special":"ANY_SPECIAL_REQUIREMENTS"}|||
+|||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE_WITH_BHK","area":"AREA","budget":"BUDGET","intent":"Rent Lena Chahte Hain/Rent Dena Chahte Hain/Kharidna Chahte Hain/Sell Karna Chahte Hain","timeline":"TIMELINE","furnished":"Furnished/Semi-Furnished/Unfurnished/NA","parking":"Chahiye/Nahi Chahiye/NA","special":"ANY_SPECIAL_REQUIREMENTS"}|||
 
 Thank you message (warm, genuine):
 "Bahut shukriya [Naam] ji! Aapki saari details note ho gayi hain 😊 Hamare senior advisor kal tak aapko call karenge. Koi bhi sawaal ho toh pooch sakte ho!"
@@ -166,6 +166,10 @@ async function sendLeadEmail(broker, leadData) {
             <td style="padding:14px 20px;font-weight:700;color:#16a34a;font-size:18px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.budget || '&mdash;'}</td>
           </tr>
           <tr>
+            <td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">&#128663; Car Parking</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.parking || 'Not specified'}</td>
+          </tr>
+          <tr style="background:#f8fafc;">
             <td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;">&#9200; Timeline</td>
             <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;">${leadData.timeline || 'Not specified'}</td>
           </tr>
@@ -375,7 +379,8 @@ app.post('/api/chat/:brokerId', async (req, res) => {
               budget: leadData.budget,
               intent: leadData.intent,
               timeline: leadData.timeline || null,
-              furnished: leadData.furnished || null
+              furnished: leadData.furnished || null,
+              parking: leadData.parking || null
             }]);
 
             await sendLeadEmail(broker, leadData);
