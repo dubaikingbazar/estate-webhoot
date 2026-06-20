@@ -344,16 +344,26 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   conversations[sessionId].push({ role: 'user', content: message });
 
   try {
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const callGroq = () => fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'llama-3.1-8b-instant',
         messages: [{ role: 'system', content: getSystemPrompt(broker.name) }, ...conversations[sessionId].slice(-12)],
         max_tokens: 300
       })
     });
-    const data = await groqRes.json();
+
+    let groqRes = await callGroq();
+    let data = await groqRes.json();
+
+    // Agar rate limit (429) lage, ek baar 2 second wait karke phir try karo
+    if (groqRes.status === 429) {
+      console.error('GROQ RATE LIMITED — retrying in 2s');
+      await new Promise(r => setTimeout(r, 2000));
+      groqRes = await callGroq();
+      data = await groqRes.json();
+    }
 
     if (!groqRes.ok || !data.choices) {
       console.error(`GROQ ERROR [${groqRes.status}]:`, JSON.stringify(data));
