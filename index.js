@@ -1,21 +1,16 @@
 const express = require('express');
 const { Resend } = require('resend');
+const { createClient } = require('@supabase/supabase-js');
 const app = express();
 app.use(express.json());
 
+// ===== KEYS =====
 const GROQ_API_KEY = "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";
 const resend = new Resend('re_7HnaPfwP_Cso6RXqBYX7A4apowdzvd6kQ');
-
-// ===== BROKER DATABASE =====
-const brokers = {
-  "test": {
-    name: "EstateBot Demo",
-    location: "Mumbai",
-    email: "dubaikingbazar@gmail.com",
-    stats: { properties: "500+", experience: "10 Yrs", rating: "4.8★" },
-    specialties: ["🏢 Residential", "🏬 Commercial", "🏗️ New Projects", "🔑 Rental"]
-  }
-};
+const supabase = createClient(
+  'https://rpswzqgzcautmfjpgohh.supabase.co',
+  'sb_publishable_fat2IZEtj5QAoVOGECWoZQ_jEYwwOvP'
+);
 
 const conversations = {};
 
@@ -45,51 +40,131 @@ RULES:
 - Hinglish only
 `;
 
-// ===== SEND EMAIL (RESEND) =====
+// ===== SEND LEAD EMAIL =====
 async function sendLeadEmail(broker, leadData) {
-  const { data, error } = await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: 'EstateBot <onboarding@resend.dev>',
     to: broker.email,
-    subject: `🏠 Naya Lead — ${leadData.name} | ${broker.name}`,
+    subject: `Naya Lead — ${leadData.name} | ${broker.name}`,
     html: `
 <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#f8fafc;padding:20px;border-radius:16px;">
   <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);padding:24px;border-radius:12px;text-align:center;margin-bottom:20px;">
-    <h2 style="color:#fff;margin:0;font-size:24px;">🏠 EstateBot</h2>
+    <h2 style="color:#fff;margin:0;font-size:24px;">EstateBot</h2>
     <p style="color:rgba(255,255,255,0.8);margin:6px 0 0;font-size:14px;">Naya Lead Aaya!</p>
   </div>
   <div style="background:#fff;padding:20px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:16px;">
-    <h3 style="color:#1e3a5f;margin:0 0 16px;font-size:16px;">📋 Lead Details</h3>
     <table style="width:100%;border-collapse:collapse;">
-      <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0;color:#64748b;font-size:13px;width:40%;">👤 Naam</td><td style="padding:10px 0;font-weight:600;color:#1e293b;">${leadData.name}</td></tr>
-      <tr style="border-bottom:1px solid #f1f5f9;background:#f8fafc;"><td style="padding:10px;color:#64748b;font-size:13px;">📱 Phone</td><td style="padding:10px;font-weight:600;color:#1e293b;font-size:16px;">${leadData.phone}</td></tr>
-      <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0;color:#64748b;font-size:13px;">🏡 Property</td><td style="padding:10px 0;font-weight:600;color:#1e293b;">${leadData.type}</td></tr>
-      <tr style="border-bottom:1px solid #f1f5f9;background:#f8fafc;"><td style="padding:10px;color:#64748b;font-size:13px;">📍 Area</td><td style="padding:10px;font-weight:600;color:#1e293b;">${leadData.area}</td></tr>
-      <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0;color:#64748b;font-size:13px;">💰 Budget</td><td style="padding:10px 0;font-weight:600;color:#1e293b;">${leadData.budget}</td></tr>
-      <tr style="background:#f8fafc;"><td style="padding:10px;color:#64748b;font-size:13px;">🎯 Intent</td><td style="padding:10px;font-weight:600;color:#1e293b;">${leadData.intent}</td></tr>
+      <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0;color:#64748b;font-size:13px;width:40%;">Naam</td><td style="padding:10px 0;font-weight:600;color:#1e293b;">${leadData.name}</td></tr>
+      <tr style="border-bottom:1px solid #f1f5f9;background:#f8fafc;"><td style="padding:10px;color:#64748b;font-size:13px;">Phone</td><td style="padding:10px;font-weight:600;color:#1e293b;font-size:16px;">${leadData.phone}</td></tr>
+      <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0;color:#64748b;font-size:13px;">Property</td><td style="padding:10px 0;font-weight:600;color:#1e293b;">${leadData.type}</td></tr>
+      <tr style="border-bottom:1px solid #f1f5f9;background:#f8fafc;"><td style="padding:10px;color:#64748b;font-size:13px;">Area</td><td style="padding:10px;font-weight:600;color:#1e293b;">${leadData.area}</td></tr>
+      <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0;color:#64748b;font-size:13px;">Budget</td><td style="padding:10px 0;font-weight:600;color:#1e293b;">${leadData.budget}</td></tr>
+      <tr style="background:#f8fafc;"><td style="padding:10px;color:#64748b;font-size:13px;">Intent</td><td style="padding:10px;font-weight:600;color:#1e293b;">${leadData.intent}</td></tr>
     </table>
   </div>
   <div style="text-align:center;margin-bottom:16px;">
-    <a href="tel:${leadData.phone}" style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;display:inline-block;">📞 Abhi Call Karein</a>
+    <a href="tel:${leadData.phone}" style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;display:inline-block;">Abhi Call Karein</a>
   </div>
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin:0;">Powered by EstateBot • AI Lead Assistant</p>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin:0;">Powered by EstateBot</p>
 </div>`
   });
+  if (error) console.error('Email error:', error);
+  else console.log(`Email sent to ${broker.email} for lead: ${leadData.name}`);
+}
+
+// ===== SEND WELCOME EMAIL TO BROKER =====
+async function sendWelcomeEmail(broker) {
+  const { error } = await resend.emails.send({
+    from: 'EstateBot <onboarding@resend.dev>',
+    to: broker.email,
+    subject: `EstateBot Setup Complete — Aapka Bot Live Hai!`,
+    html: `
+<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#f8fafc;padding:20px;border-radius:16px;">
+  <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);padding:24px;border-radius:12px;text-align:center;margin-bottom:20px;">
+    <h2 style="color:#fff;margin:0;">EstateBot</h2>
+    <p style="color:rgba(255,255,255,0.8);margin:6px 0 0;">Aapka AI Lead Bot Ready Hai!</p>
+  </div>
+  <div style="background:#fff;padding:20px;border-radius:12px;border:1px solid #e2e8f0;">
+    <p style="color:#1e293b;">Namaste ${broker.name} ji,</p>
+    <p style="color:#475569;margin-top:12px;">Aapka EstateBot live ho gaya hai. Ab customers seedha aapke bot se baat karenge aur leads aapki email pe aayengi.</p>
+    <div style="background:#f0f9ff;border-radius:8px;padding:16px;margin:20px 0;">
+      <p style="color:#0369a1;font-weight:600;margin:0;">Aapka Bot Link:</p>
+      <a href="https://estate-webhoot.onrender.com/${broker.broker_id}" style="color:#1e3a5f;font-size:15px;font-weight:700;">
+        https://estate-webhoot.onrender.com/${broker.broker_id}
+      </a>
+    </div>
+    <p style="color:#475569;">Is link ko apne Instagram bio, WhatsApp, ya visiting card pe lagaiye.</p>
+  </div>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:16px;">Powered by EstateBot • +91 86903 53003</p>
+</div>`
+  });
+  if (error) console.error('Welcome email error:', error);
+  else console.log(`Welcome email sent to ${broker.email}`);
+}
+
+// ===== BROKER SIGNUP API =====
+app.post('/api/signup', async (req, res) => {
+  const { name, business, city, specialty, email, phone } = req.body;
+  if (!name || !business || !city || !email || !phone) {
+    return res.status(400).json({ error: 'Saari details bharo' });
+  }
+
+  // broker_id banao — business name se
+  const broker_id = business.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, '-')
+    .substring(0, 30);
+
+  // Check karo — already exist toh nahi karta
+  const { data: existing } = await supabase
+    .from('brokers')
+    .select('broker_id')
+    .eq('broker_id', broker_id)
+    .single();
+
+  const finalId = existing ? `${broker_id}-${Date.now().toString().slice(-4)}` : broker_id;
+
+  // Supabase mein save karo
+  const { error } = await supabase.from('brokers').insert([{
+    broker_id: finalId,
+    name: business,
+    email,
+    phone,
+    city,
+    specialty: specialty || 'Residential',
+    status: 'trial'
+  }]);
 
   if (error) {
-    console.error('❌ Email error:', error);
-  } else {
-    console.log(`✅ Email sent to ${broker.email} for lead: ${leadData.name}`);
+    console.error('Supabase error:', error);
+    return res.status(500).json({ error: 'Database error' });
   }
-}
+
+  // Welcome email bhejo
+  await sendWelcomeEmail({ name, broker_id: finalId, email });
+
+  console.log(`New broker signup: ${business} (${finalId})`);
+  res.json({ success: true, broker_id: finalId, url: `https://estate-webhoot.onrender.com/${finalId}` });
+});
 
 // ===== CHAT API =====
 app.post('/api/chat/:brokerId', async (req, res) => {
   const { brokerId } = req.params;
   const { message, sessionId } = req.body;
-  const broker = brokers[brokerId];
-  if (!broker) return res.status(404).json({ error: 'Broker not found' });
+
+  // Pehle Supabase se broker dhundo
+  const { data: broker, error } = await supabase
+    .from('brokers')
+    .select('*')
+    .eq('broker_id', brokerId)
+    .single();
+
+  if (error || !broker) return res.status(404).json({ error: 'Broker not found' });
+  if (broker.status === 'inactive') return res.status(403).json({ error: 'Subscription expired' });
+
   if (!conversations[sessionId]) conversations[sessionId] = [];
   conversations[sessionId].push({ role: 'user', content: message });
+
   try {
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -102,14 +177,28 @@ app.post('/api/chat/:brokerId', async (req, res) => {
     const data = await groqRes.json();
     let reply = data.choices?.[0]?.message?.content || 'Kuch gadbad ho gayi, dobara try karein.';
     conversations[sessionId].push({ role: 'assistant', content: reply });
+
     let leadComplete = false;
     let leadData = null;
+
     if (reply.includes('|||LEAD|||')) {
       const match = reply.match(/\|\|\|LEAD\|\|\|(.+?)\|\|\|/);
       if (match) {
         try {
           leadData = JSON.parse(match[1]);
           reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
+
+          // Lead Supabase mein save karo
+          await supabase.from('leads').insert([{
+            broker_id: brokerId,
+            name: leadData.name,
+            phone: leadData.phone,
+            property_type: leadData.type,
+            area: leadData.area,
+            budget: leadData.budget,
+            intent: leadData.intent
+          }]);
+
           await sendLeadEmail(broker, leadData);
           leadComplete = true;
         } catch (e) { console.error('Lead parse error:', e); }
@@ -123,18 +212,27 @@ app.post('/api/chat/:brokerId', async (req, res) => {
 });
 
 // ===== BROKER PAGE =====
-app.get('/:brokerId', (req, res) => {
-  const broker = brokers[req.params.brokerId];
+app.get('/:brokerId', async (req, res) => {
+  const { brokerId } = req.params;
+
+  const { data: broker } = await supabase
+    .from('brokers')
+    .select('*')
+    .eq('broker_id', brokerId)
+    .single();
+
   if (!broker) return res.status(404).send('<h1 style="font-family:Arial;text-align:center;margin-top:100px;">Page not found</h1>');
-  res.send(getBrokerHTML(broker, req.params.brokerId));
+  res.send(getBrokerHTML(broker, brokerId));
 });
 
+// ===== LANDING PAGE =====
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/landing.html');
 });
 
 // ===== HTML TEMPLATE =====
 function getBrokerHTML(broker, brokerId) {
+  const specialties = broker.specialty ? broker.specialty.split(',').map(s => `<span class="ptag">${s.trim()}</span>`).join('') : '';
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -185,7 +283,6 @@ body{font-family:'Poppins',sans-serif;min-height:100vh;background:#f0f4f8;displa
 .lead-card{align-self:center;width:96%;background:#fff;border:1.5px solid #22c55e;border-radius:14px;padding:14px;margin-top:4px;}
 .lc-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
 .lc-title{font-size:13px;font-weight:700;color:#15803d;}
-.lc-sub{font-size:11px;color:#4ade80;}
 .lc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .lc-item{background:#f0fdf4;border-radius:8px;padding:8px 10px;}
 .li{font-size:10px;color:#86efac;font-weight:600;text-transform:uppercase;}
@@ -195,7 +292,7 @@ body{font-family:'Poppins',sans-serif;min-height:100vh;background:#f0f4f8;displa
 .chat-footer input{flex:1;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:24px;padding:10px 16px;font-family:'Poppins',sans-serif;font-size:13px;color:#334155;outline:none;}
 .chat-footer input:focus{border-color:#1e3a5f;}
 .chat-footer input::placeholder{color:#94a3b8;}
-.send{width:42px;height:42px;background:linear-gradient(135deg,#1e3a5f,#2d5a8e);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 10px rgba(30,58,95,0.25);}
+.send{width:42px;height:42px;background:linear-gradient(135deg,#1e3a5f,#2d5a8e);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .send svg{width:18px;height:18px;fill:#fff;}
 .bottom-strip{width:100%;max-width:480px;background:#fff;border-top:1px solid #e2e8f0;padding:10px;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;color:#94a3b8;}
 </style>
@@ -206,9 +303,8 @@ body{font-family:'Poppins',sans-serif;min-height:100vh;background:#f0f4f8;displa
     <div class="nav-logo"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.8L20.8 10V19.6a1.1 1.1 0 01-1.1 1.1H4.3a1.1 1.1 0 01-1.1-1.1V10Z" fill="#fff"/><circle cx="12" cy="13.6" r="2.2" fill="#f59e0b"/></svg></div>
     <div class="nav-name">Estate<b>Bot</b></div>
   </div>
-  <div class="nav-badge">🟢 Live</div>
+  <div class="nav-badge">Live</div>
 </div>
-
 <div class="hero">
   <svg viewBox="0 0 90 120" width="75" height="100" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -216,114 +312,69 @@ body{font-family:'Poppins',sans-serif;min-height:100vh;background:#f0f4f8;displa
       <linearGradient id="gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7eb8f7" stop-opacity="0.9"/><stop offset="1" stop-color="#3a78c9" stop-opacity="0.5"/></linearGradient>
     </defs>
     <line x1="45" y1="0" x2="45" y2="16" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="45" cy="0" r="2" fill="#f59e0b"/>
     <polygon points="45,8 37,26 53,26" fill="url(#bg)"/>
     <rect x="39" y="26" width="12" height="18" fill="url(#bg)" rx="1"/>
-    <rect x="41" y="29" width="2.5" height="2.5" fill="url(#gl)" rx="0.3"/><rect x="46.5" y="29" width="2.5" height="2.5" fill="url(#gl)" rx="0.3"/>
-    <rect x="41" y="34" width="2.5" height="2.5" fill="rgba(255,220,100,0.8)" rx="0.3"/><rect x="46.5" y="34" width="2.5" height="2.5" fill="url(#gl)" rx="0.3"/>
-    <rect x="35" y="44" width="20" height="4" fill="rgba(255,255,255,0.08)" rx="1"/>
-    <rect x="35" y="48" width="20" height="22" fill="url(#bg)" rx="1"/>
-    <rect x="37" y="51" width="2.8" height="2.8" fill="url(#gl)" rx="0.3"/><rect x="42" y="51" width="2.8" height="2.8" fill="rgba(255,220,100,0.8)" rx="0.3"/><rect x="47" y="51" width="2.8" height="2.8" fill="url(#gl)" rx="0.3"/><rect x="52" y="51" width="2.8" height="2.8" fill="url(#gl)" rx="0.3"/>
-    <rect x="37" y="57" width="2.8" height="2.8" fill="url(#gl)" rx="0.3"/><rect x="42" y="57" width="2.8" height="2.8" fill="url(#gl)" rx="0.3"/><rect x="47" y="57" width="2.8" height="2.8" fill="rgba(255,220,100,0.8)" rx="0.3"/><rect x="52" y="57" width="2.8" height="2.8" fill="url(#gl)" rx="0.3"/>
-    <rect x="29" y="70" width="32" height="4" fill="rgba(255,255,255,0.08)" rx="1"/>
-    <rect x="29" y="74" width="32" height="34" fill="url(#bg)" rx="1"/>
-    <rect x="31" y="77" width="3" height="3" fill="url(#gl)" rx="0.3"/><rect x="36" y="77" width="3" height="3" fill="rgba(255,220,100,0.8)" rx="0.3"/><rect x="41" y="77" width="3" height="3" fill="url(#gl)" rx="0.3"/><rect x="46" y="77" width="3" height="3" fill="url(#gl)" rx="0.3"/><rect x="51" y="77" width="3" height="3" fill="rgba(255,220,100,0.8)" rx="0.3"/><rect x="56" y="77" width="3" height="3" fill="url(#gl)" rx="0.3"/>
-    <rect x="31" y="83" width="3" height="3" fill="rgba(255,220,100,0.8)" rx="0.3"/><rect x="36" y="83" width="3" height="3" fill="url(#gl)" rx="0.3"/><rect x="41" y="83" width="3" height="3" fill="url(#gl)" rx="0.3"/><rect x="46" y="83" width="3" height="3" fill="rgba(255,220,100,0.8)" rx="0.3"/><rect x="51" y="83" width="3" height="3" fill="url(#gl)" rx="0.3"/><rect x="56" y="83" width="3" height="3" fill="url(#gl)" rx="0.3"/>
-    <rect x="31" y="89" width="3" height="3" fill="url(#gl)" rx="0.3"/><rect x="36" y="89" width="3" height="3" fill="rgba(255,220,100,0.8)" rx="0.3"/><rect x="41" y="89" width="3" height="3" fill="url(#gl)" rx="0.3"/><rect x="46" y="89" width="3" height="3" fill="url(#gl)" rx="0.3"/><rect x="51" y="89" width="3" height="3" fill="rgba(255,220,100,0.8)" rx="0.3"/><rect x="56" y="89" width="3" height="3" fill="url(#gl)" rx="0.3"/>
-    <rect x="37" y="108" width="16" height="6" fill="rgba(255,255,255,0.1)" rx="1"/>
-    <rect x="21" y="113" width="48" height="4" fill="rgba(255,255,255,0.05)" rx="2"/>
+    <rect x="35" y="44" width="20" height="26" fill="url(#bg)" rx="1"/>
+    <rect x="29" y="70" width="32" height="38" fill="url(#bg)" rx="1"/>
     <ellipse cx="45" cy="116" rx="28" ry="3" fill="rgba(245,158,11,0.1)"/>
   </svg>
   <div class="broker-name-h">${broker.name}</div>
-  <div class="broker-loc">📍 ${broker.location}</div>
+  <div class="broker-loc">${broker.city}</div>
   <div class="broker-stats">
-    <div class="stat"><div class="sv">${broker.stats.properties}</div><div class="sl">Properties</div></div>
-    <div class="stat"><div class="sv">${broker.stats.experience}</div><div class="sl">Experience</div></div>
-    <div class="stat"><div class="sv">${broker.stats.rating}</div><div class="sl">Rating</div></div>
+    <div class="stat"><div class="sv">24/7</div><div class="sl">Active</div></div>
+    <div class="stat"><div class="sv">AI</div><div class="sl">Powered</div></div>
+    <div class="stat"><div class="sv">Fast</div><div class="sl">Response</div></div>
   </div>
 </div>
-
-<div class="prop-tags">${broker.specialties.map(s=>`<span class="ptag">${s}</span>`).join('')}</div>
-
+<div class="prop-tags">${specialties}</div>
 <div class="chat-wrap">
   <div class="chat-header">
     <div class="chat-av"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.8L20.8 10V19.6a1.1 1.1 0 01-1.1 1.1H4.3a1.1 1.1 0 01-1.1-1.1V10Z" fill="#fff"/><circle cx="12" cy="13.6" r="2.2" fill="#f59e0b"/></svg></div>
-    <div><div class="ci-name">${broker.name} Assistant</div><div class="ci-sub"><span class="online"></span> Online · Turant reply karta hai</div></div>
-    <div class="ch-right"><div class="cr1">24×7 Active</div><div class="cr2">AI Powered</div></div>
+    <div><div class="ci-name">${broker.name} Assistant</div><div class="ci-sub"><span class="online"></span> Online</div></div>
+    <div class="ch-right"><div class="cr1">24x7 Active</div><div class="cr2">AI Powered</div></div>
   </div>
   <div class="chat-body" id="chatBody">
     <div class="date-label">Aaj</div>
-    <div class="msg bot"><div class="bubble">Namaste! 😊 ${broker.name} mein aapka swagat hai. Aap kya dhundh rahe hain — kharidna, rent lena, ya apni property sell/rent-out karni hai?</div><div class="ts">Abhi</div></div>
+    <div class="msg bot"><div class="bubble">Namaste! ${broker.name} mein aapka swagat hai. Aap kya dhundh rahe hain — kharidna, rent lena, ya apni property sell/rent-out karni hai?</div><div class="ts">Abhi</div></div>
   </div>
   <div class="chat-footer">
     <input type="text" id="msgInput" placeholder="Apna message yahan likhein..." onkeypress="if(event.key==='Enter')sendMsg()"/>
     <button class="send" onclick="sendMsg()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
   </div>
 </div>
-
 <div class="bottom-strip">
   <svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 2.8L20.8 10V19.6a1.1 1.1 0 01-1.1 1.1H4.3a1.1 1.1 0 01-1.1-1.1V10Z" fill="#1e3a5f"/></svg>
   <span style="font-weight:700;color:#1e3a5f;">EstateBot</span> · AI Lead Assistant
 </div>
-
 <script>
 const sessionId = Math.random().toString(36).substr(2,9);
 const brokerId = '${brokerId}';
 let leadDone = false;
-
 function getTime(){const n=new Date();return n.getHours()+':'+String(n.getMinutes()).padStart(2,'0');}
-
 function addMsg(text,role,leadData){
   const body=document.getElementById('chatBody');
   if(role==='lead'){
-    const d=document.createElement('div');
-    d.className='lead-card';
-    d.innerHTML=\`<div class="lc-top"><span style="font-size:24px;">✅</span><div><div class="lc-title">Lead Successfully Captured!</div><div class="lc-sub">📧 Email notification bhej di</div></div></div>
-    <div class="lc-grid">
-      <div class="lc-item"><div class="li">Naam</div><div class="lv">\${leadData.name||'—'}</div></div>
-      <div class="lc-item"><div class="li">Phone</div><div class="lv">\${leadData.phone||'—'}</div></div>
-      <div class="lc-item"><div class="li">Property</div><div class="lv">\${leadData.type||'—'}</div></div>
-      <div class="lc-item"><div class="li">Area</div><div class="lv">\${leadData.area||'—'}</div></div>
-    </div>
-    <div class="lc-email">📧 Agent ko email notification bhej di!</div>\`;
+    const d=document.createElement('div');d.className='lead-card';
+    d.innerHTML='<div class="lc-top"><span style="font-size:24px;">✅</span><div><div class="lc-title">Lead Captured!</div></div></div><div class="lc-grid"><div class="lc-item"><div class="li">Naam</div><div class="lv">'+leadData.name+'</div></div><div class="lc-item"><div class="li">Phone</div><div class="lv">'+leadData.phone+'</div></div><div class="lc-item"><div class="li">Property</div><div class="lv">'+leadData.type+'</div></div><div class="lc-item"><div class="li">Area</div><div class="lv">'+leadData.area+'</div></div></div><div class="lc-email">Agent ko notification bhej di!</div>';
     body.appendChild(d);
   } else {
-    const d=document.createElement('div');
-    d.className='msg '+role;
-    d.innerHTML=\`<div class="bubble">\${text}</div><div class="ts">\${getTime()}</div>\`;
+    const d=document.createElement('div');d.className='msg '+role;
+    d.innerHTML='<div class="bubble">'+text+'</div><div class="ts">'+getTime()+'</div>';
     body.appendChild(d);
   }
   body.scrollTop=body.scrollHeight;
 }
-
-function showTyping(){
-  const body=document.getElementById('chatBody');
-  const d=document.createElement('div');
-  d.className='msg bot';d.id='typing';
-  d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
-  body.appendChild(d);body.scrollTop=body.scrollHeight;
-}
+function showTyping(){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg bot';d.id='typing';d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';body.appendChild(d);body.scrollTop=body.scrollHeight;}
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
-
 async function sendMsg(){
   if(leadDone)return;
   const input=document.getElementById('msgInput');
-  const msg=input.value.trim();
-  if(!msg)return;
-  input.value='';
-  addMsg(msg,'user');
-  showTyping();
+  const msg=input.value.trim();if(!msg)return;
+  input.value='';addMsg(msg,'user');showTyping();
   try{
     const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});
-    const data=await res.json();
-    removeTyping();
-    addMsg(data.reply,'bot');
-    if(data.leadComplete&&data.leadData){
-      leadDone=true;
-      addMsg('','lead',data.leadData);
-      document.getElementById('msgInput').disabled=true;
-      document.getElementById('msgInput').placeholder='Lead submit ho gayi ✅';
-    }
+    const data=await res.json();removeTyping();addMsg(data.reply,'bot');
+    if(data.leadComplete&&data.leadData){leadDone=true;addMsg('','lead',data.leadData);document.getElementById('msgInput').disabled=true;document.getElementById('msgInput').placeholder='Lead submit ho gayi!';}
   }catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}
 }
 </script>
