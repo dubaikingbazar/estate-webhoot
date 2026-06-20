@@ -242,8 +242,8 @@ async function sendWelcomeEmail(broker) {
     <p style="color:#475569;margin-top:12px;">Aapka EstateBot live ho gaya hai. Ab customers seedha aapke bot se baat karenge aur leads aapki email pe aayengi.</p>
     <div style="background:#f0f9ff;border-radius:8px;padding:16px;margin:20px 0;">
       <p style="color:#0369a1;font-weight:600;margin:0;">Aapka Bot Link:</p>
-      <a href="https://estate-webhoot.onrender.com/${broker.broker_id}" style="color:#1e3a5f;font-size:15px;font-weight:700;">
-        https://estate-webhoot.onrender.com/${broker.broker_id}
+      <a href="https://estatebotai.in/${broker.broker_id}" style="color:#1e3a5f;font-size:15px;font-weight:700;">
+        https://estatebotai.in/${broker.broker_id}
       </a>
     </div>
     <p style="color:#475569;">Is link ko apne Instagram bio, WhatsApp, ya visiting card pe lagaiye.</p>
@@ -301,7 +301,7 @@ app.post('/api/signup', async (req, res) => {
   await sendWelcomeEmail({ name, broker_id: finalId, email });
 
   console.log(`New broker signup: ${business} (${finalId})`);
-  res.json({ success: true, broker_id: finalId, url: `https://estate-webhoot.onrender.com/${finalId}` });
+  res.json({ success: true, broker_id: finalId, url: `https://estatebotai.in/${finalId}` });
 });
 
 // ===== ADMIN API =====
