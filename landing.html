@@ -682,7 +682,7 @@ footer {
 </footer>
 
 <script>
-function submitForm() {
+async function submitForm() {
   const fields = ['f-name','f-phone','f-biz','f-city','f-spec','f-email'];
   let ok = true;
   fields.forEach(id => {
@@ -694,11 +694,53 @@ function submitForm() {
     }
   });
   if (!ok) return;
+
   const btn = document.querySelector('.submit-btn');
-  btn.textContent = 'Request Submitted';
-  btn.style.background = '#4ade80';
-  btn.style.color = '#080808';
+  btn.textContent = 'Setting up your bot...';
   btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: document.getElementById('f-name').value,
+        phone: document.getElementById('f-phone').value,
+        business: document.getElementById('f-biz').value,
+        city: document.getElementById('f-city').value,
+        specialty: document.getElementById('f-spec').value,
+        email: document.getElementById('f-email').value
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      const form = document.querySelector('.signup-wrap');
+      form.innerHTML = `
+        <div style="text-align:center;padding:20px 0;">
+          <div style="width:64px;height:64px;border-radius:50%;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#4ade80" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:10px;color:#f0ede8;">Bot Live Hai!</h2>
+          <p style="color:#6b6b6b;font-size:14px;margin-bottom:24px;">Welcome email check karo — aapka personal link wahan hai.</p>
+          <div style="background:#0f0f0f;border:1px solid rgba(200,169,110,0.2);border-radius:8px;padding:16px;margin-bottom:20px;">
+            <div style="font-size:11px;color:#6b6b6b;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Aapka Bot Link</div>
+            <a href="${data.url}" style="color:#c8a96e;font-size:14px;font-weight:600;word-break:break-all;">${data.url}</a>
+          </div>
+          <a href="${data.url}" style="display:block;background:#c8a96e;color:#080808;font-size:14px;font-weight:700;padding:14px;border-radius:6px;text-decoration:none;">Bot Open Karein</a>
+        </div>
+      `;
+    } else {
+      btn.textContent = 'Error — Dobara Try Karein';
+      btn.style.background = '#ef4444';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    btn.textContent = 'Error — Dobara Try Karein';
+    btn.style.background = '#ef4444';
+    btn.disabled = false;
+  }
 }
 </script>
 </body>
