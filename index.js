@@ -1,11 +1,10 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const app = express();
 app.use(express.json());
 
 const GROQ_API_KEY = "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";
-const GMAIL_USER = "estatebotofficial@gmail.com";
-const GMAIL_PASS = "aueaawcazrmvjiqb";
+const resend = new Resend('re_7HnaPfwP_Cso6RXqBYX7A4apowdzvd6kQ');
 
 // ===== BROKER DATABASE =====
 const brokers = {
@@ -19,12 +18,6 @@ const brokers = {
 };
 
 const conversations = {};
-
-// ===== EMAIL SETUP =====
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: { user: GMAIL_USER, pass: GMAIL_PASS }
-});
 
 // ===== AI PROMPT =====
 const getSystemPrompt = (brokerName) => `
@@ -52,10 +45,10 @@ RULES:
 - Hinglish only
 `;
 
-// ===== SEND EMAIL =====
+// ===== SEND EMAIL (RESEND) =====
 async function sendLeadEmail(broker, leadData) {
-  const mail = {
-    from: `EstateBot 🏠 <${GMAIL_USER}>`,
+  const { data, error } = await resend.emails.send({
+    from: 'EstateBot <onboarding@resend.dev>',
     to: broker.email,
     subject: `🏠 Naya Lead — ${leadData.name} | ${broker.name}`,
     html: `
@@ -80,9 +73,13 @@ async function sendLeadEmail(broker, leadData) {
   </div>
   <p style="text-align:center;color:#94a3b8;font-size:11px;margin:0;">Powered by EstateBot • AI Lead Assistant</p>
 </div>`
-  };
-  await transporter.sendMail(mail);
-  console.log(`✅ Email sent to ${broker.email} for lead: ${leadData.name}`);
+  });
+
+  if (error) {
+    console.error('❌ Email error:', error);
+  } else {
+    console.log(`✅ Email sent to ${broker.email} for lead: ${leadData.name}`);
+  }
 }
 
 // ===== CHAT API =====
