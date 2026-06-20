@@ -78,6 +78,12 @@ Step 6 — Timeline:
 Step 7 — Phone (KABHI SKIP MAT KARO):
 "[Naam] ji, ek kaam karein — apna WhatsApp number dijiye. Hamare advisor directly call karenge aur aapki requirements ke hisaab se best options dikhayenge. Bilkul free hai."
 
+SPECIAL CASE — GALAT NUMBER:
+Agar customer phone dene ke BAAD bole "number galat hai", "wrong number", "change karo", "galti ho gayi" — toh:
+1. Lead complete MAT karo abhi
+2. Bolo: "[Naam] ji, koi baat nahi! Sahi number bata dijiye."
+3. Naya number lo, phir lead complete karo sahi number ke saath
+
 IMPORTANT: Phone number liye BINA lead BILKUL complete mat karna. Phone ZAROORI hai.
 
 Jab naam, phone, property type, area, budget sab mil jaye — pehle genuinely thank karo, phir BILKUL BAAD ye EXACTLY likho:
@@ -85,6 +91,8 @@ Jab naam, phone, property type, area, budget sab mil jaye — pehle genuinely th
 
 Thank you message:
 "Bahut shukriya [Naam] ji! Aapki saari details note ho gayi hain. Hamare senior advisor 24 ghante mein aapko call karenge. Tab tak koi sawaal ho toh zaroor poochein!"
+
+IMPORTANT — Thank you message mein phone number DOBARA MAT LIKHO — sirf naam se thank karo.
 
 STRICT RULES:
 - Ek sawaal ek baar — kabhi 2 sawaal ek saath nahi
@@ -103,128 +111,102 @@ async function sendLeadEmail(broker, leadData) {
     from: 'EstateBot <leads@estatebotai.in>',
     to: broker.email,
     subject: `Naya Lead — ${leadData.name} | ${broker.name}`,
-    html: `
-<div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;background:#f0f4f8;padding:20px;border-radius:16px;">
-  <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:32px 24px;border-radius:14px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(245,158,11,0.08);"></div>
-    <div style="position:absolute;bottom:-40px;left:-20px;width:100px;height:100px;border-radius:50%;background:rgba(245,158,11,0.05);"></div>
-    <div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;">${broker.name} · New Lead</div>
-    <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);margin:0 auto 12px;display:inline-flex;align-items:center;justify-content:center;">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"></head>
+<body style="margin:0;padding:0;background-color:#f0f4f8;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:20px 0;">
+<tr><td align="center">
+<table width="580" cellpadding="0" cellspacing="0" style="max-width:580px;width:100%;">
+
+  <!-- HEADER -->
+  <tr><td style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);border-radius:14px;padding:32px 24px;text-align:center;margin-bottom:16px;" align="center">
+    <p style="font-size:10px;color:#94a3b8;letter-spacing:3px;text-transform:uppercase;margin:0 0 12px;">${broker.name} &middot; New Lead</p>
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);margin:0 auto 14px;line-height:64px;text-align:center;">
+      <span style="font-size:28px;line-height:64px;">&#128100;</span>
     </div>
-    <h2 style="color:#fff;margin:0 0 6px;font-size:26px;font-weight:700;">${leadData.name}</h2>
-    <a href="tel:${leadData.phone}" style="background:#f59e0b;color:#000;padding:11px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:8px;margin-top:12px;">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-      ${leadData.phone}
-    </a>
-  </div>
-  <div style="text-align:center;margin-bottom:14px;">
-    <span style="background:#1e40af;color:#fff;font-size:11px;font-weight:700;padding:7px 20px;border-radius:20px;text-transform:uppercase;letter-spacing:2px;display:inline-flex;align-items:center;gap:6px;">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      ${leadData.intent || 'Property Enquiry'}
-    </span>
-  </div>
-  <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:12px;overflow:hidden;">
-    <div style="padding:14px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:8px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-      <span style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:2px;text-transform:uppercase;">Property Requirements</span>
-    </div>
-    <table style="width:100%;border-collapse:collapse;">
-      <tr style="border-bottom:1px solid #f1f5f9;">
-        <td style="padding:14px 20px;width:44%;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:6px;background:#eff6ff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            <span style="color:#64748b;font-size:12px;">Property Type</span>
-          </div>
-        </td>
-        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.type || '—'}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #f1f5f9;background:#fafafa;">
-        <td style="padding:14px 20px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:6px;background:#f0fdf4;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-            </div>
-            <span style="color:#64748b;font-size:12px;">Furnished</span>
-          </div>
-        </td>
-        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.furnished || 'Not specified'}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #f1f5f9;">
-        <td style="padding:14px 20px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:6px;background:#fef3c7;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            </div>
-            <span style="color:#64748b;font-size:12px;">Preferred Area</span>
-          </div>
-        </td>
-        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.area || '—'}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #f1f5f9;background:#fafafa;">
-        <td style="padding:14px 20px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:6px;background:#f0fdf4;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-            </div>
-            <span style="color:#64748b;font-size:12px;">Budget</span>
-          </div>
-        </td>
-        <td style="padding:14px 20px;font-weight:700;color:#16a34a;font-size:18px;">${leadData.budget || '—'}</td>
-      </tr>
-      <tr>
-        <td style="padding:14px 20px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:6px;background:#fdf4ff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <span style="color:#64748b;font-size:12px;">Timeline</span>
-          </div>
-        </td>
-        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;">${leadData.timeline || 'Not specified'}</td>
-      </tr>
+    <h2 style="color:#ffffff;margin:0 0 6px;font-size:28px;font-weight:700;font-family:Arial,sans-serif;">${leadData.name}</h2>
+    <p style="margin:0 0 16px;color:#94a3b8;font-size:13px;">${leadData.intent || 'Property Enquiry'}</p>
+    <a href="tel:${leadData.phone}" style="background:#f59e0b;color:#000000;padding:13px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;font-family:Arial,sans-serif;">&#128222; ${leadData.phone}</a>
+  </td></tr>
+
+  <tr><td height="16"></td></tr>
+
+  <!-- PROPERTY REQUIREMENTS -->
+  <tr><td style="background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr><td style="padding:14px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+        <p style="margin:0;font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;">&#127968; Property Requirements</p>
+      </td></tr>
+      <tr><td style="padding:0;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr style="border-bottom:1px solid #f1f5f9;">
+            <td style="padding:14px 20px;width:44%;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">&#127968; Property Type</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.type || '&mdash;'}</td>
+          </tr>
+          <tr style="background:#f8fafc;">
+            <td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">&#127968; Furnished</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.furnished || 'Not specified'}</td>
+          </tr>
+          <tr>
+            <td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">&#128205; Preferred Area</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.area || '&mdash;'}</td>
+          </tr>
+          <tr style="background:#f8fafc;">
+            <td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">&#128176; Budget</td>
+            <td style="padding:14px 20px;font-weight:700;color:#16a34a;font-size:18px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.budget || '&mdash;'}</td>
+          </tr>
+          <tr>
+            <td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;">&#9200; Timeline</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;">${leadData.timeline || 'Not specified'}</td>
+          </tr>
+        </table>
+      </td></tr>
     </table>
-  </div>
-  <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:16px;overflow:hidden;">
-    <div style="padding:14px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:8px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span style="font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:2px;text-transform:uppercase;">Contact Details</span>
-    </div>
-    <table style="width:100%;border-collapse:collapse;">
-      <tr style="border-bottom:1px solid #f1f5f9;">
-        <td style="padding:14px 20px;width:44%;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:6px;background:#eff6ff;display:inline-flex;align-items:center;justify-content:center;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
-            <span style="color:#64748b;font-size:12px;">Name</span>
-          </div>
-        </td>
-        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:15px;">${leadData.name}</td>
-      </tr>
-      <tr>
-        <td style="padding:14px 20px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:6px;background:#f0fdf4;display:inline-flex;align-items:center;justify-content:center;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-            </div>
-            <span style="color:#64748b;font-size:12px;">Phone / WhatsApp</span>
-          </div>
-        </td>
-        <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:20px;">${leadData.phone}</td>
-      </tr>
+  </td></tr>
+
+  <tr><td height="12"></td></tr>
+
+  <!-- CONTACT -->
+  <tr><td style="background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr><td style="padding:14px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+        <p style="margin:0;font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;">&#128100; Contact Details</p>
+      </td></tr>
+      <tr><td>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:14px 20px;width:44%;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">&#128100; Name</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:15px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.name}</td>
+          </tr>
+          <tr>
+            <td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;">&#128222; Phone / WhatsApp</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:22px;font-family:Arial,sans-serif;">${leadData.phone}</td>
+          </tr>
+        </table>
+      </td></tr>
     </table>
-  </div>
-  <a href="tel:${leadData.phone}" style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#fff;padding:16px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;display:block;text-align:center;">
-    <span style="display:inline-flex;align-items:center;gap:10px;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-      Call Now — ${leadData.phone}
-    </span>
-  </a>
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin:14px 0 0;">Lead from ${broker.name} · Powered by EstateBot · estatebotai.in</p>
-</div>`
+  </td></tr>
+
+  <tr><td height="16"></td></tr>
+
+  <!-- CTA -->
+  <tr><td align="center">
+    <a href="tel:${leadData.phone}" style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#ffffff;padding:16px 48px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;font-family:Arial,sans-serif;">&#128222; Call Now &mdash; ${leadData.phone}</a>
+  </td></tr>
+
+  <tr><td height="16"></td></tr>
+
+  <!-- FOOTER -->
+  <tr><td align="center" style="color:#94a3b8;font-size:11px;font-family:Arial,sans-serif;">
+    Lead from ${broker.name} &middot; Powered by EstateBot &middot; estatebotai.in
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`
   });
   if (error) console.error('Email error:', error);
   else console.log(`Email sent to ${broker.email} for lead: ${leadData.name}`);
@@ -555,17 +537,40 @@ function addMsg(text,role){
 function showTyping(){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg bot';d.id='typing';d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';body.appendChild(d);body.scrollTop=body.scrollHeight;}
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
 async function sendMsg(){
-  if(leadDone)return;
   const input=document.getElementById('msgInput');
   const msg=input.value.trim();if(!msg)return;
+
+  // Agar lead done hai but user number correction kar raha hai
+  if(leadDone){
+    const correction = msg.toLowerCase();
+    if(correction.includes('galat') || correction.includes('wrong') || correction.includes('change') || correction.includes('correct') || correction.includes('sahi') || correction.includes('galti')){
+      leadDone=false;
+      input.disabled=false;
+      input.placeholder='Apna message yahan likhein...';
+      input.style.background='';
+      input.style.borderColor='';
+      input.style.color='';
+      const sendBtn=document.querySelector('.send');
+      if(sendBtn) sendBtn.style.display='flex';
+    } else {
+      return;
+    }
+  }
+
   input.value='';addMsg(msg,'user');showTyping();
   try{
     const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});
     const data=await res.json();removeTyping();addMsg(data.reply,'bot');
     if(data.leadComplete){
       leadDone=true;
-      document.getElementById('msgInput').disabled=true;
-      document.getElementById('msgInput').placeholder='Shukriya! Hamari team jald contact karegi.';
+      const inp=document.getElementById('msgInput');
+      const sendBtn=document.querySelector('.send');
+      inp.disabled=true;
+      inp.placeholder='Shukriya! Hamari team jald contact karegi.';
+      inp.style.background='#f0fdf4';
+      inp.style.borderColor='#22c55e';
+      inp.style.color='#15803d';
+      if(sendBtn) sendBtn.style.display='none';
     }
   }catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}
 }
