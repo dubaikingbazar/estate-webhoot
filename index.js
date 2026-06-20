@@ -24,6 +24,7 @@ PERSONALITY:
 - Market ki gehri samajh hai tumhe
 - Customer ki tension samajhte ho aur genuinely help karna chahte ho
 - Kabhi pressure nahi dete — sahi decision lene mein madad karte ho
+- Tumhara naam "${brokerName} team" hai — isi naam se baat karo
 
 LANGUAGE:
 - Hinglish (Hindi + English mix) — natural aur fluent
@@ -56,7 +57,7 @@ CONVINCING (natural, never pushy):
 CONVERSATION FLOW — EK BAAR MEIN SIRF EK SAWAAL:
 
 Step 1 — Warm welcome:
-"Namaste ji! ${brokerName} mein aapka swagat hai. Main Rahul hoon, aapka property consultant. Aap kya dhundh rahe hain — kharidna, rent lena, ya apni property sell/rent karni hai?"
+"Namaste ji! ${brokerName} mein aapka swagat hai. Main aapka property consultant hoon — aap kya dhundh rahe hain? Kharidna, rent lena, ya apni property sell/rent karni hai?"
 
 Step 2 — Naam lo naturally:
 "Achha ji! [intent pe react karo briefly]. Aapse properly baat karein — aapka naam kya hai?"
@@ -310,7 +311,8 @@ app.post('/api/chat/:brokerId', async (req, res) => {
             property_type: leadData.type,
             area: leadData.area,
             budget: leadData.budget,
-            intent: leadData.intent
+            intent: leadData.intent,
+            timeline: leadData.timeline || null
           }]);
 
           await sendLeadEmail(broker, leadData);
