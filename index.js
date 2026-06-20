@@ -304,4 +304,34 @@ function showTyping(){
   const d=document.createElement('div');
   d.className='msg bot';d.id='typing';
   d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
-  body.appendChild(d);body.scrollTop=body.scrol
+  body.appendChild(d);body.scrollTop=body.scrollHeight;
+}
+function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
+
+async function sendMsg(){
+  if(leadDone)return;
+  const input=document.getElementById('msgInput');
+  const msg=input.value.trim();
+  if(!msg)return;
+  input.value='';
+  addMsg(msg,'user');
+  showTyping();
+  try{
+    const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});
+    const data=await res.json();
+    removeTyping();
+    addMsg(data.reply,'bot');
+    if(data.leadComplete&&data.leadData){
+      leadDone=true;
+      addMsg('','lead',data.leadData);
+      document.getElementById('msgInput').disabled=true;
+      document.getElementById('msgInput').placeholder='Lead submit ho gayi ✅';
+    }
+  }catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}
+}
+</script>
+</body></html>`;
+}
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🏠 EstateBot running on port ${PORT}`));
