@@ -26,12 +26,10 @@
 html { scroll-behavior: smooth; }
 body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); overflow-x: hidden; }
 
-/* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--black); }
 ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
 
-/* ── NAV ── */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
@@ -58,7 +56,6 @@ nav {
 }
 .nav-btn:hover { background: var(--gold2); }
 
-/* ── HERO ── */
 .hero {
   min-height: 100vh;
   display: flex; flex-direction: column;
@@ -91,9 +88,7 @@ nav {
   margin-bottom: 28px;
   max-width: 780px;
 }
-.hero h1 em {
-  font-style: italic; color: var(--gold);
-}
+.hero h1 em { font-style: italic; color: var(--gold); }
 .hero-sub {
   font-size: 16px; font-weight: 300;
   color: var(--muted); line-height: 1.8;
@@ -117,7 +112,6 @@ nav {
 }
 .btn-ghost:hover { color: var(--white); border-color: rgba(255,255,255,0.15); }
 
-/* ── TICKER ── */
 .ticker {
   margin-top: 80px; width: 100%;
   border-top: 1px solid var(--border);
@@ -139,7 +133,6 @@ nav {
 .ticker-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); }
 @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-/* ── SECTION BASE ── */
 .section { padding: 120px 24px; display: flex; flex-direction: column; align-items: center; }
 .section.dark { background: var(--black2); }
 .tag {
@@ -157,7 +150,6 @@ nav {
 }
 .section-h em { font-style: italic; color: var(--gold); }
 
-/* ── CHAT DEMO ── */
 .demo-wrap {
   width: 100%; max-width: 360px;
   background: var(--black3);
@@ -186,13 +178,9 @@ nav {
 .dm { display: flex; flex-direction: column; max-width: 82%; }
 .dm.b { align-self: flex-start; }
 .dm.u { align-self: flex-end; }
-.db {
-  padding: 10px 14px; border-radius: 12px;
-  font-size: 13px; line-height: 1.55;
-}
+.db { padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.55; }
 .b .db {
-  background: var(--black4);
-  color: var(--white);
+  background: var(--black4); color: var(--white);
   border-bottom-left-radius: 3px;
   border: 1px solid var(--border2);
 }
@@ -207,13 +195,10 @@ nav {
   border: 1px solid rgba(74,222,128,0.2);
   border-radius: 10px; padding: 14px;
 }
-.lead-head {
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 12px;
-}
+.lead-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .lead-check {
-  width: 18px; height: 18px;
-  border-radius: 50%; background: rgba(74,222,128,0.15);
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(74,222,128,0.15);
   border: 1px solid rgba(74,222,128,0.4);
   display: flex; align-items: center; justify-content: center;
 }
@@ -223,73 +208,49 @@ nav {
 .lk { font-size: 11px; color: var(--muted); }
 .lv { font-size: 11px; color: var(--white); font-weight: 500; }
 
-/* ── STEPS ── */
 .steps-wrap { width: 100%; max-width: 560px; }
-.step {
-  display: grid; grid-template-columns: 48px 1fr;
-  gap: 0 24px; padding-bottom: 48px; position: relative;
-}
+.step { display: grid; grid-template-columns: 48px 1fr; gap: 0 24px; padding-bottom: 48px; position: relative; }
 .step:last-child { padding-bottom: 0; }
 .step-left { display: flex; flex-direction: column; align-items: center; }
 .step-num {
   width: 48px; height: 48px; border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--gold3);
+  border: 1px solid var(--border); background: var(--gold3);
   font-family: 'Playfair Display', serif;
   font-size: 18px; font-weight: 700; color: var(--gold);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.step-line {
-  width: 1px; flex: 1; margin-top: 12px;
-  background: var(--border);
-}
+.step-line { width: 1px; flex: 1; margin-top: 12px; background: var(--border); }
 .step:last-child .step-line { display: none; }
 .step-right { padding-top: 12px; }
 .step-right h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.2px; }
 .step-right p { font-size: 14px; color: var(--muted); line-height: 1.7; font-weight: 300; }
 
-/* ── FEATURES ── */
 .feat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1px; max-width: 820px; width: 100%;
   border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
 }
-.feat {
-  background: var(--black3);
-  padding: 36px 32px;
-  transition: background 0.25s;
-}
+.feat { background: var(--black3); padding: 36px 32px; transition: background 0.25s; }
 .feat:hover { background: var(--black4); }
 .feat-icon {
-  width: 42px; height: 42px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  width: 42px; height: 42px; border: 1px solid var(--border); border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  margin-bottom: 20px;
-  background: var(--gold4);
+  margin-bottom: 20px; background: var(--gold4);
 }
 .feat-icon svg { width: 20px; height: 20px; }
 .feat h3 { font-size: 15px; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.2px; }
 .feat p { font-size: 13px; color: var(--muted); line-height: 1.7; font-weight: 300; }
 
-/* ── PRICING ── */
 .pricing-card {
   max-width: 420px; width: 100%;
-  background: var(--black3);
-  border: 1px solid var(--border);
+  background: var(--black3); border: 1px solid var(--border);
   border-radius: 16px; overflow: hidden;
   box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px var(--border);
 }
-.pricing-top {
-  padding: 40px 40px 32px;
-  border-bottom: 1px solid var(--border2);
-}
+.pricing-top { padding: 40px 40px 32px; border-bottom: 1px solid var(--border2); }
 .pricing-label {
   font-size: 10px; font-weight: 600; letter-spacing: 3px;
-  text-transform: uppercase; color: var(--gold);
-  margin-bottom: 24px;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 24px;
 }
 .price-num {
   font-family: 'Playfair Display', serif;
@@ -299,31 +260,24 @@ nav {
 .price-num sup { font-size: 28px; vertical-align: super; letter-spacing: 0; }
 .price-period { font-size: 13px; color: var(--muted); margin-top: 6px; font-weight: 300; }
 .pricing-feats { padding: 32px 40px; display: flex; flex-direction: column; gap: 16px; }
-.pf {
-  display: flex; align-items: flex-start; gap: 14px;
-  font-size: 14px; font-weight: 300; color: var(--white); line-height: 1.5;
-}
+.pf { display: flex; align-items: flex-start; gap: 14px; font-size: 14px; font-weight: 300; color: var(--white); line-height: 1.5; }
 .pf-icon {
   width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px;
-  border-radius: 50%; background: var(--gold3);
-  border: 1px solid var(--border);
+  border-radius: 50%; background: var(--gold3); border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
 }
 .pricing-footer { padding: 0 40px 40px; }
 .pricing-footer .btn-gold { display: block; text-align: center; font-size: 14px; padding: 16px; border-radius: 6px; }
 .trial-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 14px; font-weight: 300; }
 
-/* ── SIGNUP ── */
 .signup-wrap {
   max-width: 460px; width: 100%;
-  background: var(--black3);
-  border: 1px solid var(--border);
+  background: var(--black3); border: 1px solid var(--border);
   border-radius: 16px; padding: 48px 40px;
 }
 .signup-wrap h2 {
   font-family: 'Playfair Display', serif;
-  font-size: 28px; font-weight: 700;
-  letter-spacing: -0.5px; margin-bottom: 8px;
+  font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px;
 }
 .signup-wrap p { font-size: 14px; color: var(--muted); font-weight: 300; margin-bottom: 36px; }
 .fg { margin-bottom: 18px; }
@@ -334,12 +288,9 @@ nav {
 }
 .fg input, .fg select {
   width: 100%; background: var(--black2);
-  border: 1px solid var(--border2);
-  border-radius: 6px; padding: 13px 16px;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px; font-weight: 300;
-  color: var(--white); outline: none;
-  transition: border-color 0.2s;
+  border: 1px solid var(--border2); border-radius: 6px; padding: 13px 16px;
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 300;
+  color: var(--white); outline: none; transition: border-color 0.2s;
   -webkit-appearance: none;
 }
 .fg input:focus, .fg select:focus { border-color: var(--gold); }
@@ -348,26 +299,19 @@ nav {
 .fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .submit-btn {
   width: 100%; background: var(--gold); color: var(--black);
-  font-family: 'Inter', sans-serif;
-  font-size: 14px; font-weight: 700; letter-spacing: 0.3px;
-  padding: 16px; border: none; border-radius: 6px;
-  cursor: pointer; margin-top: 8px;
-  transition: background 0.2s;
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+  letter-spacing: 0.3px; padding: 16px; border: none; border-radius: 6px;
+  cursor: pointer; margin-top: 8px; transition: background 0.2s;
 }
 .submit-btn:hover { background: var(--gold2); }
 .form-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 16px; font-weight: 300; line-height: 1.6; }
 
-/* ── FOOTER ── */
 footer {
-  padding: 48px 24px;
-  border-top: 1px solid var(--border);
+  padding: 48px 24px; border-top: 1px solid var(--border);
   display: flex; flex-direction: column; align-items: center;
   gap: 20px; text-align: center;
 }
-.footer-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px; font-weight: 800; color: var(--white);
-}
+.footer-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; color: var(--white); }
 .footer-logo span { color: var(--gold); }
 .footer-links { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; }
 .footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 300; transition: color 0.2s; }
@@ -416,7 +360,6 @@ footer {
       <span class="ticker-item"><span class="ticker-dot"></span>Your Branded Page</span>
       <span class="ticker-item"><span class="ticker-dot"></span>Setup in Minutes</span>
       <span class="ticker-item"><span class="ticker-dot"></span>No Missed Leads</span>
-      <!-- duplicate for loop -->
       <span class="ticker-item"><span class="ticker-dot"></span>Instant Email Alerts</span>
       <span class="ticker-item"><span class="ticker-dot"></span>Hinglish AI Conversations</span>
       <span class="ticker-item"><span class="ticker-dot"></span>24 / 7 Active</span>
@@ -515,8 +458,7 @@ footer {
     <div class="feat">
       <div class="feat-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5">
-          <circle cx="12" cy="12" r="9"/>
-          <path d="M12 7v5l3 3"/>
+          <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
         </svg>
       </div>
       <h3>Always On</h3>
@@ -585,33 +527,23 @@ footer {
     </div>
     <div class="pricing-feats">
       <div class="pf">
-        <div class="pf-icon">
-          <svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg>
-        </div>
+        <div class="pf-icon"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg></div>
         AI-powered lead bot, active 24/7
       </div>
       <div class="pf">
-        <div class="pf-icon">
-          <svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg>
-        </div>
+        <div class="pf-icon"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg></div>
         Unlimited conversations
       </div>
       <div class="pf">
-        <div class="pf-icon">
-          <svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg>
-        </div>
+        <div class="pf-icon"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg></div>
         Instant email on every lead
       </div>
       <div class="pf">
-        <div class="pf-icon">
-          <svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg>
-        </div>
+        <div class="pf-icon"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg></div>
         Personal branded page
       </div>
       <div class="pf">
-        <div class="pf-icon">
-          <svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg>
-        </div>
+        <div class="pf-icon"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg></div>
         Setup and onboarding included
       </div>
     </div>
@@ -648,16 +580,58 @@ footer {
         <input type="text" placeholder="Mumbai" id="f-city"/>
       </div>
       <div class="fg">
-        <label>Specialty</label>
-        <select id="f-spec">
-          <option value="">Select</option>
-          <option>Residential</option>
-          <option>Commercial</option>
-          <option>Residential + Commercial</option>
-          <option>Plots / Land</option>
-          <option>Rental</option>
+        <label>State</label>
+        <select id="f-state">
+          <option value="">Select State</option>
+          <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+          <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+          <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+          <option>Himachal Pradesh</option><option>Jharkhand</option>
+          <option>Karnataka</option><option>Kerala</option>
+          <option>Madhya Pradesh</option><option>Maharashtra</option>
+          <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+          <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+          <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+          <option>Telangana</option><option>Tripura</option>
+          <option>Uttar Pradesh</option><option>Uttarakhand</option>
+          <option>West Bengal</option><option>Delhi</option>
+          <option>Jammu & Kashmir</option><option>Ladakh</option>
         </select>
       </div>
+    </div>
+    <div class="fg-row">
+      <div class="fg">
+        <label>Experience</label>
+        <select id="f-exp">
+          <option value="">Select Years</option>
+          <option>1 Year</option><option>2 Years</option><option>3 Years</option>
+          <option>4 Years</option><option>5 Years</option><option>6 Years</option>
+          <option>7 Years</option><option>8 Years</option><option>9 Years</option>
+          <option>10 Years</option><option>11 Years</option><option>12 Years</option>
+          <option>13 Years</option><option>14 Years</option><option>15 Years</option>
+          <option>16 Years</option><option>17 Years</option><option>18 Years</option>
+          <option>19 Years</option><option>20+ Years</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Properties Dealt</label>
+        <select id="f-props">
+          <option value="">Select Range</option>
+          <option>10+</option><option>25+</option><option>50+</option>
+          <option>100+</option><option>200+</option><option>500+</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Specialty</label>
+      <select id="f-spec">
+        <option value="">Select</option>
+        <option>Residential</option>
+        <option>Commercial</option>
+        <option>Residential + Commercial</option>
+        <option>Plots / Land</option>
+        <option>Rental</option>
+      </select>
     </div>
     <div class="fg">
       <label>Email</label>
@@ -683,7 +657,7 @@ footer {
 
 <script>
 async function submitForm() {
-  const fields = ['f-name','f-phone','f-biz','f-city','f-spec','f-email'];
+  const fields = ['f-name','f-phone','f-biz','f-city','f-state','f-exp','f-props','f-spec','f-email'];
   let ok = true;
   fields.forEach(id => {
     const el = document.getElementById(id);
@@ -708,8 +682,11 @@ async function submitForm() {
         phone: document.getElementById('f-phone').value,
         business: document.getElementById('f-biz').value,
         city: document.getElementById('f-city').value,
+        state: document.getElementById('f-state').value,
         specialty: document.getElementById('f-spec').value,
-        email: document.getElementById('f-email').value
+        email: document.getElementById('f-email').value,
+        experience: document.getElementById('f-exp').value,
+        properties: document.getElementById('f-props').value
       })
     });
 
