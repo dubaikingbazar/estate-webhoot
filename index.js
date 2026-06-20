@@ -11,7 +11,7 @@ const brokers = {
   "test": {
     name: "EstateBot Demo",
     location: "Mumbai",
-    email: "estatebotofficial@gmail.com",
+    email: "dubaikingbazar@gmail.com",
     stats: { properties: "500+", experience: "10 Yrs", rating: "4.8★" },
     specialties: ["🏢 Residential", "🏬 Commercial", "🏗️ New Projects", "🔑 Rental"]
   }
