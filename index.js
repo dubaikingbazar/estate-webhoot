@@ -116,8 +116,7 @@ STRICT RULES:
 
 // ===== SEND LEAD EMAIL =====
 async function sendLeadEmail(broker, leadData) {
-  console.log('EMAIL ATTEMPT to:', broker.email, '| Lead:', leadData.name);
-  const { data, error } = await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: 'EstateBot <leads@estatebotai.in>',
     to: broker.email,
     subject: `Naya Lead — ${leadData.name} | ${broker.name}`,
@@ -222,11 +221,8 @@ async function sendLeadEmail(broker, leadData) {
 </body>
 </html>`
   });
-  if (error) {
-    console.error('Email error details:', JSON.stringify(error));
-  } else {
-    console.log(`Email sent successfully to ${broker.email} for lead: ${leadData.name}`);
-  }
+  if (error) console.error('Email error:', error);
+  else console.log(`Email sent to ${broker.email} for lead: ${leadData.name}`);
 }
 
 // ===== SEND WELCOME EMAIL TO BROKER =====
@@ -266,11 +262,13 @@ app.post('/api/signup', async (req, res) => {
     return res.status(400).json({ error: 'Saari details bharo' });
   }
 
+  // broker_id banao — business name se
   const broker_id = business.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '-')
     .substring(0, 30);
 
+  // Check karo — already exist toh nahi karta
   const { data: existing } = await supabase
     .from('brokers')
     .select('broker_id')
@@ -279,6 +277,7 @@ app.post('/api/signup', async (req, res) => {
 
   const finalId = existing ? `${broker_id}-${Date.now().toString().slice(-4)}` : broker_id;
 
+  // Supabase mein save karo
   const { error } = await supabase.from('brokers').insert([{
     broker_id: finalId,
     name: business,
@@ -298,6 +297,7 @@ app.post('/api/signup', async (req, res) => {
     return res.status(500).json({ error: 'Database error' });
   }
 
+  // Welcome email bhejo
   await sendWelcomeEmail({ name, broker_id: finalId, email });
 
   console.log(`New broker signup: ${business} (${finalId})`);
@@ -330,6 +330,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   const { brokerId } = req.params;
   const { message, sessionId } = req.body;
 
+  // Pehle Supabase se broker dhundo
   const { data: broker, error } = await supabase
     .from('brokers')
     .select('*')
@@ -356,6 +357,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
     let groqRes = await callGroq();
     let data = await groqRes.json();
 
+    // Agar rate limit (429) lage, ek baar 2 second wait karke phir try karo
     if (groqRes.status === 429) {
       console.error('GROQ RATE LIMITED — retrying in 2s');
       await new Promise(r => setTimeout(r, 2000));
@@ -379,23 +381,21 @@ app.post('/api/chat/:brokerId', async (req, res) => {
     let leadData = null;
 
     if (reply.includes('|||LEAD|||')) {
-      const match = reply.match(/\|\|\|LEAD\|\|\|([\s\S]+?)\|\|\|/);
+      const match = reply.match(/\|\|\|LEAD\|\|\|(.+?)\|\|\|/);
       if (match) {
         try {
           leadData = JSON.parse(match[1]);
 
           // Phone mandatory check
           if (!leadData.phone || leadData.phone.length < 8) {
-            // ✅ FIX 1: Proper multiline regex to remove LEAD block
-            reply = reply.replace(/\|\|\|LEAD\|\|\|[\s\S]+?\|\|\|/g, '').trim();
+            reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
             leadComplete = false;
             leadData = null;
           } else {
-            // ✅ FIX 1: Proper multiline regex to remove LEAD block
-            reply = reply.replace(/\|\|\|LEAD\|\|\|[\s\S]+?\|\|\|/g, '').trim();
+            reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
 
-            // Save lead to Supabase
-            const { error: leadError } = await supabase.from('leads').insert([{
+            // Lead Supabase mein save karo
+            await supabase.from('leads').insert([{
               broker_id: brokerId,
               name: leadData.name,
               phone: leadData.phone,
@@ -408,24 +408,12 @@ app.post('/api/chat/:brokerId', async (req, res) => {
               parking: leadData.parking || null
             }]);
 
-            if (leadError) {
-              console.error('Supabase lead insert error:', JSON.stringify(leadError));
-            } else {
-              console.log('Lead saved to Supabase:', leadData.name);
-            }
-
-            // ✅ FIX 2: Send email and log result
             await sendLeadEmail(broker, leadData);
             leadComplete = true;
           }
-        } catch (e) {
-          console.error('Lead parse error:', e);
-          // ✅ FIX 1: Remove broken LEAD block so user doesn't see it
-          reply = reply.replace(/\|\|\|LEAD\|\|\|[\s\S]+?\|\|\|/g, '').trim();
-        }
+        } catch (e) { console.error('Lead parse error:', e); }
       }
     }
-
     res.json({ reply, leadComplete, leadData });
   } catch (err) {
     console.error('Error:', err);
