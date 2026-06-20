@@ -566,7 +566,7 @@ function typeMsg(text, role) {
   d.className = 'msg ' + role;
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-  bubble.textContent = '';
+  bubble.innerHTML = '';
   const ts = document.createElement('div');
   ts.className = 'ts';
   ts.textContent = getTime();
@@ -576,16 +576,15 @@ function typeMsg(text, role) {
   body.scrollTop = body.scrollHeight;
 
   let i = 0;
-  const chars = text.split('');
-  const interval = setInterval(() => {
-    if (i < chars.length) {
-      bubble.textContent += chars[i];
+  function typeNext() {
+    if (i < text.length) {
+      bubble.innerHTML += text.charAt(i);
       i++;
       body.scrollTop = body.scrollHeight;
-    } else {
-      clearInterval(interval);
+      setTimeout(typeNext, 20);
     }
-  }, 18);
+  }
+  typeNext();
 }
 async function sendMsg(){
   const input=document.getElementById('msgInput');
