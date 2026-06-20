@@ -74,8 +74,10 @@ Step 5 — Budget (sensitively):
 Step 6 — Timeline:
 "Kitne time mein lena chahenge? Jaldi hai ya thoda time hai sochne ke liye?"
 
-Step 7 — Phone (warmly):
+Step 7 — Phone (warmly) — YE STEP SKIP MAT KARO KABHI:
 "[Naam] ji, ek kaam karein — apna phone number dijiye. Hamare senior property advisor directly call karenge aur aapki requirements ke hisaab se best options dikhayenge. Bilkul free consultation hai."
+
+IMPORTANT: Phone number liye BINA lead BILKUL complete mat karna — chahe customer kitna bhi bata de. Phone number aana ZAROORI hai.
 
 Jab naam, phone, property type, area, budget sab mil jaye — genuinely thank karo phir BILKUL BAAD ye EXACTLY likho:
 |||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE","area":"AREA","budget":"BUDGET","intent":"INTENT","timeline":"TIMELINE"}|||
@@ -303,22 +305,30 @@ app.post('/api/chat/:brokerId', async (req, res) => {
       if (match) {
         try {
           leadData = JSON.parse(match[1]);
-          reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
 
-          // Lead Supabase mein save karo
-          await supabase.from('leads').insert([{
-            broker_id: brokerId,
-            name: leadData.name,
-            phone: leadData.phone,
-            property_type: leadData.type,
-            area: leadData.area,
-            budget: leadData.budget,
-            intent: leadData.intent,
-            timeline: leadData.timeline || null
-          }]);
+          // Phone mandatory check
+          if (!leadData.phone || leadData.phone.length < 8) {
+            reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
+            leadComplete = false;
+            leadData = null;
+          } else {
+            reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
 
-          await sendLeadEmail(broker, leadData);
-          leadComplete = true;
+            // Lead Supabase mein save karo
+            await supabase.from('leads').insert([{
+              broker_id: brokerId,
+              name: leadData.name,
+              phone: leadData.phone,
+              property_type: leadData.type,
+              area: leadData.area,
+              budget: leadData.budget,
+              intent: leadData.intent,
+              timeline: leadData.timeline || null
+            }]);
+
+            await sendLeadEmail(broker, leadData);
+            leadComplete = true;
+          }
         } catch (e) { console.error('Lead parse error:', e); }
       }
     }
@@ -474,17 +484,11 @@ const sessionId = Math.random().toString(36).substr(2,9);
 const brokerId = '${brokerId}';
 let leadDone = false;
 function getTime(){const n=new Date();return n.getHours()+':'+String(n.getMinutes()).padStart(2,'0');}
-function addMsg(text,role,leadData){
+function addMsg(text,role){
   const body=document.getElementById('chatBody');
-  if(role==='lead'){
-    const d=document.createElement('div');d.className='lead-card';
-    d.innerHTML='<div class="lc-top"><span style="font-size:24px;">✅</span><div><div class="lc-title">Lead Captured!</div></div></div><div class="lc-grid"><div class="lc-item"><div class="li">Naam</div><div class="lv">'+leadData.name+'</div></div><div class="lc-item"><div class="li">Phone</div><div class="lv">'+leadData.phone+'</div></div><div class="lc-item"><div class="li">Property</div><div class="lv">'+leadData.type+'</div></div><div class="lc-item"><div class="li">Area</div><div class="lv">'+leadData.area+'</div></div></div><div class="lc-email">Agent ko notification bhej di!</div>';
-    body.appendChild(d);
-  } else {
-    const d=document.createElement('div');d.className='msg '+role;
-    d.innerHTML='<div class="bubble">'+text+'</div><div class="ts">'+getTime()+'</div>';
-    body.appendChild(d);
-  }
+  const d=document.createElement('div');d.className='msg '+role;
+  d.innerHTML='<div class="bubble">'+text+'</div><div class="ts">'+getTime()+'</div>';
+  body.appendChild(d);
   body.scrollTop=body.scrollHeight;
 }
 function showTyping(){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg bot';d.id='typing';d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';body.appendChild(d);body.scrollTop=body.scrollHeight;}
@@ -497,7 +501,11 @@ async function sendMsg(){
   try{
     const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});
     const data=await res.json();removeTyping();addMsg(data.reply,'bot');
-    if(data.leadComplete&&data.leadData){leadDone=true;addMsg('','lead',data.leadData);document.getElementById('msgInput').disabled=true;document.getElementById('msgInput').placeholder='Lead submit ho gayi!';}
+    if(data.leadComplete){
+      leadDone=true;
+      document.getElementById('msgInput').disabled=true;
+      document.getElementById('msgInput').placeholder='Shukriya! Hamari team jald contact karegi.';
+    }
   }catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}
 }
 </script>
