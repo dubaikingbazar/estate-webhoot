@@ -336,6 +336,7 @@ footer {
   <div class="nav-right">
     <a href="#how" class="nav-link">How it works</a>
     <a href="#pricing" class="nav-link">Pricing</a>
+    <a href="/broker-login" class="nav-link" style="color:#c8a96e;font-weight:600;">Broker Login</a>
     <a href="#signup" class="nav-btn">Start Free Trial</a>
   </div>
 </nav>
@@ -651,6 +652,7 @@ footer {
     <a href="tel:+918690353003">+91 86903 53003</a>
     <a href="#demo">Demo</a>
     <a href="#pricing">Pricing</a>
+    <a href="/broker-login" style="color:#c8a96e;">Broker Login</a>
   </div>
   <div class="footer-copy">© 2026 EstateBot. All rights reserved.</div>
 </footer>
@@ -709,12 +711,12 @@ async function submitForm() {
         </div>
       `;
     } else {
-      btn.textContent = 'Error — Dobara Try Karein';
+      btn.textContent = 'Error — Try Again';
       btn.style.background = '#ef4444';
       btn.disabled = false;
     }
   } catch(e) {
-    btn.textContent = 'Error — Dobara Try Karein';
+    btn.textContent = 'Error — Try Again';
     btn.style.background = '#ef4444';
     btn.disabled = false;
   }
