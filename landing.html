@@ -55,6 +55,15 @@ nav {
   letter-spacing: 0.2px;
 }
 .nav-btn:hover { background: var(--gold2); }
+.nav-login {
+  font-size: 13px; font-weight: 600;
+  color: var(--gold); background: transparent;
+  padding: 10px 20px; border-radius: 4px;
+  text-decoration: none; transition: all 0.2s;
+  border: 1px solid rgba(200,169,110,0.4);
+  letter-spacing: 0.2px;
+}
+.nav-login:hover { background: rgba(200,169,110,0.1); }
 
 .hero {
   min-height: 100vh;
@@ -321,6 +330,9 @@ footer {
 @media (max-width: 600px) {
   nav { padding: 0 20px; }
   .nav-right .nav-link { display: none; }
+  .nav-right { gap: 10px; }
+  .nav-btn { font-size: 12px; padding: 9px 14px; }
+  .nav-login { font-size: 12px; padding: 9px 14px; }
   .hero h1 { letter-spacing: -1px; }
   .signup-wrap { padding: 32px 24px; }
   .pricing-top, .pricing-feats, .pricing-footer { padding-left: 28px; padding-right: 28px; }
@@ -336,7 +348,7 @@ footer {
   <div class="nav-right">
     <a href="#how" class="nav-link">How it works</a>
     <a href="#pricing" class="nav-link">Pricing</a>
-    <a href="/broker-login" class="nav-link" style="color:#c8a96e;font-weight:600;">Broker Login</a>
+    <a href="/broker-login" class="nav-login">Login</a>
     <a href="#signup" class="nav-btn">Start Free Trial</a>
   </div>
 </nav>
