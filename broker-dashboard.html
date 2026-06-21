@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Broker Dashboard — EstateBot</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #f0f4f8;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-logo span {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.header-logo small {
+  display: block;
+  color: #c8a96e;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.logout-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* BROKER INFO CARD */
+.broker-card {
+  background: #fff;
+  margin: 16px;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.broker-card-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.broker-avatar {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c8a96e;
+  font-size: 20px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.broker-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.broker-city {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+.status-trial { background: #fef3c7; color: #d97706; }
+.status-active { background: #dcfce7; color: #16a34a; }
+.status-inactive { background: #fee2e2; color: #dc2626; }
+
+/* BOT LINK */
+.bot-link-box {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.bot-link-label {
+  font-size: 10px;
+  color: #0369a1;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.bot-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bot-link-url {
+  font-size: 12px;
+  color: #1e3a5f;
+  font-weight: 600;
+  flex: 1;
+  word-break: break-all;
+}
+.copy-btn {
+  background: #1e3a5f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+}
+.copy-btn.copied { background: #16a34a; }
+
+/* STATS ROW */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0 16px 16px;
+}
+.stat-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+.stat-num {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e3a5f;
+  line-height: 1;
+}
+.stat-lbl {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* SECTION TITLE */
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  padding: 0 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+/* LEADS LIST */
+.leads-container {
+  padding: 0 16px 16px;
+}
+.lead-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+.lead-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.lead-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.lead-time {
+  font-size: 10px;
+  color: #94a3b8;
+}
+.lead-phone {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin-bottom: 8px;
+}
+.lead-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.tag {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+.tag.intent {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+.lead-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn-call {
+  flex: 1;
+  background: #1e3a5f;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.btn-whatsapp {
+  flex: 1;
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+}
+.empty-state svg { margin-bottom: 12px; opacity: 0.4; }
+.empty-state p { font-size: 13px; }
+
+/* LOADING */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+.dot-loader {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.dot-loader span {
+  width: 8px; height: 8px;
+  background: #c8a96e;
+  border-radius: 50%;
+  animation: dotbounce 1.2s infinite;
+}
+.dot-loader span:nth-child(2) { animation-delay: 0.2s; }
+.dot-loader span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotbounce {
+  0%,60%,100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* ERROR */
+.error-state {
+  text-align: center;
+  padding: 30px 20px;
+  background: #fee2e2;
+  border-radius: 12px;
+  margin: 0 16px;
+  color: #dc2626;
+  font-size: 13px;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.8">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    <div>
+      <span>EstateBot</span>
+      <small>Broker Dashboard</small>
+    </div>
+  </div>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<!-- CONTENT -->
+<div id="loadingState" class="loading">
+  <div class="dot-loader"><span></span><span></span><span></span></div>
+  <p>Loading your dashboard...</p>
+</div>
+
+<div id="mainContent" style="display:none;">
+
+  <!-- BROKER INFO -->
+  <div class="broker-card" id="brokerCard"></div>
+
+  <!-- STATS -->
+  <div class="stats-row" id="statsRow"></div>
+
+  <!-- LEADS -->
+  <div class="section-title">
+    Recent Leads
+  </div>
+  <div class="leads-container" id="leadsContainer"></div>
+
+</div>
+
+<div id="errorState" class="error-state" style="display:none;">
+  ⚠️ Could not load dashboard. Please <a href="/broker-login" style="color:#dc2626;font-weight:700;">login again</a>.
+</div>
+
+<script>
+const SUPABASE_URL = 'https://rpswzqgzcautmfjpgohh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc3d6cWd6Y2F1dG1manBnb2hoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTkyMjYzMCwiZXhwIjoyMDk3NDk4NjMwfQ.v48pCXRn0DTb2dUJv8bhBgoB-vxINiWR-wqlDc7vAFQ';
+
+// Get broker_id from URL or localStorage
+const params = new URLSearchParams(window.location.search);
+const brokerId = params.get('broker_id') || localStorage.getItem('broker_id');
+
+if (!brokerId) {
+  window.location.href = '/broker-login';
+}
+
+async function fetchData(table, filter) {
+  const url = `${SUPABASE_URL}/rest/v1/${table}?${filter}&order=created_at.desc`;
+  const res = await fetch(url, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`
+    }
+  });
+  return res.json();
+}
+
+function timeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+function formatDate(dateStr) {
+  return new Date(dateStr).toLocaleDateString('en-IN', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  });
+}
+
+async function loadDashboard() {
+  try {
+    // Fetch broker info
+    const brokers = await fetchData('brokers', `broker_id=eq.${brokerId}`);
+    if (!brokers || brokers.length === 0) throw new Error('Broker not found');
+    const broker = brokers[0];
+
+    // Fetch leads
+    const leads = await fetchData('leads', `broker_id=eq.${brokerId}`);
+
+    // Hide loading, show content
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+
+    // Render broker card
+    const botUrl = `https://estatebotai.in/${broker.broker_id}`;
+    document.getElementById('brokerCard').innerHTML = `
+      <div class="broker-card-top">
+        <div class="broker-avatar">${broker.name.substring(0,2).toUpperCase()}</div>
+        <div>
+          <div class="broker-name">${broker.name}</div>
+          <div class="broker-city">📍 ${broker.city || '—'}</div>
+          <span class="status-badge status-${broker.status || 'trial'}">${broker.status || 'Trial'}</span>
+        </div>
+      </div>
+      <div class="bot-link-box">
+        <div class="bot-link-label">🔗 Your Bot Link</div>
+        <div class="bot-link-row">
+          <div class="bot-link-url">${botUrl}</div>
+          <button class="copy-btn" id="copyBtn" onclick="copyLink('${botUrl}')">Copy</button>
+        </div>
+      </div>
+    `;
+
+    // Render stats
+    const todayLeads = leads.filter(l => {
+      const d = new Date(l.created_at);
+      const today = new Date();
+      return d.toDateString() === today.toDateString();
+    }).length;
+
+    document.getElementById('statsRow').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-num">${leads.length}</div>
+        <div class="stat-lbl">Total Leads</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${todayLeads}</div>
+        <div class="stat-lbl">Today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${broker.stats?.properties || '—'}</div>
+        <div class="stat-lbl">Properties</div>
+      </div>
+    `;
+
+    // Render leads
+    const container = document.getElementById('leadsContainer');
+    if (!leads || leads.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+          <p>No leads yet. Share your bot link to get started!</p>
+        </div>
+      `;
+    } else {
+      container.innerHTML = leads.map(lead => `
+        <div class="lead-card">
+          <div class="lead-top">
+            <div class="lead-name">👤 ${lead.name || '—'}</div>
+            <div class="lead-time">${lead.created_at ? timeAgo(lead.created_at) : ''}</div>
+          </div>
+          <div class="lead-phone">📞 ${lead.phone || '—'}</div>
+          <div class="lead-tags">
+            ${lead.intent ? `<span class="tag intent">${lead.intent}</span>` : ''}
+            ${lead.property_type ? `<span class="tag">🏠 ${lead.property_type}</span>` : ''}
+            ${lead.area ? `<span class="tag">📍 ${lead.area}</span>` : ''}
+            ${lead.budget ? `<span class="tag">💰 ${lead.budget}</span>` : ''}
+            ${lead.timeline ? `<span class="tag">⏰ ${lead.timeline}</span>` : ''}
+          </div>
+          <div class="lead-actions">
+            <a class="btn-call" href="tel:${lead.phone}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              Call
+            </a>
+            <a class="btn-whatsapp" href="https://wa.me/${lead.phone?.replace(/[^0-9]/g,'')}" target="_blank">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.531 5.855L.057 24l6.305-1.654A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.368l-.36-.213-3.733.979 1.004-3.648-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
+              WhatsApp
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+  }
+}
+
+function copyLink(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function logout() {
+  localStorage.removeItem('broker_id');
+  window.location.href = '/broker-login';
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>
