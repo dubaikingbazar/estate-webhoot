@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Broker Login — EstateBot</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #0a0a14;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(200,169,110,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.card {
+  background: #12121f;
+  border: 1px solid rgba(200,169,110,0.2);
+  border-radius: 20px;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #c8a96e, transparent);
+}
+.logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.logo-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  border: 1px solid rgba(200,169,110,0.3);
+}
+.logo-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
+}
+.logo-sub {
+  font-size: 12px;
+  color: #c8a96e;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.form-group {
+  margin-bottom: 18px;
+}
+.form-group label {
+  display: block;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.form-group input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(200,169,110,0.2);
+  border-radius: 10px;
+  padding: 13px 16px;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  outline: none;
+  transition: all 0.2s;
+}
+.form-group input:focus {
+  border-color: #c8a96e;
+  background: rgba(200,169,110,0.05);
+}
+.form-group input::placeholder {
+  color: rgba(255,255,255,0.2);
+}
+.btn-login {
+  width: 100%;
+  background: linear-gradient(135deg, #c8a96e, #a07840);
+  color: #0a0a14;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-login:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+.btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+.msg-box {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  margin-top: 14px;
+  display: none;
+  text-align: center;
+}
+.msg-box.error {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #f87171;
+}
+.msg-box.success {
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.3);
+  color: #4ade80;
+}
+.footer-note {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.2);
+}
+.footer-note a {
+  color: #c8a96e;
+  text-decoration: none;
+}
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(10,10,20,0.3);
+  border-top-color: #0a0a14;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.8">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    </div>
+    <div class="logo-title">EstateBot</div>
+    <div class="logo-sub">Broker Portal</div>
+  </div>
+
+  <div class="form-group">
+    <label>Broker ID</label>
+    <input type="text" id="brokerId" placeholder="e.g. dipanshu-realstate-" autocomplete="off"/>
+  </div>
+
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter your password" onkeypress="if(event.key==='Enter')doLogin()"/>
+  </div>
+
+  <button class="btn-login" id="loginBtn" onclick="doLogin()">
+    <span id="btnText">Login</span>
+    <div class="spinner" id="spinner"></div>
+  </button>
+
+  <div class="msg-box error" id="errorBox"></div>
+  <div class="msg-box success" id="successBox"></div>
+
+  <div class="footer-note">
+    <a href="/">← Go Back</a> &nbsp;|&nbsp;
+    Help: <a href="mailto:estatebotofficial@gmail.com">estatebotofficial@gmail.com</a>
+  </div>
+</div>
+
+<script>
+async function doLogin() {
+  const brokerId = document.getElementById('brokerId').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const btn = document.getElementById('loginBtn');
+  const btnText = document.getElementById('btnText');
+  const spinner = document.getElementById('spinner');
+  const errorBox = document.getElementById('errorBox');
+  const successBox = document.getElementById('successBox');
+
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!brokerId || !password) {
+    errorBox.textContent = 'Please enter your Broker ID and Password.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btnText.textContent = 'Verifying...';
+  spinner.style.display = 'block';
+
+  try {
+    const res = await fetch('/api/broker-auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ broker_id: brokerId, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      successBox.textContent = 'Login successful! Redirecting to dashboard...';
+      successBox.style.display = 'block';
+      localStorage.setItem('broker_id', data.broker_id);
+      setTimeout(() => {
+        window.location.href = '/dashboard?broker_id=' + data.broker_id;
+      }, 800);
+    } else {
+      errorBox.textContent = data.error || 'Login failed. Please try again.';
+      errorBox.style.display = 'block';
+      btn.disabled = false;
+      btnText.textContent = 'Login';
+      spinner.style.display = 'none';
+    }
+  } catch (err) {
+    errorBox.textContent = 'Server error. Please try again later.';
+    errorBox.style.display = 'block';
+    btn.disabled = false;
+    btnText.textContent = 'Login';
+    spinner.style.display = 'none';
+  }
+}
+</script>
+
+</body>
+</html>
