@@ -430,6 +430,15 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   }
 });
 
+// ===== LEGAL PAGES =====
+app.get("/privacy", (req, res) => {
+  res.sendFile(__dirname + "/privacy.html");
+});
+
+app.get("/terms", (req, res) => {
+  res.sendFile(__dirname + "/terms.html");
+});
+
 // ===== ADMIN PANEL =====
 app.get('/admin', (req, res) => {
   res.sendFile(__dirname + '/admin.html');
