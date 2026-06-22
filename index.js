@@ -301,8 +301,8 @@ async function sendWelcomeEmail(broker) {
 
 // ===== BROKER SIGNUP API =====
 app.post('/api/signup', async (req, res) => {
-  const { name, business, city, state, specialty, email, phone, experience, properties } = req.body;
-  if (!name || !business || !city || !email || !phone) {
+  const { name, business, city, state, specialty, email, phone, experience, properties, password } = req.body;
+  if (!name || !business || !city || !email || !phone || !password) {
     return res.status(400).json({ error: 'Saari details bharo' });
   }
   const broker_id = business.toLowerCase()
@@ -320,6 +320,7 @@ app.post('/api/signup', async (req, res) => {
     name: business,
     email,
     phone,
+    password,
     city: city + (state ? ', ' + state : ''),
     specialty: specialty || 'Residential',
     status: 'trial',
@@ -336,19 +337,19 @@ app.post('/api/signup', async (req, res) => {
   res.json({ success: true, broker_id: finalId, url: `https://estatebotai.in/${finalId}` });
 });
 
-// ===== BROKER AUTH API =====
+// ===== BROKER AUTH API (EMAIL + PASSWORD) =====
 app.post('/api/broker-auth', async (req, res) => {
-  const { broker_id, password } = req.body;
-  if (!broker_id || !password) {
-    return res.status(400).json({ error: 'Broker ID aur password dono chahiye' });
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email aur password dono chahiye' });
   }
   const { data: broker, error } = await supabase
     .from('brokers')
     .select('*')
-    .eq('broker_id', broker_id)
+    .eq('email', email)
     .single();
   if (error || !broker) {
-    return res.status(404).json({ error: 'Broker nahi mila' });
+    return res.status(404).json({ error: 'Is email se koi account nahi mila' });
   }
   if (broker.password !== password) {
     return res.status(401).json({ error: 'Password galat hai' });
@@ -458,7 +459,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
 
   if (!conversations[sessionId]) conversations[sessionId] = [];
   conversations[sessionId].push({ role: 'user', content: message });
-
 
   try {
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -621,7 +621,6 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .powered{width:100%;max-width:100%;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;color:#6B6354;font-weight:700;}
 .chat-body{background:transparent;padding:0;min-height:180px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:360px;}
 .date-label{align-self:center;background:#EDE7D8;color:#6B6354;font-size:10px;padding:5px 14px;border-radius:100px;font-weight:600;}
-
 </style>
 </head>
 <body>
@@ -846,8 +845,6 @@ async function sendMsg(){
     if(data.leadComplete){leadDone=true;disableChat();}
   }catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}
 }
-
-
 </script>
 </body></html>`;
 }
