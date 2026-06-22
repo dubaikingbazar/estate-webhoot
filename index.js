@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 // ===== KEYS =====
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = "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";
 const resend = new Resend('re_7HnaPfwP_Cso6RXqBYX7A4apowdzvd6kQ');
 const supabase = createClient(
   'https://rpswzqgzcautmfjpgohh.supabase.co',
