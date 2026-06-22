@@ -102,7 +102,11 @@ IMPORTANT: Phone number liye BINA lead BILKUL complete mat karna.
 Jab naam, phone, property type, area, budget sab mil jaye — warmly thank karo, phir BILKUL BAAD likho:
 |||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE_WITH_BHK","area":"AREA","budget":"BUDGET","intent":"Rent Lena Chahte Hain/Rent Dena Chahte Hain/Kharidna Chahte Hain/Sell Karna Chahte Hain","timeline":"TIMELINE","furnished":"Furnished/Semi-Furnished/Unfurnished/NA","parking":"Chahiye/Nahi Chahiye/NA","special":"ANY_SPECIAL_REQUIREMENTS"}|||
 
-Thank you message (warm, genuine):
+Thank you message:
+- Agar intent "Sell Karna Chahte Hain" ya "Rent Dena Chahte Hain" hai:
+"Bahut shukriya [Naam] ji! Aapki details note ho gayi hain 😊 Ek kaam — apni property ki photos yahan upload karein, agent ko jaldi best buyer/tenant milega: |||UPLOAD_LINK||| Hamare senior advisor kal tak call karenge!"
+
+- Agar intent "Kharidna Chahte Hain" ya "Rent Lena Chahte Hain" hai:
 "Bahut shukriya [Naam] ji! Aapki saari details note ho gayi hain 😊 Hamare senior advisor kal tak aapko call karenge. Koi bhi sawaal ho toh pooch sakte ho!"
 
 STRICT RULES:
@@ -334,6 +338,45 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(__dirname + '/broker-dashboard.html');
 });
 
+// ===== UPLOAD PAGE =====
+app.get('/upload/:token', (req, res) => {
+  res.sendFile(__dirname + '/upload.html');
+});
+
+// ===== UPLOAD API =====
+app.post('/api/upload/:token', async (req, res) => {
+  const { token } = req.params;
+  // Find lead by token
+  const { data: lead, error } = await supabase
+    .from('leads')
+    .select('*')
+    .eq('upload_token', token)
+    .single();
+  if (error || !lead) return res.status(404).json({ error: 'Invalid link' });
+  res.json({ success: true, lead_id: lead.id, broker_id: lead.broker_id });
+});
+
+// ===== SUPABASE UPLOAD SIGNED URL =====
+app.post('/api/upload-image/:token', async (req, res) => {
+  const { token } = req.params;
+  const { fileName, fileType } = req.body;
+  
+  const { data: lead } = await supabase
+    .from('leads')
+    .select('id')
+    .eq('upload_token', token)
+    .single();
+  if (!lead) return res.status(404).json({ error: 'Invalid token' });
+  
+  const filePath = lead.id + '/' + Date.now() + '-' + fileName;
+  const { data, error } = await supabase.storage
+    .from('property-images')
+    .createSignedUploadUrl(filePath);
+  
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ signedUrl: data.signedUrl, path: filePath });
+});
+
 // ===== ADMIN API =====
 app.get('/api/admin/brokers', async (req, res) => {
   const { data, error } = await supabase.from('brokers').select('*').order('created_at', { ascending: false });
@@ -404,7 +447,10 @@ app.post('/api/chat/:brokerId', async (req, res) => {
             reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
 
             // Lead Supabase mein save karo
-            await supabase.from('leads').insert([{
+            // Generate unique upload token
+            const uploadToken = Math.random().toString(36).substr(2,12) + Date.now().toString(36);
+            
+            const { data: insertedLead } = await supabase.from('leads').insert([{
               broker_id: brokerId,
               name: leadData.name,
               phone: leadData.phone,
@@ -414,8 +460,14 @@ app.post('/api/chat/:brokerId', async (req, res) => {
               intent: leadData.intent,
               timeline: leadData.timeline || null,
               furnished: leadData.furnished || null,
-              parking: leadData.parking || null
-            }]);
+              parking: leadData.parking || null,
+              special_requirements: leadData.special || null,
+              upload_token: uploadToken
+            }]).select().single();
+            
+            // Agar sell/rent-out hai toh upload link replace karo
+            const uploadUrl = 'https://estatebotai.in/upload/' + uploadToken;
+            reply = reply.replace('|||UPLOAD_LINK|||', uploadUrl);
 
             await sendLeadEmail(broker, leadData);
             leadComplete = true;
