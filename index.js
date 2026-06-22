@@ -556,7 +556,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'llama3-70b-8192',
         messages: [{ role: 'system', content: getSystemPrompt(broker.name) }, ...conversations[sessionId]]
       })
     });
