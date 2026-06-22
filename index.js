@@ -337,19 +337,19 @@ app.post('/api/signup', async (req, res) => {
   res.json({ success: true, broker_id: finalId, url: `https://estatebotai.in/${finalId}` });
 });
 
-// ===== BROKER AUTH API (EMAIL + PASSWORD) =====
+// ===== BROKER AUTH API =====
 app.post('/api/broker-auth', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email aur password dono chahiye' });
+  const { broker_id, password } = req.body;
+  if (!broker_id || !password) {
+    return res.status(400).json({ error: 'Broker ID aur password dono chahiye' });
   }
   const { data: broker, error } = await supabase
     .from('brokers')
     .select('*')
-    .eq('email', email)
+    .eq('broker_id', broker_id)
     .single();
   if (error || !broker) {
-    return res.status(404).json({ error: 'Is email se koi account nahi mila' });
+    return res.status(404).json({ error: 'Broker nahi mila' });
   }
   if (broker.password !== password) {
     return res.status(401).json({ error: 'Password galat hai' });
@@ -460,6 +460,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   if (!conversations[sessionId]) conversations[sessionId] = [];
   conversations[sessionId].push({ role: 'user', content: message });
 
+
   try {
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -502,7 +503,8 @@ app.post('/api/chat/:brokerId', async (req, res) => {
               timeline: leadData.timeline || null,
               furnished: leadData.furnished || null,
               parking: leadData.parking || null,
-              special_requirements: leadData.special || null
+              special_requirements: leadData.special || null,
+              upload_token: null
             }]).select().single();
             if (insertError) console.error('Lead insert error:', JSON.stringify(insertError));
             await sendLeadEmail(broker, leadData);
@@ -621,6 +623,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .powered{width:100%;max-width:100%;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;color:#6B6354;font-weight:700;}
 .chat-body{background:transparent;padding:0;min-height:180px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:360px;}
 .date-label{align-self:center;background:#EDE7D8;color:#6B6354;font-size:10px;padding:5px 14px;border-radius:100px;font-weight:600;}
+
 </style>
 </head>
 <body>
@@ -845,6 +848,8 @@ async function sendMsg(){
     if(data.leadComplete){leadDone=true;disableChat();}
   }catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}
 }
+
+
 </script>
 </body></html>`;
 }
