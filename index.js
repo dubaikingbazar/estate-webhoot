@@ -753,6 +753,26 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .powered{width:100%;max-width:100%;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;color:#6B6354;font-weight:700;}
 .chat-body{background:transparent;padding:0;min-height:180px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:360px;}
 .date-label{align-self:center;background:#EDE7D8;color:#6B6354;font-size:10px;padding:5px 14px;border-radius:100px;font-weight:600;}
+.upload-link{color:#1e3a5f;font-weight:700;text-decoration:underline;cursor:pointer;word-break:break-all;}
+/* Upload Modal */
+.upload-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:flex-end;justify-content:center;}
+.upload-modal-overlay.active{display:flex;}
+.upload-modal{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px;max-height:85vh;overflow-y:auto;}
+.upload-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.upload-modal-title{font-size:16px;font-weight:700;color:#1e293b;}
+.upload-modal-close{width:32px;height:32px;background:#f1f5f9;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#64748b;}
+.upload-drop{border:2px dashed #D4A24C;border-radius:12px;padding:24px 16px;text-align:center;cursor:pointer;position:relative;margin-bottom:16px;}
+.upload-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-drop-text{font-size:13px;color:#64748b;margin-top:8px;}
+.upload-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.upload-preview-item{aspect-ratio:1;border-radius:8px;overflow:hidden;position:relative;border:1px solid #e2e8f0;}
+.upload-preview-item img{width:100%;height:100%;object-fit:cover;}
+.upload-preview-item .del{position:absolute;top:3px;right:3px;background:rgba(239,68,68,0.9);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;font-weight:700;}
+.upload-submit{width:100%;background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#fff;border:none;border-radius:10px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;}
+.upload-submit:disabled{opacity:0.5;cursor:not-allowed;}
+.upload-msg{text-align:center;padding:10px;font-size:12px;border-radius:8px;margin-top:10px;}
+.upload-msg.success{background:#dcfce7;color:#16a34a;}
+.upload-msg.error{background:#fee2e2;color:#dc2626;}
 </style>
 </head>
 <body>
@@ -910,6 +930,29 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
   EstateBot · AI Lead Assistant
 </div>
 
+<!-- UPLOAD MODAL -->
+<div class="upload-modal-overlay" id="uploadModal">
+  <div class="upload-modal">
+    <div class="upload-modal-header">
+      <div class="upload-modal-title">📸 Property Photos Upload</div>
+      <button class="upload-modal-close" onclick="closeUploadModal()">×</button>
+    </div>
+    <div class="upload-drop" id="uploadDrop">
+      <input type="file" id="modalFileInput" accept="image/*" multiple onchange="handleModalFiles(this.files)"/>
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D4A24C" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21,15 16,10 5,21"/>
+      </svg>
+      <div class="upload-drop-text">Photos select karein — Max 5</div>
+    </div>
+    <div class="upload-preview" id="modalPreview"></div>
+    <button class="upload-submit" id="modalSubmitBtn" onclick="submitModalUpload()" style="display:none;">
+      Upload Karein
+    </button>
+    <div class="upload-msg" id="modalMsg" style="display:none;"></div>
+  </div>
+</div>
+
 <script>
 const sessionId = Math.random().toString(36).substr(2,9);
 const brokerId = '${brokerId}';
@@ -979,9 +1022,95 @@ async function sendMsg(){
   input.value='';addMsg(msg,'user');showTyping();
   try{
     const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});
-    const data=await res.json();removeTyping();typeMsg(data.reply,'bot');
+    const data=await res.json();removeTyping();
+    // Check for upload links and make them clickable
+    let reply = data.reply;
+    const urlRegex = /(https:\/\/estatebotai\.in\/upload\/[^\s]+)/g;
+    reply = reply.replace(urlRegex, (url) => {
+      currentUploadToken = url.split('/upload/')[1];
+      return '<span class="upload-link" onclick="openUploadModal(''+currentUploadToken+'')">📸 Yahan tap karein — Photos Upload Karein</span>';
+    });
+    typeMsg(reply,'bot');
     if(data.leadComplete){leadDone=true;disableChat();}
   }catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}
+}
+
+// Upload Modal
+let currentUploadToken = '';
+let modalFiles = [];
+
+function openUploadModal(token) {
+  currentUploadToken = token;
+  modalFiles = [];
+  document.getElementById('modalPreview').innerHTML = '';
+  document.getElementById('modalSubmitBtn').style.display = 'none';
+  document.getElementById('modalMsg').style.display = 'none';
+  document.getElementById('uploadModal').classList.add('active');
+}
+
+function closeUploadModal() {
+  document.getElementById('uploadModal').classList.remove('active');
+}
+
+function handleModalFiles(files) {
+  const newFiles = Array.from(files).slice(0, 5 - modalFiles.length);
+  modalFiles = [...modalFiles, ...newFiles].slice(0, 5);
+  renderModalPreviews();
+}
+
+function renderModalPreviews() {
+  const preview = document.getElementById('modalPreview');
+  const btn = document.getElementById('modalSubmitBtn');
+  preview.innerHTML = '';
+  if(modalFiles.length === 0){ btn.style.display='none'; return; }
+  btn.style.display = 'block';
+  modalFiles.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const item = document.createElement('div');
+      item.className = 'upload-preview-item';
+      item.innerHTML = '<img src="'+e.target.result+'"/><button class="del" onclick="removeModalFile('+i+')">×</button>';
+      preview.appendChild(item);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeModalFile(i) {
+  modalFiles.splice(i, 1);
+  renderModalPreviews();
+}
+
+async function submitModalUpload() {
+  if(modalFiles.length === 0) return;
+  const btn = document.getElementById('modalSubmitBtn');
+  const msg = document.getElementById('modalMsg');
+  btn.disabled = true;
+  btn.textContent = 'Upload ho raha hai...';
+  
+  try {
+    for(let i = 0; i < modalFiles.length; i++) {
+      const file = modalFiles[i];
+      const signRes = await fetch('/api/upload-image/'+currentUploadToken, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({fileName: file.name, fileType: file.type})
+      });
+      const {signedUrl} = await signRes.json();
+      await fetch(signedUrl, {method:'PUT', headers:{'Content-Type':file.type}, body: file});
+    }
+    msg.className = 'upload-msg success';
+    msg.textContent = '✅ Photos upload ho gayi!';
+    msg.style.display = 'block';
+    btn.style.display = 'none';
+    setTimeout(() => closeUploadModal(), 1500);
+  } catch(e) {
+    msg.className = 'upload-msg error';
+    msg.textContent = 'Upload fail — dobara try karein';
+    msg.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Upload Karein';
+  }
 }
 </script>
 </body></html>`;
