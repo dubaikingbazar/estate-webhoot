@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Property Photos Upload — EstateBot</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Property Photos Upload</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-  font-family: 'Poppins', sans-serif;
-  background: #0a0a14;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f8fafc;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -17,342 +16,161 @@ body {
   padding: 20px;
 }
 .card {
-  background: #12121f;
-  border: 1px solid rgba(200,169,110,0.2);
-  border-radius: 20px;
-  padding: 36px 28px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 20px;
   width: 100%;
-  max-width: 420px;
-  position: relative;
-  overflow: hidden;
+  max-width: 400px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
 }
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #c8a96e, transparent);
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 6px;
 }
-.logo {
-  text-align: center;
-  margin-bottom: 28px;
-}
-.logo-icon {
-  width: 56px; height: 56px;
-  background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 12px;
-  border: 1px solid rgba(200,169,110,0.3);
-}
-.logo-title { font-size: 20px; font-weight: 700; color: #fff; }
-.logo-sub { font-size: 11px; color: #c8a96e; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
-
-.info-box {
-  background: rgba(200,169,110,0.06);
-  border: 1px solid rgba(200,169,110,0.2);
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 24px;
+.sub {
   font-size: 13px;
-  color: rgba(255,255,255,0.7);
-  line-height: 1.6;
-  text-align: center;
-}
-.info-box strong { color: #c8a96e; }
-
-/* Upload Zone */
-.upload-zone {
-  border: 2px dashed rgba(200,169,110,0.3);
-  border-radius: 14px;
-  padding: 32px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
+  color: #64748b;
   margin-bottom: 20px;
-  position: relative;
 }
-.upload-zone:hover, .upload-zone.dragover {
-  border-color: #c8a96e;
-  background: rgba(200,169,110,0.05);
-}
-.upload-zone input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
+.upload-zone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 28px 16px;
+  text-align: center;
   cursor: pointer;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  margin-bottom: 16px;
+  transition: all 0.2s;
 }
-.upload-icon { margin-bottom: 12px; }
-.upload-text { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
-.upload-sub { font-size: 11px; color: rgba(255,255,255,0.3); }
-
-/* Preview Grid */
+.upload-zone:hover { border-color: #1e3a5f; background: #f8fafc; }
+.upload-zone input {
+  position: absolute; inset: 0; opacity: 0;
+  cursor: pointer; width: 100%; height: 100%;
+}
+.upload-zone svg { margin-bottom: 8px; }
+.upload-zone p { font-size: 13px; color: #64748b; }
 .preview-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 .preview-item {
-  position: relative;
   aspect-ratio: 1;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(200,169,110,0.2);
+  position: relative;
+  border: 1px solid #e2e8f0;
 }
-.preview-item img {
-  width: 100%; height: 100%;
-  object-fit: cover;
+.preview-item img { width: 100%; height: 100%; object-fit: cover; }
+.preview-item .del {
+  position: absolute; top: 3px; right: 3px;
+  background: rgba(239,68,68,0.9); color: #fff;
+  border: none; border-radius: 50%;
+  width: 20px; height: 20px;
+  font-size: 12px; cursor: pointer; font-weight: 700;
 }
-.preview-item .remove-btn {
-  position: absolute;
-  top: 4px; right: 4px;
-  width: 22px; height: 22px;
-  background: rgba(239,68,68,0.9);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  font-size: 12px;
-  color: #fff;
-  font-weight: 700;
-  border: none;
-}
-.preview-item .upload-progress {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 3px;
-  background: rgba(0,0,0,0.3);
-}
-.preview-item .progress-bar {
-  height: 100%;
-  background: #c8a96e;
-  transition: width 0.3s;
-}
-
-/* Submit Button */
-.btn-upload {
+.btn {
   width: 100%;
-  background: linear-gradient(135deg, #c8a96e, #a07840);
-  color: #0a0a14;
+  background: #1e3a5f;
+  color: #fff;
   border: none;
   border-radius: 10px;
   padding: 14px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
-  font-family: 'Poppins', sans-serif;
   cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.btn-upload:hover { opacity: 0.9; transform: translateY(-1px); }
-.btn-upload:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-.msg-box {
-  border-radius: 8px;
-  padding: 12px 14px;
-  font-size: 13px;
-  margin-top: 14px;
-  text-align: center;
   display: none;
 }
-.msg-box.success {
-  background: rgba(34,197,94,0.1);
-  border: 1px solid rgba(34,197,94,0.3);
-  color: #4ade80;
-}
-.msg-box.error {
-  background: rgba(239,68,68,0.1);
-  border: 1px solid rgba(239,68,68,0.3);
-  color: #f87171;
-}
-
-.photo-count {
-  font-size: 12px;
-  color: rgba(255,255,255,0.4);
-  text-align: center;
-  margin-bottom: 12px;
-}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.msg { text-align: center; padding: 10px; font-size: 13px; border-radius: 8px; margin-top: 12px; display: none; }
+.msg.success { background: #dcfce7; color: #16a34a; }
+.msg.error { background: #fee2e2; color: #dc2626; }
+.count { font-size: 11px; color: #94a3b8; text-align: center; margin-bottom: 10px; }
 </style>
 </head>
 <body>
-
 <div class="card">
-  <div class="logo">
-    <div style="width:72px;height:72px;background:linear-gradient(135deg,#1e3a5f,#2d5a8e);border-radius:18px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(200,169,110,0.3);overflow:hidden;">
-      <img src="https://raw.githubusercontent.com/dubaikingbazar/estate-webhoot/main/estatebot-dp.png" alt="EstateBot Logo" style="width:52px;height:52px;object-fit:contain;"/>
-    </div>
-    <div class="logo-title">EstateBot</div>
-    <div class="logo-sub">Property Photos</div>
-  </div>
+  <h2>📸 Property Photos</h2>
+  <p class="sub">Apni property ki photos upload karein — jaldi buyer milega!</p>
 
-  <div class="info-box">
-    Apni property ki <strong>photos upload karein</strong> — agent ko jaldi best buyer/tenant milega! 📸
-  </div>
-
-  <div class="upload-zone" id="uploadZone">
+  <div class="upload-zone" id="zone">
     <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)"/>
-    <div class="upload-icon">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5">
-        <rect x="3" y="3" width="18" height="18" rx="2"/>
-        <circle cx="8.5" cy="8.5" r="1.5"/>
-        <polyline points="21,15 16,10 5,21"/>
-      </svg>
-    </div>
-    <div class="upload-text">Photos select karein ya yahan drag karein</div>
-    <div class="upload-sub">JPG, PNG — Max 5 photos</div>
-  </div>
-
-  <div class="photo-count" id="photoCount" style="display:none;"></div>
-  <div class="preview-grid" id="previewGrid"></div>
-
-  <button class="btn-upload" id="uploadBtn" onclick="uploadAll()" style="display:none;">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a14" stroke-width="2.5">
-      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-      <polyline points="17 8 12 3 7 8"/>
-      <line x1="12" y1="3" x2="12" y2="15"/>
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <circle cx="8.5" cy="8.5" r="1.5"/>
+      <polyline points="21,15 16,10 5,21"/>
     </svg>
-    Photos Upload Karein
-  </button>
-
-  <div class="msg-box success" id="successBox">
-    ✅ Photos successfully upload ho gayi! Agent ko jald contact karenge.
+    <p>Photos select karein<br><small style="color:#cbd5e1;">JPG, PNG · Max 5</small></p>
   </div>
-  <div class="msg-box error" id="errorBox"></div>
+
+  <div class="count" id="count" style="display:none;"></div>
+  <div class="preview-grid" id="preview"></div>
+  <button class="btn" id="submitBtn" onclick="uploadAll()">Photos Upload Karein</button>
+  <div class="msg success" id="successMsg">✅ Photos upload ho gayi! Agent se jald contact hoga.</div>
+  <div class="msg error" id="errorMsg">Upload fail ho gaya. Dobara try karein.</div>
 </div>
 
 <script>
 const token = window.location.pathname.split('/').pop();
-let selectedFiles = [];
+let files = [];
 
-// Drag and drop
-const zone = document.getElementById('uploadZone');
-zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
-zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-zone.addEventListener('drop', e => {
-  e.preventDefault();
-  zone.classList.remove('dragover');
-  handleFiles(e.dataTransfer.files);
-});
+const zone = document.getElementById('zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor='#1e3a5f'; });
+zone.addEventListener('dragleave', () => zone.style.borderColor='#cbd5e1');
+zone.addEventListener('drop', e => { e.preventDefault(); zone.style.borderColor='#cbd5e1'; handleFiles(e.dataTransfer.files); });
 
-function handleFiles(files) {
-  const newFiles = Array.from(files).slice(0, 5 - selectedFiles.length);
-  selectedFiles = [...selectedFiles, ...newFiles].slice(0, 5);
-  renderPreviews();
+function handleFiles(f) {
+  files = [...files, ...Array.from(f)].slice(0, 5);
+  render();
 }
 
-function renderPreviews() {
-  const grid = document.getElementById('previewGrid');
-  const count = document.getElementById('photoCount');
-  const btn = document.getElementById('uploadBtn');
-  
-  grid.innerHTML = '';
-  
-  if (selectedFiles.length === 0) {
-    count.style.display = 'none';
-    btn.style.display = 'none';
-    return;
-  }
-
-  count.style.display = 'block';
-  count.textContent = selectedFiles.length + ' photo(s) selected';
-  btn.style.display = 'flex';
-
-  selectedFiles.forEach((file, i) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const item = document.createElement('div');
-      item.className = 'preview-item';
-      item.id = 'preview-' + i;
-      item.innerHTML = `
-        <img src="${e.target.result}"/>
-        <button class="remove-btn" onclick="removeFile(${i})">×</button>
-        <div class="upload-progress"><div class="progress-bar" id="progress-${i}" style="width:0%"></div></div>
-      `;
-      grid.appendChild(item);
+function render() {
+  const p = document.getElementById('preview');
+  const c = document.getElementById('count');
+  const btn = document.getElementById('submitBtn');
+  p.innerHTML = '';
+  if (!files.length) { c.style.display='none'; btn.style.display='none'; return; }
+  c.style.display='block'; c.textContent = files.length + ' photo(s) selected';
+  btn.style.display='block';
+  files.forEach((f, i) => {
+    const r = new FileReader();
+    r.onload = e => {
+      const d = document.createElement('div');
+      d.className = 'preview-item';
+      d.innerHTML = '<img src="'+e.target.result+'"/><button class="del" onclick="remove('+i+')">×</button>';
+      p.appendChild(d);
     };
-    reader.readAsDataURL(file);
+    r.readAsDataURL(f);
   });
 }
 
-function removeFile(index) {
-  selectedFiles.splice(index, 1);
-  renderPreviews();
-}
+function remove(i) { files.splice(i,1); render(); }
 
 async function uploadAll() {
-  if (selectedFiles.length === 0) return;
-  
-  const btn = document.getElementById('uploadBtn');
-  const errorBox = document.getElementById('errorBox');
-  const successBox = document.getElementById('successBox');
-  
-  btn.disabled = true;
-  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a14" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path d="M3 12a9 9 0 019-9"/></svg> Upload ho raha hai...';
-  errorBox.style.display = 'none';
-
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Upload ho raha hai...';
   try {
-    let allSuccess = true;
-    
-    for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i];
-      
-      // Get signed URL from server
-      const signRes = await fetch('/api/upload-image/' + token, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileName: file.name, fileType: file.type })
+    for (const file of files) {
+      const r = await fetch('/api/upload-image/'+token, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({fileName:file.name, fileType:file.type})
       });
-      
-      if (!signRes.ok) { allSuccess = false; continue; }
-      
-      const { signedUrl } = await signRes.json();
-      
-      // Upload to Supabase Storage
-      const uploadRes = await fetch(signedUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': file.type },
-        body: file
-      });
-      
-      if (uploadRes.ok) {
-        document.getElementById('progress-' + i).style.width = '100%';
-      } else {
-        allSuccess = false;
-      }
+      const {signedUrl} = await r.json();
+      await fetch(signedUrl, {method:'PUT', headers:{'Content-Type':file.type}, body:file});
     }
-
-    if (allSuccess) {
-      btn.style.display = 'none';
-      successBox.style.display = 'block';
-      document.getElementById('uploadZone').style.display = 'none';
-      document.getElementById('previewGrid').style.display = 'none';
-      document.getElementById('photoCount').style.display = 'none';
-    } else {
-      throw new Error('Kuch photos upload nahi ho payi');
-    }
-    
-  } catch (err) {
-    errorBox.textContent = 'Upload fail ho gaya — dobara try karein.';
-    errorBox.style.display = 'block';
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a14" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Dobara Try Karein';
+    document.getElementById('successMsg').style.display='block';
+    document.getElementById('zone').style.display='none';
+    document.getElementById('preview').style.display='none';
+    document.getElementById('count').style.display='none';
+    btn.style.display='none';
+  } catch(e) {
+    document.getElementById('errorMsg').style.display='block';
+    btn.disabled=false; btn.textContent='Photos Upload Karein';
   }
 }
-
-// Verify token on load
-fetch('/api/upload/' + token, { method: 'POST' })
-  .then(r => r.json())
-  .then(data => {
-    if (!data.success) {
-      document.querySelector('.card').innerHTML = '<div style="text-align:center;padding:40px 20px;color:#f87171;">❌ Ye link invalid ya expire ho gaya hai.</div>';
-    }
-  })
-  .catch(() => {});
 </script>
 </body>
 </html>
