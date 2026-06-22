@@ -13,6 +13,7 @@ const supabase = createClient(
 );
 
 const conversations = {};
+const tempUploads = {}; // temporary tokens for photo uploads before lead save
 
 // ===== AI PROMPT =====
 const getSystemPrompt = (brokerName) => `
@@ -190,19 +191,19 @@ AGAR INTENT = SELL ya RENT DENA (seller/landlord):
 Step 5 — Location:
 "Kaunsa area prefer karenge? Koi specific locality hai mann mein?"
 
-Step 6 — Budget:
-"Budget range roughly kitni hai? — bilkul honest raho, usi hisaab se sahi options bataunga"
-
-Step 7 — Timeline:
-"Aur kitne time mein lena chahenge — abhi urgent hai ya thoda time hai?"
-
-Step 8 — SELL/RENT DENA wale ke liye UPLOAD LINK:
-Agar intent SELL ya RENT DENA hai:
-"[Naam] ji, ek kaam — apni property ki photos yahan upload karein: |||UPLOAD_LINK||| Agent ko jaldi best buyer/tenant milega!"
-Phir wait karo customer ka response aane ka — jab woh bole "upload kar diya" ya "ho gaya" ya kuch bhi reply kare toh phone maango.
+Step 6 — SELL/RENT DENA wale ke liye PHOTOS (Budget se PEHLE):
+Agar intent SELL ya RENT DENA hai — EXACTLY YE LIKHO:
+"[Naam] ji, ek kaam — apni property ki photos yahan upload karein, jaldi best buyer/tenant milega: |||PHOTO_LINK|||"
+Phir customer ka response aane do — phir budget puchho.
 
 Agar intent KHARIDNA ya RENT LENA hai:
-Seedha Step 9 pe jao.
+Seedha Step 7 pe jao.
+
+Step 7 — Budget:
+"Budget range roughly kitni hai? — bilkul honest raho, usi hisaab se sahi options bataunga"
+
+Step 8 — Timeline:
+"Aur kitne time mein lena chahenge — abhi urgent hai ya thoda time hai?"
 
 Step 9 — Phone (KABHI SKIP MAT KARO):
 "[Naam] ji, ek kaam — apna WhatsApp number do. Hamare senior advisor directly call karenge aur sab options clearly batayenge. Bilkul free consultation hai 👍"
@@ -219,11 +220,14 @@ Jab naam, phone, property type, area, budget sab mil jaye — warmly thank karo,
 
 Thank you message:
 Thank you message — BILKUL EXACTLY YE LIKHO:
+
+Agar intent SELL ya RENT DENA hai — EXACTLY YE LIKHO:
+"Bahut shukriya [Naam] ji! Aapki details note ho gayi hain 😊 Apni property ki photos yahan upload karein — jaldi buyer milega: |||UPLOAD_LINK||| Hamare senior advisor kal tak call karenge!"
+
+Agar intent KHARIDNA ya RENT LENA hai — EXACTLY YE LIKHO:
 "Bahut shukriya [Naam] ji! Aapki saari details note ho gayi hain 😊 Hamare senior advisor kal tak aapko call karenge. Koi bhi sawaal ho toh pooch sakte ho!"
 
-STRICT RULE: 
-- Upload link SIRF Step 8 mein dena hai — thank you message mein nahi
-- |||UPLOAD_LINK||| SIRF Step 8 mein use karo
+STRICT RULE: |||UPLOAD_LINK||| ko apne words mein mat badlo — EXACTLY waise hi likho jaise upar diya hai.
 
 STRICT RULES:
 - EK sawaal EK baar — kabhi 2 ek saath nahi
@@ -454,6 +458,20 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(__dirname + '/broker-dashboard.html');
 });
 
+// ===== TEMP UPLOAD TOKEN API =====
+app.post('/api/temp-upload-token', (req, res) => {
+  const { sessionId } = req.body;
+  if (!sessionId) return res.status(400).json({ error: 'Session ID chahiye' });
+  const token = 'tmp_' + Math.random().toString(36).substr(2,12) + Date.now().toString(36);
+  tempUploads[token] = { sessionId, photos: [], createdAt: Date.now() };
+  // Clean old tokens (older than 2 hours)
+  const now = Date.now();
+  Object.keys(tempUploads).forEach(k => {
+    if (now - tempUploads[k].createdAt > 7200000) delete tempUploads[k];
+  });
+  res.json({ success: true, token, uploadUrl: 'https://estatebotai.in/upload/' + token });
+});
+
 // ===== UPLOAD PAGE =====
 app.get('/upload/:token', (req, res) => {
   res.sendFile(__dirname + '/upload.html');
@@ -462,7 +480,13 @@ app.get('/upload/:token', (req, res) => {
 // ===== UPLOAD API =====
 app.post('/api/upload/:token', async (req, res) => {
   const { token } = req.params;
-  // Find lead by token
+  
+  // Check temp token first
+  if (token.startsWith('tmp_') && tempUploads[token]) {
+    return res.json({ success: true, temp: true, token });
+  }
+  
+  // Find lead by token in DB
   const { data: lead, error } = await supabase
     .from('leads')
     .select('*')
@@ -477,19 +501,34 @@ app.post('/api/upload-image/:token', async (req, res) => {
   const { token } = req.params;
   const { fileName, fileType } = req.body;
   
-  const { data: lead } = await supabase
-    .from('leads')
-    .select('id')
-    .eq('upload_token', token)
-    .single();
-  if (!lead) return res.status(404).json({ error: 'Invalid token' });
+  let folderPath;
   
-  const filePath = lead.id + '/' + Date.now() + '-' + fileName;
+  if (token.startsWith('tmp_') && tempUploads[token]) {
+    // Temp token - use token as folder
+    folderPath = token;
+  } else {
+    // Lead token - use lead id as folder
+    const { data: lead } = await supabase
+      .from('leads')
+      .select('id')
+      .eq('upload_token', token)
+      .single();
+    if (!lead) return res.status(404).json({ error: 'Invalid token' });
+    folderPath = lead.id;
+  }
+  
+  const filePath = folderPath + '/' + Date.now() + '-' + fileName;
   const { data, error } = await supabase.storage
     .from('property-images')
     .createSignedUploadUrl(filePath);
   
   if (error) return res.status(500).json({ error: error.message });
+  
+  // Save photo path in temp if temp token
+  if (token.startsWith('tmp_') && tempUploads[token]) {
+    tempUploads[token].photos.push(filePath);
+  }
+  
   res.json({ signedUrl: data.signedUrl, path: filePath });
 });
 
@@ -531,6 +570,14 @@ app.post('/api/chat/:brokerId', async (req, res) => {
 
   if (!conversations[sessionId]) conversations[sessionId] = [];
   conversations[sessionId].push({ role: 'user', content: message });
+  
+  // Generate temp upload token for this session if not exists
+  if (!Object.values(tempUploads).find(t => t.sessionId === sessionId)) {
+    const tempToken = 'tmp_' + Math.random().toString(36).substr(2,12) + Date.now().toString(36);
+    tempUploads[tempToken] = { sessionId, photos: [], createdAt: Date.now() };
+  }
+  const sessionToken = Object.keys(tempUploads).find(k => tempUploads[k].sessionId === sessionId);
+  const photoUploadUrl = sessionToken ? 'https://estatebotai.in/upload/' + sessionToken : '';
 
   try {
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -543,6 +590,8 @@ app.post('/api/chat/:brokerId', async (req, res) => {
     });
     const data = await groqRes.json();
     let reply = data.choices?.[0]?.message?.content || 'Kuch gadbad ho gayi, dobara try karein.';
+    // Replace photo link placeholder with actual temp upload URL
+    reply = reply.replace('|||PHOTO_LINK|||', photoUploadUrl);
     conversations[sessionId].push({ role: 'assistant', content: reply });
 
     let leadComplete = false;
@@ -566,6 +615,9 @@ app.post('/api/chat/:brokerId', async (req, res) => {
             // Generate unique upload token
             const uploadToken = Math.random().toString(36).substr(2,12) + Date.now().toString(36);
             
+            // Get temp photos if any
+            const tempPhotos = sessionToken && tempUploads[sessionToken] ? tempUploads[sessionToken].photos : [];
+            
             const { data: insertedLead } = await supabase.from('leads').insert([{
               broker_id: brokerId,
               name: leadData.name,
@@ -578,10 +630,16 @@ app.post('/api/chat/:brokerId', async (req, res) => {
               furnished: leadData.furnished || null,
               parking: leadData.parking || null,
               special_requirements: leadData.special || null,
-              upload_token: uploadToken
+              upload_token: uploadToken,
+              photos: tempPhotos.length > 0 ? tempPhotos : null
             }]).select().single();
             
-            // Agar sell/rent-out hai toh upload link replace karo
+            // Clean up temp token
+            if (sessionToken && tempUploads[sessionToken]) {
+              delete tempUploads[sessionToken];
+            }
+            
+            // Replace upload link in thank you message
             const uploadUrl = 'https://estatebotai.in/upload/' + uploadToken;
             reply = reply.replace('|||UPLOAD_LINK|||', uploadUrl);
 
