@@ -185,8 +185,8 @@ body::before {
   </div>
 
   <div class="form-group">
-    <label>Broker ID</label>
-    <input type="text" id="brokerId" placeholder="e.g. dipanshu-realstate-" autocomplete="off"/>
+    <label>Email Address</label>
+    <input type="email" id="emailInput" placeholder="rajesh@gmail.com" autocomplete="email"/>
   </div>
 
   <div class="form-group">
@@ -210,7 +210,7 @@ body::before {
 
 <script>
 async function doLogin() {
-  const brokerId = document.getElementById('brokerId').value.trim();
+  const email = document.getElementById('emailInput').value.trim();
   const password = document.getElementById('password').value.trim();
   const btn = document.getElementById('loginBtn');
   const btnText = document.getElementById('btnText');
@@ -221,8 +221,8 @@ async function doLogin() {
   errorBox.style.display = 'none';
   successBox.style.display = 'none';
 
-  if (!brokerId || !password) {
-    errorBox.textContent = 'Please enter your Broker ID and Password.';
+  if (!email || !password) {
+    errorBox.textContent = 'Please enter your Email and Password.';
     errorBox.style.display = 'block';
     return;
   }
@@ -235,7 +235,7 @@ async function doLogin() {
     const res = await fetch('/api/broker-auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ broker_id: brokerId, password })
+      body: JSON.stringify({ email, password })
     });
 
     const data = await res.json();
