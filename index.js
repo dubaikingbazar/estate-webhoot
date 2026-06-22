@@ -561,6 +561,10 @@ app.post('/api/chat/:brokerId', async (req, res) => {
       })
     });
     const data = await groqRes.json();
+    console.log('Groq response status:', groqRes.status);
+    if (!data.choices || !data.choices[0]) {
+      console.error('Groq error response:', JSON.stringify(data));
+    }
     let reply = data.choices?.[0]?.message?.content || 'Kuch gadbad ho gayi, dobara try karein.';
     // Replace photo link placeholder with actual temp upload URL
     reply = reply.replace('|||PHOTO_LINK|||', photoUploadUrl);
