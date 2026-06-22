@@ -594,7 +594,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
             // Get temp photos if any
             const tempPhotos = sessionToken && tempUploads[sessionToken] ? tempUploads[sessionToken].photos : [];
             
-            const { data: insertedLead } = await supabase.from('leads').insert([{
+            const { data: insertedLead, error: insertError } = await supabase.from('leads').insert([{
               broker_id: brokerId,
               name: leadData.name,
               phone: leadData.phone,
@@ -606,9 +606,9 @@ app.post('/api/chat/:brokerId', async (req, res) => {
               furnished: leadData.furnished || null,
               parking: leadData.parking || null,
               special_requirements: leadData.special || null,
-              upload_token: uploadToken,
-              photos: tempPhotos.length > 0 ? tempPhotos : null
+              upload_token: uploadToken
             }]).select().single();
+            if (insertError) console.error('Lead insert error:', JSON.stringify(insertError));
             
             // Clean up temp token
             if (sessionToken && tempUploads[sessionToken]) {
