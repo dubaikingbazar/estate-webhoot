@@ -162,21 +162,13 @@ AGAR INTENT = SELL ya RENT DENA (seller/landlord):
 Step 5 — Location:
 "Kaunsa area prefer karenge? Koi specific locality hai mann mein?"
 
-Step 6 — SELL/RENT DENA wale ke liye PHOTOS (Budget se PEHLE):
-Agar intent SELL ya RENT DENA hai — EXACTLY YE LIKHO:
-"[Naam] ji, ek kaam — apni property ki photos yahan upload karein, jaldi best buyer/tenant milega: |||PHOTO_LINK|||"
-Phir customer ka response aane do — phir budget puchho.
-
-Agar intent KHARIDNA ya RENT LENA hai:
-Seedha Step 7 pe jao.
-
-Step 7 — Budget:
+Step 6 — Budget:
 "Budget range roughly kitni hai? — bilkul honest raho, usi hisaab se sahi options bataunga"
 
-Step 8 — Timeline:
+Step 7 — Timeline:
 "Aur kitne time mein lena chahenge — abhi urgent hai ya thoda time hai?"
 
-Step 9 — Phone (KABHI SKIP MAT KARO):
+Step 8 — Phone (KABHI SKIP MAT KARO):
 "[Naam] ji, ek kaam — apna WhatsApp number do. Hamare senior advisor directly call karenge aur sab options clearly batayenge. Bilkul free consultation hai 👍"
 
 SPECIAL CASE — GALAT NUMBER:
@@ -189,13 +181,8 @@ IMPORTANT: Phone number liye BINA lead BILKUL complete mat karna.
 Jab naam, phone, property type, area, budget sab mil jaye — warmly thank karo, phir BILKUL BAAD likho:
 |||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE_WITH_BHK","area":"AREA","budget":"BUDGET","intent":"Rent Lena Chahte Hain/Rent Dena Chahte Hain/Kharidna Chahte Hain/Sell Karna Chahte Hain","timeline":"TIMELINE","furnished":"Furnished/Semi-Furnished/Unfurnished/NA","parking":"Chahiye/Nahi Chahiye/NA","special":"ANY_SPECIAL_REQUIREMENTS"}|||
 
-Agar intent SELL ya RENT DENA hai — EXACTLY YE LIKHO:
-"Bahut shukriya [Naam] ji! Aapki details note ho gayi hain 😊 Apni property ki photos yahan upload karein — jaldi buyer milega: |||UPLOAD_LINK||| Hamare senior advisor kal tak call karenge!"
-
-Agar intent KHARIDNA ya RENT LENA hai — EXACTLY YE LIKHO:
+Thank you message — BILKUL EXACTLY YE LIKHO:
 "Bahut shukriya [Naam] ji! Aapki saari details note ho gayi hain 😊 Hamare senior advisor kal tak aapko call karenge. Koi bhi sawaal ho toh pooch sakte ho!"
-
-STRICT RULE: |||UPLOAD_LINK||| ko apne words mein mat badlo — EXACTLY waise hi likho.
 STRICT RULES:
 - EK sawaal EK baar — kabhi 2 ek saath nahi
 - Jo bataya wo dobara mat puchho
@@ -472,12 +459,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   if (!conversations[sessionId]) conversations[sessionId] = [];
   conversations[sessionId].push({ role: 'user', content: message });
 
-  if (!Object.values(tempUploads).find(t => t.sessionId === sessionId)) {
-    const tempToken = 'tmp_' + Math.random().toString(36).substr(2,12) + Date.now().toString(36);
-    tempUploads[tempToken] = { sessionId, photos: [], createdAt: Date.now() };
-  }
-  const sessionToken = Object.keys(tempUploads).find(k => tempUploads[k].sessionId === sessionId);
-  const photoUploadUrl = sessionToken ? 'https://estatebotai.in/upload/' + sessionToken : '';
 
   try {
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -494,7 +475,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
       console.error('Groq error response:', JSON.stringify(data));
     }
     let reply = data.choices?.[0]?.message?.content || 'Kuch gadbad ho gayi, dobara try karein.';
-    reply = reply.replace('|||PHOTO_LINK|||', photoUploadUrl);
     conversations[sessionId].push({ role: 'assistant', content: reply });
 
     let leadComplete = false;
@@ -511,7 +491,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
             leadData = null;
           } else {
             reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
-            const uploadToken = Math.random().toString(36).substr(2,12) + Date.now().toString(36);
             const { data: insertedLead, error: insertError } = await supabase.from('leads').insert([{
               broker_id: brokerId,
               name: leadData.name,
@@ -523,15 +502,9 @@ app.post('/api/chat/:brokerId', async (req, res) => {
               timeline: leadData.timeline || null,
               furnished: leadData.furnished || null,
               parking: leadData.parking || null,
-              special_requirements: leadData.special || null,
-              upload_token: uploadToken
+              special_requirements: leadData.special || null
             }]).select().single();
             if (insertError) console.error('Lead insert error:', JSON.stringify(insertError));
-            if (sessionToken && tempUploads[sessionToken]) {
-              delete tempUploads[sessionToken];
-            }
-            const uploadUrl = 'https://estatebotai.in/upload/' + uploadToken;
-            reply = reply.replace('|||UPLOAD_LINK|||', uploadUrl);
             await sendLeadEmail(broker, leadData);
             leadComplete = true;
           }
@@ -648,25 +621,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .powered{width:100%;max-width:100%;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;color:#6B6354;font-weight:700;}
 .chat-body{background:transparent;padding:0;min-height:180px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:360px;}
 .date-label{align-self:center;background:#EDE7D8;color:#6B6354;font-size:10px;padding:5px 14px;border-radius:100px;font-weight:600;}
-.upload-link{color:#1e3a5f;font-weight:700;text-decoration:underline;cursor:pointer;}
-.upload-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:flex-end;justify-content:center;}
-.upload-modal-overlay.active{display:flex;}
-.upload-modal{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px;max-height:85vh;overflow-y:auto;}
-.upload-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.upload-modal-title{font-size:16px;font-weight:700;color:#1e293b;}
-.upload-modal-close{width:32px;height:32px;background:#f1f5f9;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#64748b;}
-.upload-drop{border:2px dashed #D4A24C;border-radius:12px;padding:24px 16px;text-align:center;cursor:pointer;position:relative;margin-bottom:16px;}
-.upload-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.upload-drop-text{font-size:13px;color:#64748b;margin-top:8px;}
-.upload-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
-.upload-preview-item{aspect-ratio:1;border-radius:8px;overflow:hidden;position:relative;border:1px solid #e2e8f0;}
-.upload-preview-item img{width:100%;height:100%;object-fit:cover;}
-.upload-preview-item .del{position:absolute;top:3px;right:3px;background:rgba(239,68,68,0.9);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;font-weight:700;}
-.upload-submit{width:100%;background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#fff;border:none;border-radius:10px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;}
-.upload-submit:disabled{opacity:0.5;cursor:not-allowed;}
-.upload-msg{text-align:center;padding:10px;font-size:12px;border-radius:8px;margin-top:10px;}
-.upload-msg.success{background:#dcfce7;color:#16a34a;}
-.upload-msg.error{background:#fee2e2;color:#dc2626;}
+
 </style>
 </head>
 <body>
@@ -815,29 +770,10 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
   </svg>
   EstateBot · AI Lead Assistant
 </div>
-<!-- UPLOAD MODAL -->
-<div class="upload-modal-overlay" id="uploadModal">
-  <div class="upload-modal">
-    <div class="upload-modal-header">
-      <div class="upload-modal-title">📸 Property Photos Upload</div>
-      <button class="upload-modal-close" onclick="closeUploadModal()">×</button>
-    </div>
-    <div class="upload-drop">
-      <input type="file" id="modalFileInput" accept="image/*" multiple onchange="handleModalFiles(this.files)"/>
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D4A24C" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
-      <div class="upload-drop-text">Photos select karein — Max 5</div>
-    </div>
-    <div class="upload-preview" id="modalPreview"></div>
-    <button class="upload-submit" id="modalSubmitBtn" onclick="submitModalUpload()" style="display:none;">Upload Karein</button>
-    <div class="upload-msg" id="modalMsg" style="display:none;"></div>
-  </div>
-</div>
 
 <script>
 const sessionId = Math.random().toString(36).substr(2,9);
 const brokerId = '${brokerId}';
-let currentUploadToken = '';
-let modalFiles = [];
 let leadDone = false;
 
 function getTime(){const n=new Date();return n.getHours()+':'+String(n.getMinutes()).padStart(2,'0');}
@@ -877,12 +813,7 @@ function quickSelect(btn, text){
   fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,sessionId})})
   .then(r=>r.json()).then(data=>{
     removeTyping();
-    let reply=data.reply;
-    reply=reply.replace(/https:\/\/estatebotai\.in\/upload\/[^\s]+/g,function(url){
-      currentUploadToken=url.split('/upload/')[1];
-      return '<span class="upload-link" onclick="openUploadModal(\''+currentUploadToken+'\')">📸 Photos Upload Karein — Yahan Tap Karein</span>';
-    });
-    typeMsg(reply,'bot');
+    typeMsg(data.reply,'bot');
     if(data.leadComplete){leadDone=true;disableChat();}
   }).catch(e=>{removeTyping();addMsg('Dobara try karein.','bot');});
 }
@@ -911,70 +842,12 @@ async function sendMsg(){
   try{
     const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});
     const data=await res.json();removeTyping();
-    let reply=data.reply;
-    reply=reply.replace(/https:\/\/estatebotai\.in\/upload\/[^\s]+/g,function(url){
-      currentUploadToken=url.split('/upload/')[1];
-      return '<span class="upload-link" onclick="openUploadModal(\''+currentUploadToken+'\')">📸 Photos Upload Karein — Yahan Tap Karein</span>';
-    });
-    typeMsg(reply,'bot');
+    typeMsg(data.reply,'bot');
     if(data.leadComplete){leadDone=true;disableChat();}
   }catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}
 }
 
-function openUploadModal(token){
-  currentUploadToken=token;
-  modalFiles=[];
-  document.getElementById('modalPreview').innerHTML='';
-  document.getElementById('modalSubmitBtn').style.display='none';
-  document.getElementById('modalMsg').style.display='none';
-  document.getElementById('uploadModal').classList.add('active');
-}
-function closeUploadModal(){
-  document.getElementById('uploadModal').classList.remove('active');
-}
-function handleModalFiles(files){
-  const newFiles=Array.from(files).slice(0,5-modalFiles.length);
-  modalFiles=[...modalFiles,...newFiles].slice(0,5);
-  renderModalPreviews();
-}
-function renderModalPreviews(){
-  const preview=document.getElementById('modalPreview');
-  const btn=document.getElementById('modalSubmitBtn');
-  preview.innerHTML='';
-  if(modalFiles.length===0){btn.style.display='none';return;}
-  btn.style.display='block';
-  modalFiles.forEach(function(file,i){
-    const reader=new FileReader();
-    reader.onload=function(e){
-      const item=document.createElement('div');
-      item.className='upload-preview-item';
-      item.innerHTML='<img src="'+e.target.result+'"/><button class="del" onclick="removeModalFile('+i+')">×</button>';
-      preview.appendChild(item);
-    };
-    reader.readAsDataURL(file);
-  });
-}
-function removeModalFile(i){modalFiles.splice(i,1);renderModalPreviews();}
-async function submitModalUpload(){
-  if(modalFiles.length===0)return;
-  const btn=document.getElementById('modalSubmitBtn');
-  const msg=document.getElementById('modalMsg');
-  btn.disabled=true;btn.textContent='Upload ho raha hai...';
-  try{
-    for(let i=0;i<modalFiles.length;i++){
-      const file=modalFiles[i];
-      const signRes=await fetch('/api/upload-image/'+currentUploadToken,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fileName:file.name,fileType:file.type})});
-      const signData=await signRes.json();
-      await fetch(signData.signedUrl,{method:'PUT',headers:{'Content-Type':file.type},body:file});
-    }
-    msg.className='upload-msg success';msg.textContent='✅ Photos upload ho gayi!';msg.style.display='block';
-    btn.style.display='none';
-    setTimeout(function(){closeUploadModal();},1500);
-  }catch(e){
-    msg.className='upload-msg error';msg.textContent='Upload fail — dobara try karein';msg.style.display='block';
-    btn.disabled=false;btn.textContent='Upload Karein';
-  }
-}
+
 </script>
 </body></html>`;
 }
