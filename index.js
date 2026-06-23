@@ -563,7 +563,7 @@ function getBrokerHTML(broker, brokerId) {
   --border:rgba(201,168,76,0.12);--border2:rgba(255,255,255,0.06);
 }
 html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--fg);overflow:hidden;}
-.page{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;}
+.page{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:480px;margin:0 auto;}
 
 /* PROFILE — compact */
 .profile{border-bottom:1px solid var(--border);flex-shrink:0;position:relative;overflow:hidden;}
@@ -594,7 +594,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .chat-bar-status{font-size:11px;color:var(--online);display:flex;align-items:center;gap:4px;margin-top:1px;}
 .chat-bar-pulse{width:5px;height:5px;border-radius:50%;background:var(--online);}
 
-.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.msgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:flex;flex-direction:column;gap:10px;}
 .msgs::-webkit-scrollbar{width:3px;}
 .msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 .msg-row{display:flex;align-items:flex-end;gap:8px;}
