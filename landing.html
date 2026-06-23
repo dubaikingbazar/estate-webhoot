@@ -3,448 +3,649 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EstateBot — AI Lead Assistant</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>EstateBotAI — AI Lead Intelligence for Real Estate</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --black:#080808;--black2:#0f0f0f;--black3:#161616;--black4:#1e1e1e;
-  --gold:#c8a96e;--gold2:#e2c98a;--gold3:rgba(200,169,110,0.12);--gold4:rgba(200,169,110,0.06);
-  --white:#f0ede8;--muted:#6b6b6b;--border:rgba(200,169,110,0.14);--border2:rgba(255,255,255,0.06);
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#000000;--card:#0b0b0c;--secondary:#15130e;
+  --gold:#c9a84c;--gold-fg:#0a0a0a;
+  --fg:#ededed;--muted:#8c887e;
+  --border:rgba(201,168,76,0.12);--border2:rgba(237,237,237,0.08);
+  --radius:0.75rem;
 }
 html{scroll-behavior:smooth;}
-body{font-family:'Inter',sans-serif;background:var(--black);color:var(--white);overflow-x:hidden;}
-::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--black);}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px;}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:68px;background:rgba(8,8,8,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
-.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:800;letter-spacing:-0.3px;color:var(--white);}
-.logo span{color:var(--gold);}
-.nav-right{display:flex;align-items:center;gap:32px;}
-.nav-link{font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;transition:color 0.2s;}
-.nav-link:hover{color:var(--white);}
-.nav-btn{font-size:13px;font-weight:600;color:var(--black);background:var(--gold);padding:10px 24px;border-radius:4px;text-decoration:none;transition:background 0.2s;letter-spacing:0.2px;}
-.nav-btn:hover{background:var(--gold2);}
-.nav-login{font-size:13px;font-weight:600;color:var(--gold);background:transparent;padding:10px 20px;border-radius:4px;text-decoration:none;transition:all 0.2s;border:1px solid rgba(200,169,110,0.4);letter-spacing:0.2px;}
-.nav-login:hover{background:rgba(200,169,110,0.1);}
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 24px 100px;position:relative;overflow:hidden;}
-.hero-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:500px;background:radial-gradient(ellipse at top,rgba(200,169,110,0.07) 0%,transparent 65%);pointer-events:none;}
-.hero-line{width:1px;height:60px;background:linear-gradient(to bottom,transparent,var(--gold));margin:0 auto 40px;}
-.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:28px;}
-.hero h1{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,82px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:28px;max-width:780px;}
-.hero h1 em{font-style:italic;color:var(--gold);}
-.hero-sub{font-size:16px;font-weight:300;color:var(--muted);line-height:1.8;max-width:420px;margin:0 auto 52px;}
-.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
-.btn-gold{font-size:13px;font-weight:600;letter-spacing:0.3px;color:var(--black);background:var(--gold);padding:15px 36px;border-radius:4px;text-decoration:none;transition:all 0.25s;}
-.btn-gold:hover{background:var(--gold2);transform:translateY(-1px);}
-.btn-ghost{font-size:13px;font-weight:500;color:var(--muted);background:transparent;padding:15px 36px;border-radius:4px;text-decoration:none;border:1px solid var(--border2);transition:all 0.25s;}
-.btn-ghost:hover{color:var(--white);border-color:rgba(255,255,255,0.15);}
-.ticker{margin-top:80px;width:100%;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px 0;overflow:hidden;display:flex;}
-.ticker-track{display:flex;gap:64px;align-items:center;animation:ticker 18s linear infinite;white-space:nowrap;}
-.ticker-item{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--muted);flex-shrink:0;}
-.ticker-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);}
-@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-.section{padding:120px 24px;display:flex;flex-direction:column;align-items:center;}
-.section.dark{background:var(--black2);}
-.tag{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
-.section-h{font-family:'Playfair Display',serif;font-size:clamp(30px,4vw,48px);font-weight:700;text-align:center;line-height:1.15;max-width:540px;margin-bottom:72px;letter-spacing:-0.5px;}
-.section-h em{font-style:italic;color:var(--gold);}
-.demo-wrap{width:100%;max-width:360px;background:var(--black3);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 60px 120px rgba(0,0,0,0.7),0 0 80px rgba(200,169,110,0.05);}
-.demo-bar{background:var(--black4);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border2);}
-.demo-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1a1200,#3a2a00);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.demo-name{font-size:13px;font-weight:600;}
-.demo-status{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-top:2px;}
-.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:blink 2s infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
-.demo-body{padding:20px 16px;display:flex;flex-direction:column;gap:10px;}
-.dm{display:flex;flex-direction:column;max-width:82%;}
-.dm.b{align-self:flex-start;}.dm.u{align-self:flex-end;}
-.db{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.55;}
-.b .db{background:var(--black4);color:var(--white);border-bottom-left-radius:3px;border:1px solid var(--border2);}
-.u .db{background:linear-gradient(135deg,var(--gold),#a07840);color:#080808;font-weight:500;border-bottom-right-radius:3px;}
-.demo-lead{margin:6px 16px 16px;background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.2);border-radius:10px;padding:14px;}
-.lead-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-.lead-check{width:18px;height:18px;border-radius:50%;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.4);display:flex;align-items:center;justify-content:center;}
-.lead-title{font-size:12px;font-weight:600;color:#4ade80;}
-.lead-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
-.lead-row:last-child{border-bottom:none;}
-.lk{font-size:11px;color:var(--muted);}.lv{font-size:11px;color:var(--white);font-weight:500;}
-.steps-wrap{width:100%;max-width:560px;}
-.step{display:grid;grid-template-columns:48px 1fr;gap:0 24px;padding-bottom:48px;position:relative;}
-.step:last-child{padding-bottom:0;}
-.step-left{display:flex;flex-direction:column;align-items:center;}
-.step-num{width:48px;height:48px;border-radius:50%;border:1px solid var(--border);background:var(--gold3);font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.step-line{width:1px;flex:1;margin-top:12px;background:var(--border);}
-.step:last-child .step-line{display:none;}
-.step-right{padding-top:12px;}
-.step-right h3{font-size:16px;font-weight:600;margin-bottom:8px;letter-spacing:-0.2px;}
-.step-right p{font-size:14px;color:var(--muted);line-height:1.7;font-weight:300;}
-.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;max-width:820px;width:100%;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-.feat{background:var(--black3);padding:36px 32px;transition:background 0.25s;}
-.feat:hover{background:var(--black4);}
-.feat-icon{width:42px;height:42px;border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;background:var(--gold4);}
-.feat-icon svg{width:20px;height:20px;}
-.feat h3{font-size:15px;font-weight:600;margin-bottom:10px;letter-spacing:-0.2px;}
-.feat p{font-size:13px;color:var(--muted);line-height:1.7;font-weight:300;}
-.pricing-card{max-width:420px;width:100%;background:var(--black3);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5),0 0 0 1px var(--border);}
-.pricing-top{padding:40px 40px 32px;border-bottom:1px solid var(--border2);}
-.pricing-label{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:24px;}
-.price-num{font-family:'Playfair Display',serif;font-size:64px;font-weight:800;color:var(--white);line-height:1;letter-spacing:-2px;}
-.price-num sup{font-size:28px;vertical-align:super;letter-spacing:0;}
-.price-period{font-size:13px;color:var(--muted);margin-top:6px;font-weight:300;}
-.pricing-feats{padding:32px 40px;display:flex;flex-direction:column;gap:16px;}
-.pf{display:flex;align-items:flex-start;gap:14px;font-size:14px;font-weight:300;color:var(--white);line-height:1.5;}
-.pf-icon{width:20px;height:20px;flex-shrink:0;margin-top:1px;border-radius:50%;background:var(--gold3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
-.pricing-footer{padding:0 40px 40px;}
-.pricing-footer .btn-gold{display:block;text-align:center;font-size:14px;padding:16px;border-radius:6px;}
-.trial-note{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;font-weight:300;}
-.signup-wrap{max-width:460px;width:100%;background:var(--black3);border:1px solid var(--border);border-radius:16px;padding:48px 40px;}
-.signup-wrap h2{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;}
-.signup-wrap p{font-size:14px;color:var(--muted);font-weight:300;margin-bottom:36px;}
-.fg{margin-bottom:18px;}
-.fg label{display:block;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-.fg input,.fg select{width:100%;background:var(--black2);border:1px solid var(--border2);border-radius:6px;padding:13px 16px;font-family:'Inter',sans-serif;font-size:14px;font-weight:300;color:var(--white);outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
-.fg input:focus,.fg select:focus{border-color:var(--gold);}
-.fg input::placeholder{color:#333;}
-.fg select option{background:var(--black3);}
-.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.submit-btn{width:100%;background:var(--gold);color:var(--black);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.3px;padding:16px;border:none;border-radius:6px;cursor:pointer;margin-top:8px;transition:background 0.2s;}
-.submit-btn:hover{background:var(--gold2);}
-.form-note{font-size:12px;color:var(--muted);text-align:center;margin-top:16px;font-weight:300;line-height:1.6;}
-footer{padding:48px 24px;border-top:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;}
-.footer-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:var(--white);}
-.footer-logo span{color:var(--gold);}
-.footer-links{display:flex;gap:32px;flex-wrap:wrap;justify-content:center;}
-.footer-links a{font-size:13px;color:var(--muted);text-decoration:none;font-weight:300;transition:color 0.2s;}
-.footer-links a:hover{color:var(--white);}
-.footer-copy{font-size:12px;color:#333;font-weight:300;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--fg);overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#000;}::-webkit-scrollbar-thumb{background:#15130e;border-radius:2px;}
+a{text-decoration:none;color:inherit;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;transition:all 0.3s;}
+nav.scrolled{background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;height:100%;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;letter-spacing:-0.3px;}
+.logo-icon{width:28px;height:28px;border-radius:8px;background:var(--gold);display:flex;align-items:center;justify-content:center;}
+.logo span{color:var(--muted);}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-links a{font-size:14px;color:var(--muted);transition:color 0.2s;}
+.nav-links a:hover{color:var(--fg);}
+.nav-actions{display:flex;align-items:center;gap:12px;}
+.nav-signin{font-size:14px;color:var(--muted);transition:color 0.2s;}
+.nav-signin:hover{color:var(--fg);}
+.nav-cta{font-size:13px;font-weight:500;color:var(--gold-fg);background:var(--gold);padding:8px 18px;border-radius:8px;transition:opacity 0.2s;}
+.nav-cta:hover{opacity:0.9;}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;padding:160px 20px 100px;display:flex;flex-direction:column;align-items:center;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(to right,rgba(201,168,76,0.05) 1px,transparent 1px),linear-gradient(to bottom,rgba(201,168,76,0.05) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(ellipse 60% 50% at 50% 0%,#000 60%,transparent 100%);mask-image:radial-gradient(ellipse 60% 50% at 50% 0%,#000 60%,transparent 100%);}
+.hero-glow{position:absolute;inset-x:0;top:0;height:500px;background:radial-gradient(ellipse 50% 50% at 50% 0%,rgba(201,168,76,0.1),transparent);pointer-events:none;}
+.hero-inner{position:relative;max-width:1200px;width:100%;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+.hero-left{display:flex;flex-direction:column;align-items:flex-start;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:rgba(21,19,14,0.6);border-radius:100px;padding:6px 14px 6px 8px;margin-bottom:24px;}
+.badge-pulse{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse-soft 2.4s ease-in-out infinite;}
+@keyframes pulse-soft{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.badge-text{font-size:12px;font-weight:500;color:var(--muted);}
+.hero h1{font-size:clamp(36px,4.5vw,58px);font-weight:600;line-height:1.05;letter-spacing:-1.5px;margin-bottom:24px;color:var(--fg);}
+.hero h1 .gold{color:var(--gold);}
+.hero-sub{font-size:16px;color:var(--muted);line-height:1.7;max-width:440px;margin-bottom:32px;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px;}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--gold-fg);font-size:14px;font-weight:500;padding:12px 22px;border-radius:8px;transition:opacity 0.2s;}
+.btn-primary:hover{opacity:0.9;}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border2);background:rgba(21,19,14,0.4);color:var(--fg);font-size:14px;font-weight:500;padding:12px 22px;border-radius:8px;transition:colors 0.2s;}
+.btn-secondary:hover{background:rgba(21,19,14,0.8);}
+.hero-social{display:flex;align-items:center;gap:16px;}
+.avatars{display:flex;}
+.avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--bg);margin-left:-8px;}
+.avatar:first-child{margin-left:0;}
+.stars{display:flex;gap:2px;color:var(--gold);font-size:13px;}
+.social-text{font-size:12px;color:var(--muted);}
+
+/* CHAT DEMO */
+.chat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 0 0 1px rgba(201,168,76,0.12),0 1px 0 0 rgba(237,237,237,0.04) inset,0 30px 80px -32px rgba(201,168,76,0.18),0 24px 60px -24px rgba(0,0,0,0.8);}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);}
+.chat-agent{display:flex;align-items:center;gap:10px;}
+.chat-av{position:relative;width:32px;height:32px;border-radius:50%;background:var(--secondary);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chat-av-dot{position:absolute;top:-1px;right:-1px;width:10px;height:10px;border-radius:50%;background:#34d399;border:2px solid var(--card);}
+.chat-agent-name{font-size:13px;font-weight:500;}
+.chat-agent-sub{font-size:11px;color:var(--muted);}
+.chat-live{display:flex;align-items:center;gap:4px;border:1px solid var(--border);border-radius:100px;padding:4px 10px;font-size:10px;font-weight:500;color:var(--muted);}
+.chat-live-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse-soft 2s infinite;}
+.chat-msgs{height:320px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.chat-msgs::-webkit-scrollbar{display:none;}
+.bubble{max-width:82%;border-radius:16px;padding:10px 14px;font-size:13px;line-height:1.5;animation:fade-up 0.5s cubic-bezier(0.16,1,0.3,1) forwards;}
+@keyframes fade-up{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.bubble.ai{background:var(--secondary);color:var(--fg);border-top-left-radius:4px;align-self:flex-start;}
+.bubble.user{background:var(--gold);color:var(--gold-fg);font-weight:500;border-top-right-radius:4px;align-self:flex-end;}
+.typing-bubble{display:flex;align-items:center;gap:4px;background:var(--secondary);border-radius:16px;border-top-left-radius:4px;padding:12px 16px;width:fit-content;align-self:flex-start;}
+.typing-bubble span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite;}
+.typing-bubble span:nth-child(2){animation-delay:-0.15s;}
+.typing-bubble span:nth-child(3){animation-delay:0s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.qualified-bar{display:flex;align-items:center;gap:8px;background:var(--secondary);border-radius:8px;padding:10px 14px;font-size:12px;font-weight:500;color:var(--fg);align-self:flex-start;animation:fade-up 0.5s forwards;}
+.qualified-bar svg{color:var(--gold);}
+.chat-composer{border-top:1px solid var(--border);padding:12px;}
+.composer-inner{display:flex;align-items:center;justify-content:space-between;background:var(--secondary);border:1px solid var(--border);border-radius:10px;padding:10px 14px;}
+.composer-text{font-size:13px;color:var(--muted);}
+.composer-btn{width:28px;height:28px;border-radius:8px;background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* MARQUEE */
+.marquee-section{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(11,11,12,0.4);padding:20px 0;}
+.marquee-label{text-align:center;font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.marquee-wrap{position:relative;overflow:hidden;-webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);}
+.marquee-track{display:flex;animation:marquee 32s linear infinite;}
+.marquee-item{display:flex;align-items:center;white-space:nowrap;padding:0 24px;font-size:14px;font-weight:500;color:rgba(237,237,237,0.7);}
+.marquee-sep{color:var(--muted);margin:0 4px;font-size:10px;}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* SECTIONS */
+.section{padding:96px 20px;}
+.section-inner{max-width:1200px;margin:0 auto;}
+.section-tag{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.section-h{font-size:clamp(28px,3.5vw,40px);font-weight:600;letter-spacing:-1px;line-height:1.1;max-width:520px;margin-bottom:16px;}
+.section-sub{font-size:15px;color:var(--muted);line-height:1.7;max-width:480px;margin-bottom:56px;}
+.text-center{text-align:center;}.mx-auto{margin-left:auto;margin-right:auto;}
+
+/* FEATURES */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.feat{background:var(--card);padding:28px;transition:background 0.2s;}
+.feat:hover{background:rgba(21,19,14,0.5);}
+.feat-icon{width:40px;height:40px;border-radius:8px;border:1px solid var(--border);background:var(--secondary);display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+.feat h3{font-size:15px;font-weight:500;margin-bottom:8px;}
+.feat p{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* HOW IT WORKS */
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;}
+.step{position:relative;display:flex;flex-direction:column;}
+.step-connector{position:absolute;left:20px;top:20px;height:1px;width:100%;background:var(--border);}
+.step-icon{position:relative;z-index:1;width:40px;height:40px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;margin-bottom:20px;flex-shrink:0;}
+.step-num{font-size:11px;font-weight:500;font-family:monospace;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.step-num::after{content:'';flex:1;height:1px;background:var(--border);}
+.step h3{font-size:15px;font-weight:500;margin-bottom:8px;}
+.step p{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start;}
+.price-card{border:1px solid var(--border);border-radius:16px;padding:28px;background:var(--card);position:relative;}
+.price-card.highlighted{border-color:rgba(237,237,237,0.3);box-shadow:0 0 0 1px rgba(201,168,76,0.12),0 1px 0 0 rgba(237,237,237,0.04) inset,0 30px 80px -32px rgba(201,168,76,0.18),0 24px 60px -24px rgba(0,0,0,0.8);}
+.price-popular{position:absolute;top:-12px;left:28px;background:var(--gold);color:var(--gold-fg);font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;}
+.price-name{font-size:14px;font-weight:500;margin-bottom:16px;}
+.price-amount{font-size:40px;font-weight:600;letter-spacing:-1.5px;margin-bottom:4px;}
+.price-amount span{font-size:14px;font-weight:400;color:var(--muted);}
+.price-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.price-btn{display:block;text-align:center;font-size:13px;font-weight:500;padding:10px 20px;border-radius:8px;transition:all 0.2s;margin-bottom:24px;}
+.price-btn.primary{background:var(--gold);color:var(--gold-fg);}
+.price-btn.primary:hover{opacity:0.9;}
+.price-btn.outline{border:1px solid var(--border2);background:rgba(21,19,14,0.4);color:var(--fg);}
+.price-btn.outline:hover{background:rgba(21,19,14,0.8);}
+.price-divider{height:1px;background:var(--border);margin-bottom:24px;}
+.price-feats{display:flex;flex-direction:column;gap:12px;}
+.price-feat{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted);}
+.check{width:16px;height:16px;flex-shrink:0;color:var(--gold);margin-top:1px;}
+
+/* SIGNUP */
+.signup-wrap{max-width:520px;margin:0 auto;}
+.signup-card{border:1px solid var(--border);border-radius:24px;padding:40px;background:var(--card);box-shadow:0 0 0 1px rgba(201,168,76,0.12),0 1px 0 0 rgba(237,237,237,0.04) inset,0 30px 80px -32px rgba(201,168,76,0.18),0 24px 60px -24px rgba(0,0,0,0.8);}
+.signup-glow{position:absolute;inset-x:0;bottom:0;height:400px;background:radial-gradient(ellipse 50% 60% at 50% 100%,rgba(201,168,76,0.1),transparent);pointer-events:none;}
+.signup-card h2{font-size:28px;font-weight:600;letter-spacing:-0.75px;margin-bottom:8px;}
+.signup-card>p{font-size:14px;color:var(--muted);margin-bottom:32px;}
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;}
+.fg input,.fg select{width:100%;background:rgba(21,19,14,0.4);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:14px;color:var(--fg);outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+.fg input:focus,.fg select:focus{border-color:rgba(237,237,237,0.4);box-shadow:0 0 0 2px rgba(237,237,237,0.08);}
+.fg select option{background:#0b0b0c;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.submit-btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:var(--gold-fg);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;padding:13px;border:none;border-radius:8px;cursor:pointer;margin-top:8px;transition:opacity 0.2s;}
+.submit-btn:hover{opacity:0.9;}
+.form-note{font-size:12px;color:var(--muted);text-align:center;margin-top:12px;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);}
+.footer-inner{max-width:1200px;margin:0 auto;padding:56px 20px 24px;}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;}
+.footer-logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;letter-spacing:-0.3px;margin-bottom:16px;}
+.footer-logo-icon{width:28px;height:28px;border-radius:8px;background:var(--gold);display:flex;align-items:center;justify-content:center;}
+.footer-logo span{color:var(--muted);}
+.footer-desc{font-size:13px;color:var(--muted);line-height:1.7;max-width:260px;}
+.footer-col h4{font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.footer-col ul{display:flex;flex-direction:column;gap:12px;list-style:none;}
+.footer-col a{font-size:13px;color:var(--muted);transition:color 0.2s;}
+.footer-col a:hover{color:var(--fg);}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:24px;}
+.footer-copy{font-size:12px;color:var(--muted);}
+.footer-bottom-links{display:flex;gap:24px;}
+.footer-bottom-links a{font-size:12px;color:var(--muted);transition:color 0.2s;}
+.footer-bottom-links a:hover{color:var(--fg);}
+
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;}
+  .feat-grid{grid-template-columns:1fr 1fr;}
+  .steps-grid{grid-template-columns:1fr 1fr;}
+  .pricing-grid{grid-template-columns:1fr;}
+  .footer-top{grid-template-columns:1fr 1fr;}
+  .nav-links{display:none;}
+}
 @media(max-width:600px){
-  nav{padding:0 20px;}.nav-right .nav-link{display:none;}.nav-right{gap:10px;}
-  .nav-btn{font-size:12px;padding:9px 14px;}.nav-login{font-size:12px;padding:9px 14px;}
-  .hero h1{letter-spacing:-1px;}
-  .signup-wrap{padding:32px 24px;}
-  .pricing-top,.pricing-feats,.pricing-footer{padding-left:28px;padding-right:28px;}
+  .feat-grid{grid-template-columns:1fr;}
+  .steps-grid{grid-template-columns:1fr;}
   .fg-row{grid-template-columns:1fr;}
+  .footer-top{grid-template-columns:1fr;}
+  .hero{padding:120px 20px 60px;}
 }
 </style>
 </head>
 <body>
-<nav>
-  <div class="logo">Estate<span>Bot</span></div>
-  <div class="nav-right">
-    <a href="#how" class="nav-link">How it works</a>
-    <a href="#pricing" class="nav-link">Pricing</a>
-    <a href="/broker-login" class="nav-login">Login</a>
-    <a href="#signup" class="nav-btn">Start Free Trial</a>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <div class="logo-icon">
+        <svg width="16" height="16" viewBox="0 0 100 100" fill="none">
+          <path d="M50 8 L92 40 L92 88 Q92 93 87 93 L13 93 Q8 93 8 88 L8 40 Z" fill="#0a0a0a"/>
+          <circle cx="52" cy="57" r="19" fill="#c9a84c"/>
+          <polygon points="34,68 25,80 42,73" fill="#c9a84c"/>
+          <circle cx="43" cy="57" r="2.8" fill="#0a0a0a"/>
+          <circle cx="52" cy="57" r="2.8" fill="#0a0a0a"/>
+          <circle cx="61" cy="57" r="2.8" fill="#0a0a0a"/>
+        </svg>
+      </div>
+      EstateBot<span>AI</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <div class="nav-actions">
+      <a href="/broker-login" class="nav-signin">Sign in</a>
+      <a href="#signup" class="nav-cta">Get started</a>
+    </div>
   </div>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
+  <div class="hero-grid"></div>
   <div class="hero-glow"></div>
-  <div class="hero-line"></div>
-  <div class="hero-eyebrow">AI Lead Assistant — Real Estate</div>
-  <h1>Every Visitor.<br><em>A Qualified Lead.</em></h1>
-  <p class="hero-sub">EstateBot qualifies your website visitors through conversation and delivers complete lead details to your inbox — around the clock.</p>
-  <div class="hero-actions">
-    <a href="#signup" class="btn-gold">Start Free — 7 Days</a>
-    <a href="#demo" class="btn-ghost">See it live</a>
-  </div>
-  <div class="ticker">
-    <div class="ticker-track">
-      <span class="ticker-item"><span class="ticker-dot"></span>Instant Email Alerts</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>Hinglish AI Conversations</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>24 / 7 Active</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>Your Branded Page</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>Setup in Minutes</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>No Missed Leads</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>Instant Email Alerts</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>Hinglish AI Conversations</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>24 / 7 Active</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>Your Branded Page</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>Setup in Minutes</span>
-      <span class="ticker-item"><span class="ticker-dot"></span>No Missed Leads</span>
-    </div>
-  </div>
-</section>
-
-<section class="section dark" id="demo">
-  <div class="tag">Live Demo</div>
-  <div class="section-h">Watch a Lead Get <em>Captured</em></div>
-  <div class="demo-wrap">
-    <div class="demo-bar">
-      <div class="demo-av">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#c8a96e" stroke-width="1.5">
-          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
-          <path d="M9 21V12h6v9"/>
-        </svg>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span class="badge-pulse"></span>
+        <span class="badge-text">Built for India's real estate market</span>
       </div>
-      <div>
-        <div class="demo-name">Sharma Realty</div>
-        <div class="demo-status"><span class="live-dot"></span> Online</div>
+      <h1>Your AI agent that turns clicks into <span class="gold">qualified property buyers</span></h1>
+      <p class="hero-sub">EstateBotAI engages every lead in seconds, qualifies budget and intent, and books site visits — 24/7, in English and Hindi. Stop chasing cold leads. Start closing.</p>
+      <div class="hero-btns">
+        <a href="#signup" class="btn-primary">
+          Start free trial
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#how" class="btn-secondary">See how it works</a>
       </div>
-    </div>
-    <div class="demo-body">
-      <div class="dm b"><div class="db">Namaste. Aap kya dhundh rahe hain — kharidna, rent, ya sell?</div></div>
-      <div class="dm u"><div class="db">2BHK kharidni hai Mumbai mein</div></div>
-      <div class="dm b"><div class="db">Aapka naam aur preferred area?</div></div>
-      <div class="dm u"><div class="db">Rahul — Andheri West</div></div>
-      <div class="dm b"><div class="db">Budget range kya hai, Rahul ji?</div></div>
-      <div class="dm u"><div class="db">75–85 lakh</div></div>
-      <div class="dm b"><div class="db">Phone number dijiye — agent aapse directly connect karenge.</div></div>
-      <div class="dm u"><div class="db">98765 43210</div></div>
-    </div>
-    <div class="demo-lead">
-      <div class="lead-head">
-        <div class="lead-check">
-          <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="#4ade80" stroke-width="2"><polyline points="2,6 5,9 10,3"/></svg>
+      <div class="hero-social">
+        <div class="avatars">
+          <div class="avatar" style="background:#c9a84c;"></div>
+          <div class="avatar" style="background:#a98a3a;"></div>
+          <div class="avatar" style="background:#6b5a2c;"></div>
         </div>
-        <div class="lead-title">Lead Captured · Email Sent</div>
+        <div>
+          <div class="stars">★★★★★</div>
+          <div class="social-text">Trusted by 500+ agents &amp; brokers</div>
+        </div>
       </div>
-      <div class="lead-row"><span class="lk">Name</span><span class="lv">Rahul</span></div>
-      <div class="lead-row"><span class="lk">Phone</span><span class="lv">98765 43210</span></div>
-      <div class="lead-row"><span class="lk">Property</span><span class="lv">2BHK, Andheri West</span></div>
-      <div class="lead-row"><span class="lk">Budget</span><span class="lv">Rs 75-85 Lakh</span></div>
+    </div>
+    <div class="chat-card">
+      <div class="chat-header">
+        <div class="chat-agent">
+          <div class="chat-av">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M12 8V4m0 0L9 7m3-3 3 3M6.5 20a5.5 5.5 0 1 1 11 0"/><circle cx="12" cy="13" r="3"/></svg>
+            <div class="chat-av-dot"></div>
+          </div>
+          <div>
+            <div class="chat-agent-name">EstateBotAI Assistant</div>
+            <div class="chat-agent-sub">Online · replies instantly</div>
+          </div>
+        </div>
+        <div class="chat-live">
+          <div class="chat-live-dot"></div>
+          Live
+        </div>
+      </div>
+      <div class="chat-msgs" id="chatMsgs"></div>
+      <div class="chat-composer">
+        <div class="composer-inner">
+          <span class="composer-text">AI is handling this conversation…</span>
+          <div class="composer-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5"><path d="M5 3l14 9-14 9V3z"/></svg>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="section" id="how">
-  <div class="tag">Process</div>
-  <div class="section-h">From Signup to <em>First Lead</em></div>
-  <div class="steps-wrap">
-    <div class="step">
-      <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
-      <div class="step-right"><h3>Fill the Form</h3><p>Business name, city, specialties. Two minutes, done.</p></div>
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-label">Powering lead generation across India</div>
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <div class="marquee-item">Mumbai <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">2.4M+ leads qualified <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Bengaluru <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">24/7 AI response <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Gurugram <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">English &amp; Hindi <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Pune <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">500+ agencies <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Hyderabad <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">38% more site visits <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Noida <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">WhatsApp ready <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Mumbai <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">2.4M+ leads qualified <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Bengaluru <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">24/7 AI response <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Gurugram <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">English &amp; Hindi <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Pune <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">500+ agencies <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Hyderabad <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">38% more site visits <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">Noida <span class="marquee-sep">✦</span></div>
+      <div class="marquee-item">WhatsApp ready <span class="marquee-sep">✦</span></div>
     </div>
-    <div class="step">
-      <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
-      <div class="step-right"><h3>Get Your Page</h3><p>A branded page goes live at your personal link — share it anywhere.</p></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="text-center">
+      <div class="section-tag mx-auto">Features</div>
+      <div class="section-h mx-auto" style="max-width:560px;">Everything you need to close more deals</div>
+      <div class="section-sub mx-auto" style="margin-bottom:48px;">A complete AI lead engine purpose-built for the way real estate works in India.</div>
     </div>
-    <div class="step">
-      <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
-      <div class="step-right"><h3>Bot Qualifies Visitors</h3><p>Every visitor is walked through a conversation. Name, budget, location, intent — all collected.</p></div>
-    </div>
-    <div class="step">
-      <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
-      <div class="step-right"><h3>Lead Lands in Your Inbox</h3><p>The moment a lead is complete, you get an email with every detail. Call and close.</p></div>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <h3>Instant lead qualification</h3>
+        <p>The AI engages every enquiry in under 5 seconds, asking the right questions to score budget, intent, and timeline.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <h3>Automated site visits</h3>
+        <p>Qualified buyers get booked straight into your calendar and handed to the right advisor — no manual follow-up.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M5 8l6 6 6-6"/><circle cx="12" cy="12" r="9"/></svg></div>
+        <h3>English &amp; Hindi fluency</h3>
+        <p>Converse naturally with buyers in the language they prefer, with full understanding of local property lingo.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h3>24/7 availability</h3>
+        <p>Never miss a midnight enquiry again. Your AI agent works around the clock so leads never go cold.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <h3>Lead intelligence dashboard</h3>
+        <p>See every conversation, qualification score, and conversion metric in one clean, real-time dashboard.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3>CRM &amp; WhatsApp ready</h3>
+        <p>Plugs into WhatsApp Business, your website, and popular Indian CRMs in minutes — no code required.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="section dark">
-  <div class="tag">Features</div>
-  <div class="section-h">Built for <em>Real Estate</em> Agents</div>
-  <div class="feat-grid">
-    <div class="feat">
-      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-      <h3>Always On</h3><p>No office hours. The bot handles conversations at 2 AM as well as it does at noon.</p>
+<!-- HOW IT WORKS -->
+<section class="section" id="how" style="background:#080808;">
+  <div class="section-inner">
+    <div class="text-center">
+      <div class="section-tag mx-auto">How it works</div>
+      <div class="section-h mx-auto" style="max-width:560px;">From enquiry to booked visit in four steps</div>
+      <div class="section-sub mx-auto" style="margin-bottom:48px;">Set up once and let your AI agent handle the rest — every lead, every hour, every day.</div>
     </div>
-    <div class="feat">
-      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-      <h3>Natural Hinglish</h3><p>Conversations feel human — warm, natural, the way your customers already speak.</p>
-    </div>
-    <div class="feat">
-      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-      <h3>Instant Alerts</h3><p>Complete lead details hit your inbox the moment a conversation closes.</p>
-    </div>
-    <div class="feat">
-      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
-      <h3>Your Brand</h3><p>Business name, location, and specialties — visitors only ever see your identity.</p>
-    </div>
-    <div class="feat">
-      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-      <h3>One Link</h3><p>Share on Instagram bio, WhatsApp, or visiting card. One URL, everything works.</p>
-    </div>
-    <div class="feat">
-      <div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-      <h3>Qualify, Not Just Collect</h3><p>Budget, area, timeline — the bot gets what you need before you ever pick up the phone.</p>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+        </div>
+        <div class="step-num">01</div>
+        <h3>Connect your channels</h3>
+        <p>Add EstateBotAI to your website and WhatsApp Business in minutes — no code, no developers.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <div class="step-num">02</div>
+        <h3>AI engages every lead</h3>
+        <p>The moment a buyer enquires, the AI responds in seconds and qualifies budget, intent, and timeline.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </div>
+        <div class="step-num">03</div>
+        <h3>Site visits get booked</h3>
+        <p>Qualified buyers are scheduled directly into your calendar and routed to the right advisor automatically.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="step-num">04</div>
+        <h3>You close more deals</h3>
+        <p>Spend your time with serious buyers while the dashboard tracks every conversation and conversion.</p>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- PRICING -->
 <section class="section" id="pricing">
-  <div class="tag">Pricing</div>
-  <div class="section-h">One Plan. <em>Everything Included.</em></div>
-  <div class="pricing-card">
-    <div class="pricing-top">
-      <div class="pricing-label">Per Agent Monthly</div>
-      <div class="price-num"><sup>Rs</sup>2,999</div>
-      <div class="price-period">One deal pays for six months.</div>
+  <div class="section-inner">
+    <div class="text-center">
+      <div class="section-tag mx-auto">Pricing</div>
+      <div class="section-h mx-auto">Simple pricing that scales with you</div>
+      <div class="section-sub mx-auto" style="margin-bottom:48px;">No setup fees. Cancel anytime. 7-day free trial on all plans.</div>
     </div>
-    <div class="pricing-feats">
-      <div class="pf"><div class="pf-icon"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg></div>AI-powered lead bot, active 24/7</div>
-      <div class="pf"><div class="pf-icon"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg></div>Unlimited conversations</div>
-      <div class="pf"><div class="pf-icon"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg></div>Instant email on every lead</div>
-      <div class="pf"><div class="pf-icon"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg></div>Personal branded page</div>
-      <div class="pf"><div class="pf-icon"><svg viewBox="0 0 10 10" width="10" height="10" fill="none" stroke="#c8a96e" stroke-width="1.5"><polyline points="2,5 4,7 8,3"/></svg></div>Setup and onboarding included</div>
-    </div>
-    <div class="pricing-footer">
-      <a href="#signup" class="btn-gold">Start Free — 7 Days</a>
-      <div class="trial-note">No credit card required for trial. Cancel anytime.</div>
+    <div style="max-width:420px;margin:0 auto;">
+      <div class="price-card highlighted">
+        <div class="price-popular">Per Agent · Monthly</div>
+        <div class="price-amount">₹2,999<span>/mo</span></div>
+        <div class="price-desc">The only tool your competition doesn't have. One closed deal covers 6 months.</div>
+        <a href="#signup" class="price-btn primary">Start free trial</a>
+        <div class="price-divider"></div>
+        <div class="price-feats">
+          <div class="price-feat"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>AI lead agent, active 24/7</div>
+          <div class="price-feat"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Unlimited conversations</div>
+          <div class="price-feat"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Instant email on every qualified lead</div>
+          <div class="price-feat"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Personal branded page</div>
+          <div class="price-feat"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Dedicated onboarding support</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="section dark" id="signup">
+<!-- SIGNUP -->
+<section class="section" id="signup" style="position:relative;overflow:hidden;">
+  <div class="signup-glow"></div>
   <div class="signup-wrap">
-    <h2>Start Your Free Trial</h2>
-    <p>We set up your bot within 24 hours. No card needed.</p>
-    <div class="fg-row">
-      <div class="fg"><label>Your Name</label><input type="text" placeholder="Rajesh Sharma" id="f-name"/></div>
-      <div class="fg"><label>WhatsApp</label><input type="tel" placeholder="+91 98765 43210" id="f-phone"/></div>
-    </div>
-    <div class="fg"><label>Business / Agency Name</label><input type="text" placeholder="Sharma Realty" id="f-biz"/></div>
-    <div class="fg-row">
-      <div class="fg"><label>City</label><input type="text" placeholder="Mumbai" id="f-city"/></div>
-      <div class="fg">
-        <label>State</label>
-        <select id="f-state">
-          <option value="">Select State</option>
-          <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
-          <option>Bihar</option><option>Chhattisgarh</option><option>Goa</option>
-          <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
-          <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
-          <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
-          <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option>
-          <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
-          <option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option>
-          <option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
-          <option>West Bengal</option><option>Delhi</option><option>Jammu and Kashmir</option>
-          <option>Ladakh</option>
+    <div class="signup-card">
+      <div class="text-center" style="margin-bottom:32px;">
+        <div class="section-tag mx-auto">Get started</div>
+        <div class="section-h" style="font-size:28px;max-width:100%;">Start your free trial</div>
+        <p style="font-size:14px;color:var(--muted);margin-top:8px;">Set up your AI lead agent in minutes. No credit card required.</p>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Full Name</label><input type="text" id="f-name"/></div>
+        <div class="fg"><label>Phone</label><input type="tel" id="f-phone"/></div>
+      </div>
+      <div class="fg"><label>Business / Agency Name</label><input type="text" id="f-biz"/></div>
+      <div class="fg-row">
+        <div class="fg"><label>City</label><input type="text" id="f-city"/></div>
+        <div class="fg"><label>State</label>
+          <select id="f-state">
+            <option value="">Select</option>
+            <option>Delhi</option><option>Maharashtra</option><option>Gujarat</option>
+            <option>Rajasthan</option><option>Uttar Pradesh</option><option>Haryana</option>
+            <option>Punjab</option><option>Karnataka</option><option>Tamil Nadu</option>
+            <option>Telangana</option><option>Madhya Pradesh</option><option>Bihar</option>
+            <option>West Bengal</option><option>Andhra Pradesh</option><option>Kerala</option>
+            <option>Odisha</option><option>Jharkhand</option><option>Chhattisgarh</option>
+            <option>Assam</option><option>Himachal Pradesh</option><option>Uttarakhand</option>
+            <option>Goa</option><option>Jammu and Kashmir</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Experience</label>
+          <select id="f-exp">
+            <option value="">Select</option>
+            <option>1 Year</option><option>2 Years</option><option>3 Years</option>
+            <option>4 Years</option><option>5 Years</option><option>6 Years</option>
+            <option>7 Years</option><option>8 Years</option><option>9 Years</option>
+            <option>10 Years</option><option>15 Years</option><option>20+ Years</option>
+          </select>
+        </div>
+        <div class="fg"><label>Properties Dealt</label>
+          <select id="f-props">
+            <option value="">Select</option>
+            <option>10+</option><option>25+</option><option>50+</option>
+            <option>100+</option><option>200+</option><option>500+</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>Specialty</label>
+        <select id="f-spec">
+          <option value="">Select</option>
+          <option>Residential</option><option>Commercial</option>
+          <option>Residential + Commercial</option><option>Plots / Land</option><option>Rental</option>
         </select>
       </div>
-    </div>
-    <div class="fg-row">
-      <div class="fg">
-        <label>Experience</label>
-        <select id="f-exp">
-          <option value="">Select Years</option>
-          <option>1 Year</option><option>2 Years</option><option>3 Years</option>
-          <option>4 Years</option><option>5 Years</option><option>6 Years</option>
-          <option>7 Years</option><option>8 Years</option><option>9 Years</option>
-          <option>10 Years</option><option>11 Years</option><option>12 Years</option>
-          <option>13 Years</option><option>14 Years</option><option>15 Years</option>
-          <option>16 Years</option><option>17 Years</option><option>18 Years</option>
-          <option>19 Years</option><option>20+ Years</option>
-        </select>
+      <div class="fg"><label>Email Address</label><input type="email" id="f-email"/></div>
+      <div class="fg-row">
+        <div class="fg"><label>Password</label><input type="password" id="f-pass"/></div>
+        <div class="fg"><label>Confirm Password</label><input type="password" id="f-pass2"/></div>
       </div>
-      <div class="fg">
-        <label>Properties Dealt</label>
-        <select id="f-props">
-          <option value="">Select Range</option>
-          <option>10+</option><option>25+</option><option>50+</option>
-          <option>100+</option><option>200+</option><option>500+</option>
-        </select>
-      </div>
+      <button class="submit-btn" onclick="submitForm()">
+        Claim your free trial
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <div class="form-note">By signing up you agree to our Terms &amp; Privacy Policy.</div>
     </div>
-    <div class="fg">
-      <label>Specialty</label>
-      <select id="f-spec">
-        <option value="">Select</option>
-        <option>Residential</option><option>Commercial</option>
-        <option>Residential + Commercial</option><option>Plots / Land</option>
-        <option>Rental</option>
-      </select>
-    </div>
-    <div class="fg"><label>Email</label><input type="email" placeholder="rajesh@gmail.com" id="f-email"/></div>
-    <div class="fg-row">
-      <div class="fg"><label>Password</label><input type="password" placeholder="Password banayein" id="f-pass"/></div>
-      <div class="fg"><label>Confirm Password</label><input type="password" placeholder="Dobara likhein" id="f-pass2"/></div>
-    </div>
-    <button class="submit-btn" onclick="submitForm()">Request Free Trial</button>
-    <div class="form-note">After submitting, we will contact you on WhatsApp to complete setup.</div>
   </div>
 </section>
 
+<!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Estate<span>Bot</span></div>
-  <div class="footer-links">
-    <a href="mailto:estatebotofficial@gmail.com">estatebotofficial@gmail.com</a>
-    <a href="tel:+918690353003">+91 86903 53003</a>
-    <a href="#demo">Demo</a>
-    <a href="#pricing">Pricing</a>
-    <a href="/privacy">Privacy Policy</a>
-    <a href="/terms">Terms of Service</a>
-    <a href="/broker-login" style="color:#c8a96e;">Broker Login</a>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">
+          <div class="footer-logo-icon">
+            <svg width="16" height="16" viewBox="0 0 100 100" fill="none">
+              <path d="M50 8 L92 40 L92 88 Q92 93 87 93 L13 93 Q8 93 8 88 L8 40 Z" fill="#0a0a0a"/>
+              <circle cx="52" cy="57" r="19" fill="#c9a84c"/>
+              <polygon points="34,68 25,80 42,73" fill="#c9a84c"/>
+              <circle cx="43" cy="57" r="2.8" fill="#0a0a0a"/>
+              <circle cx="52" cy="57" r="2.8" fill="#0a0a0a"/>
+              <circle cx="61" cy="57" r="2.8" fill="#0a0a0a"/>
+            </svg>
+          </div>
+          EstateBot<span>AI</span>
+        </div>
+        <p class="footer-desc">AI lead generation built for real estate agents and developers across India.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#signup">Get started</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="mailto:estatebotofficial@gmail.com">Contact</a></li>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+          <li><a href="/broker-login">Agent Login</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:estatebotofficial@gmail.com">estatebotofficial@gmail.com</a></li>
+          <li><a href="tel:+918690353003">+91 86903 53003</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 EstateBotAI. All rights reserved.</div>
+      <div class="footer-bottom-links">
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+      </div>
+    </div>
   </div>
-  <div class="footer-copy">2026 EstateBot. All rights reserved.</div>
 </footer>
 
 <script>
-async function submitForm() {
-  const fields = ['f-name','f-phone','f-biz','f-city','f-state','f-exp','f-props','f-spec','f-email','f-pass','f-pass2'];
-  let ok = true;
-  fields.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el.value.trim()) {
-      el.style.borderColor = '#ef4444';
-      setTimeout(() => el.style.borderColor = '', 2000);
-      ok = false;
-    }
-  });
-  if (!ok) return;
+// Nav scroll effect
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>12);
+});
 
-  const pass = document.getElementById('f-pass').value;
-  const pass2 = document.getElementById('f-pass2').value;
-  if (pass !== pass2) {
-    document.getElementById('f-pass').style.borderColor = '#ef4444';
-    document.getElementById('f-pass2').style.borderColor = '#ef4444';
-    alert('Passwords match nahi kar rahe!');
+// Chat animation
+const script=[
+  {from:'ai',text:'Hi! Thanks for your interest in the 3 BHK at Prestige Lakeside, Whitefield. Are you looking to buy for yourself or as an investment?'},
+  {from:'user',text:'For my family, we want to move in soon.'},
+  {from:'ai',text:'Great! What budget range are you comfortable with — under ₹1.2 Cr, ₹1.2–1.8 Cr, or above ₹1.8 Cr?'},
+  {from:'user',text:'Around 1.5 crore, with a home loan.'},
+  {from:'ai',text:'Perfect fit. I can also connect you with our loan partners for instant pre-approval. When are you free for a site visit this weekend?'},
+  {from:'user',text:'Saturday morning works for me.'},
+  {from:'ai',text:'Booked you for Sat, 11 AM. Rohan, our senior advisor, will meet you there. See you soon!'},
+];
+const msgsEl=document.getElementById('chatMsgs');
+let idx=0;
+function runChat(){
+  if(idx>=script.length){
+    const bar=document.createElement('div');
+    bar.className='qualified-bar';
+    bar.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Lead qualified &amp; site visit booked';
+    msgsEl.appendChild(bar);
+    msgsEl.scrollTop=msgsEl.scrollHeight;
+    setTimeout(()=>{msgsEl.innerHTML='';idx=0;setTimeout(runChat,1500);},4200);
     return;
   }
-  if (pass.length < 6) {
-    document.getElementById('f-pass').style.borderColor = '#ef4444';
-    alert('Password kam se kam 6 characters ka hona chahiye!');
-    return;
-  }
-
-  const btn = document.querySelector('.submit-btn');
-  btn.textContent = 'Setting up your bot...';
-  btn.disabled = true;
-
-  try {
-    const res = await fetch('/api/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: document.getElementById('f-name').value,
-        phone: document.getElementById('f-phone').value,
-        business: document.getElementById('f-biz').value,
-        city: document.getElementById('f-city').value,
-        state: document.getElementById('f-state').value,
-        specialty: document.getElementById('f-spec').value,
-        email: document.getElementById('f-email').value,
-        experience: document.getElementById('f-exp').value,
-        properties: document.getElementById('f-props').value,
-        password: pass
-      })
-    });
-    const data = await res.json();
-    if (data.success) {
-      const form = document.querySelector('.signup-wrap');
-      form.innerHTML = `
-        <div style="text-align:center;padding:20px 0;">
-          <div style="width:64px;height:64px;border-radius:50%;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#4ade80" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <h2 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:10px;color:#f0ede8;">Bot Live Hai!</h2>
-          <p style="color:#6b6b6b;font-size:14px;margin-bottom:24px;">Welcome email check karo — aapka personal link wahan hai.</p>
-          <div style="background:#0f0f0f;border:1px solid rgba(200,169,110,0.2);border-radius:8px;padding:16px;margin-bottom:20px;">
-            <div style="font-size:11px;color:#6b6b6b;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Aapka Bot Link</div>
-            <a href="${data.url}" style="color:#c8a96e;font-size:14px;font-weight:600;word-break:break-all;">${data.url}</a>
-          </div>
-          <a href="${data.url}" style="display:block;background:#c8a96e;color:#080808;font-size:14px;font-weight:700;padding:14px;border-radius:6px;text-decoration:none;">Bot Open Karein</a>
-        </div>
-      `;
-    } else {
-      btn.textContent = 'Error — Try Again';
-      btn.style.background = '#ef4444';
-      btn.disabled = false;
-    }
-  } catch(e) {
-    btn.textContent = 'Error — Try Again';
-    btn.style.background = '#ef4444';
-    btn.disabled = false;
+  const m=script[idx];
+  if(m.from==='ai'){
+    const t=document.createElement('div');t.className='typing-bubble';
+    t.innerHTML='<span></span><span></span><span></span>';
+    msgsEl.appendChild(t);msgsEl.scrollTop=msgsEl.scrollHeight;
+    setTimeout(()=>{
+      t.remove();
+      const d=document.createElement('div');d.className='bubble ai';d.textContent=m.text;
+      msgsEl.appendChild(d);msgsEl.scrollTop=msgsEl.scrollHeight;
+      idx++;setTimeout(runChat,1500);
+    },1100);
+  } else {
+    const d=document.createElement('div');d.className='bubble user';d.textContent=m.text;
+    msgsEl.appendChild(d);msgsEl.scrollTop=msgsEl.scrollHeight;
+    idx++;setTimeout(runChat,1500);
   }
 }
+setTimeout(runChat,700);
+
+// Form submit
+async function submitForm(){
+  const fields=['f-name','f-phone','f-biz','f-city','f-state','f-exp','f-props','f-spec','f-email','f-pass','f-pass2'];
+  let ok=true;
+  fields.forEach(id=>{const el=document.getElementById(id);if(!el.value.trim()){el.style.borderColor='#ef4444';setTimeout(()=>el.style.borderColor='',2000);ok=false;}});
+  if(!ok)return;
+  const pass=document.getElementById('f-pass').value;
+  const pass2=document.getElementById('f-pass2').value;
+  if(pass!==pass2){alert('Passwords do not match.');return;}
+  if(pass.length<6){alert('Password must be at least 6 characters.');return;}
+  const btn=document.querySelector('.submit-btn');
+  btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Creating your account…';
+  btn.disabled=true;
+  try{
+    const res=await fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      name:document.getElementById('f-name').value,phone:document.getElementById('f-phone').value,
+      business:document.getElementById('f-biz').value,city:document.getElementById('f-city').value,
+      state:document.getElementById('f-state').value,specialty:document.getElementById('f-spec').value,
+      email:document.getElementById('f-email').value,experience:document.getElementById('f-exp').value,
+      properties:document.getElementById('f-props').value,password:pass
+    })});
+    const data=await res.json();
+    if(data.success){
+      document.querySelector('.signup-card').innerHTML=`
+        <div style="text-align:center;padding:24px 0;">
+          <div style="width:56px;height:56px;border-radius:50%;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#c9a84c" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h2 style="font-size:22px;font-weight:600;letter-spacing:-0.5px;margin-bottom:8px;">You're on the list!</h2>
+          <p style="color:var(--muted);font-size:14px;margin-bottom:24px;">Check your inbox for next steps.</p>
+          <div style="background:#080808;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
+            <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Your Bot Link</div>
+            <a href="${data.url}" style="color:var(--gold);font-size:13px;font-weight:500;word-break:break-all;">${data.url}</a>
+          </div>
+          <a href="${data.url}" style="display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--gold-fg);font-size:13px;font-weight:500;padding:12px 24px;border-radius:8px;text-decoration:none;">Open Your Bot →</a>
+        </div>`;
+    } else {btn.innerHTML='Error — Try Again';btn.style.background='#ef4444';btn.disabled=false;}
+  } catch(e){btn.innerHTML='Error — Try Again';btn.style.background='#ef4444';btn.disabled=false;}
+}
 </script>
+<style>@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}</style>
 </body>
 </html>
+                                    
