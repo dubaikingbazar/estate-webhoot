@@ -553,128 +553,124 @@ function getBrokerHTML(broker, brokerId) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${broker.name} — EstateBotAI</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#141410;--card:#1e1e18;--secondary:#28281e;
+  --bg:#0f0f0d;--card:#1a1a16;--secondary:#222220;
   --gold:#c9a84c;--gold2:#e2c46e;--gold-soft:rgba(201,168,76,0.12);--gold-fg:#0a0a0a;
-  --fg:#f5f2eb;--muted:#8a8678;--online:#4ade80;
-  --border:rgba(201,168,76,0.15);--border2:rgba(255,255,255,0.07);
+  --fg:#f0ede6;--muted:#7a776e;--online:#4ade80;
+  --border:rgba(201,168,76,0.12);--border2:rgba(255,255,255,0.06);
 }
 html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--fg);overflow:hidden;}
-.page{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;position:relative;}
+.page{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;}
 
-/* PROFILE */
-.profile{position:relative;overflow:hidden;border-bottom:1px solid var(--border);flex-shrink:0;}
-.profile-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:500px;height:250px;background:radial-gradient(ellipse,rgba(201,168,76,0.08),transparent 65%);pointer-events:none;}
-.profile-main{position:relative;display:flex;align-items:center;gap:16px;padding:20px 16px 14px;}
-.av-wrap{position:relative;flex-shrink:0;}
-.av{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold),#8a6820);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold-fg);border:2px solid rgba(201,168,76,0.5);box-shadow:0 0 24px rgba(201,168,76,0.2),0 8px 32px rgba(0,0,0,0.4);}
-.av-dot{position:absolute;bottom:3px;right:3px;width:14px;height:14px;border-radius:50%;background:var(--online);border:2px solid var(--bg);box-shadow:0 0 8px rgba(74,222,128,0.5);}
-.profile-info{flex:1;min-width:0;}
-.broker-name{display:flex;align-items:center;gap:7px;font-family:'Playfair Display',serif;font-size:20px;font-weight:700;letter-spacing:-0.3px;margin-bottom:5px;}
-.verified{color:var(--gold);}
-.broker-loc{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);margin-bottom:10px;}
-.specs{display:flex;flex-wrap:wrap;gap:6px;}
-.spec{font-size:11px;font-weight:500;color:var(--gold);background:var(--gold-soft);border:1px solid rgba(201,168,76,0.2);border-radius:100px;padding:3px 10px;white-space:nowrap;}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border);}
-.stat{background:var(--card);padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;}
+/* PROFILE TOP */
+.profile{border-bottom:1px solid var(--border);flex-shrink:0;position:relative;overflow:hidden;}
+.profile-glow{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:400px;height:280px;background:radial-gradient(ellipse,rgba(201,168,76,0.1),transparent 65%);pointer-events:none;}
+
+/* Avatar centered */
+.av-section{display:flex;flex-direction:column;align-items:center;padding:28px 16px 16px;position:relative;}
+.av-wrap{position:relative;margin-bottom:16px;}
+.av{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,var(--gold2) 0%,var(--gold) 50%,#8a6820 100%);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:34px;font-weight:700;color:var(--gold-fg);box-shadow:0 8px 32px rgba(201,168,76,0.3),0 0 0 3px rgba(201,168,76,0.2);}
+.av-verified{position:absolute;bottom:2px;right:2px;width:26px;height:26px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);}
+.broker-name{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;letter-spacing:-0.3px;text-align:center;margin-bottom:6px;}
+.broker-loc{display:flex;align-items:center;justify-content:center;gap:5px;font-size:13px;color:var(--muted);margin-bottom:14px;}
+.specs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.spec{font-size:12px;font-weight:500;color:var(--gold);background:var(--gold-soft);border:1px solid rgba(201,168,76,0.2);border-radius:100px;padding:5px 14px;}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 14px 16px;}
+.stat{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;}
 .stat svg{color:var(--gold);margin-bottom:2px;}
-.stat-val{font-size:14px;font-weight:600;color:var(--fg);}
+.stat-val{font-size:15px;font-weight:600;color:var(--fg);}
 .stat-lbl{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
 
 /* CHAT */
 .chat{display:flex;flex-direction:column;flex:1;min-height:0;}
-.chat-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(30,30,24,0.7);backdrop-filter:blur(12px);flex-shrink:0;}
-.chat-bar-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gold-fg);position:relative;flex-shrink:0;border:1px solid rgba(201,168,76,0.3);}
-.chat-bar-dot{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:50%;background:var(--online);border:2px solid var(--card);box-shadow:0 0 6px rgba(74,222,128,0.4);}
-.chat-bar-name{font-size:13px;font-weight:600;}
+.chat-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(26,26,22,0.8);backdrop-filter:blur(12px);flex-shrink:0;}
+.chat-bar-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--gold-fg);position:relative;flex-shrink:0;}
+.chat-bar-dot{position:absolute;bottom:-1px;right:-1px;width:11px;height:11px;border-radius:50%;background:var(--online);border:2px solid var(--card);}
+.chat-bar-name{font-size:14px;font-weight:600;}
 .chat-bar-status{font-size:11px;color:var(--online);display:flex;align-items:center;gap:4px;margin-top:1px;}
-.chat-bar-pulse{width:5px;height:5px;border-radius:50%;background:var(--online);}
-.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.chat-bar-pulse{width:6px;height:6px;border-radius:50%;background:var(--online);}
+
+/* Messages */
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
 .msgs::-webkit-scrollbar{width:3px;}
 .msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 .msg-row{display:flex;align-items:flex-end;gap:8px;}
 .msg-row.user{flex-direction:row-reverse;}
-.msg-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gold-fg);flex-shrink:0;border:1px solid rgba(201,168,76,0.2);}
-.bubble{max-width:80%;padding:10px 14px;border-radius:18px;font-size:13px;line-height:1.6;}
+.msg-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold-fg);flex-shrink:0;}
+.bubble{max-width:80%;padding:11px 15px;border-radius:18px;font-size:13.5px;line-height:1.6;}
 .bubble.ai{background:var(--card);color:var(--fg);border:1px solid var(--border2);border-bottom-left-radius:4px;}
 .bubble.ai .hi{color:var(--gold);font-weight:600;}
-.bubble.user{background:linear-gradient(135deg,var(--gold2),var(--gold));color:var(--gold-fg);font-weight:500;border-bottom-right-radius:4px;box-shadow:0 4px 16px rgba(201,168,76,0.25);}
-.typing{display:flex;align-items:center;gap:4px;padding:10px 14px;background:var(--card);border:1px solid var(--border2);border-radius:18px;border-bottom-left-radius:4px;width:fit-content;}
+.bubble.user{background:linear-gradient(135deg,var(--gold2),var(--gold));color:var(--gold-fg);font-weight:500;border-bottom-right-radius:4px;}
+.typing{display:flex;align-items:center;gap:5px;padding:12px 16px;background:var(--card);border:1px solid var(--border2);border-radius:18px;border-bottom-left-radius:4px;width:fit-content;}
 .typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:td 1.2s infinite ease-in-out;}
 .typing span:nth-child(2){animation-delay:0.2s;}
 .typing span:nth-child(3){animation-delay:0.4s;}
-@keyframes td{0%,60%,100%{transform:translateY(0);opacity:0.4;}30%{transform:translateY(-4px);opacity:1;}}
+@keyframes td{0%,60%,100%{transform:translateY(0);opacity:0.4;}30%{transform:translateY(-5px);opacity:1;}}
 
-/* QUICK REPLIES */
-.qrs{display:flex;flex-wrap:wrap;gap:7px;padding:10px 14px 6px;flex-shrink:0;}
-.qr{font-size:12px;font-weight:500;color:var(--gold);background:var(--gold-soft);border:1px solid rgba(201,168,76,0.25);border-radius:100px;padding:7px 14px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+/* Quick replies */
+.qrs{display:flex;flex-wrap:wrap;gap:8px;padding:10px 16px 6px;flex-shrink:0;}
+.qr{font-size:12.5px;font-weight:500;color:var(--gold);background:var(--gold-soft);border:1px solid rgba(201,168,76,0.22);border-radius:100px;padding:8px 16px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
 .qr:hover{background:var(--gold);color:var(--gold-fg);}
 
-/* INPUT */
-.input-bar{display:flex;align-items:center;gap:10px;padding:10px 14px 14px;border-top:1px solid var(--border);background:rgba(30,30,24,0.7);backdrop-filter:blur(12px);flex-shrink:0;}
-.msg-input{flex:1;background:var(--secondary);border:1px solid var(--border2);border-radius:100px;padding:11px 16px;font-family:'Inter',sans-serif;font-size:13px;color:var(--fg);outline:none;transition:border-color 0.2s;}
+/* Input */
+.input-bar{display:flex;align-items:center;gap:10px;padding:10px 16px 16px;border-top:1px solid var(--border);background:rgba(26,26,22,0.8);backdrop-filter:blur(12px);flex-shrink:0;}
+.msg-input{flex:1;background:var(--secondary);border:1px solid var(--border2);border-radius:100px;padding:12px 18px;font-family:'Inter',sans-serif;font-size:13px;color:var(--fg);outline:none;transition:border-color 0.2s;}
 .msg-input:focus{border-color:rgba(201,168,76,0.4);}
 .msg-input::placeholder{color:var(--muted);}
-.send{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(201,168,76,0.3);transition:all 0.2s;}
-.send:hover{transform:scale(1.05);box-shadow:0 6px 20px rgba(201,168,76,0.4);}
+.send{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(201,168,76,0.3);transition:all 0.2s;}
+.send:hover{transform:scale(1.05);}
 .send:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
 
-/* POWERED */
-.powered{text-align:center;padding:8px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);flex-shrink:0;background:var(--bg);}
+/* Powered */
+.powered{text-align:center;padding:8px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);flex-shrink:0;}
 .powered strong{color:var(--fg);font-weight:600;}
-
-/* LEAD DONE */
-.lead-done-input{background:rgba(74,222,128,0.05);border-color:rgba(74,222,128,0.2);color:#4ade80;}
+.lead-done{background:rgba(74,222,128,0.05)!important;border-color:rgba(74,222,128,0.2)!important;color:#4ade80!important;}
 </style>
 </head>
 <body>
 <div class="page">
-
-  <!-- PROFILE -->
   <div class="profile">
     <div class="profile-glow"></div>
-    <div class="profile-main">
+    <div class="av-section">
       <div class="av-wrap">
         <div class="av">${initials}</div>
-        <div class="av-dot"></div>
+        <div class="av-verified">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#c9a84c"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+        </div>
       </div>
-      <div class="profile-info">
-        <div class="broker-name">
-          ${broker.name}
-          <svg class="verified" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-        </div>
-        <div class="broker-loc">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          ${broker.city}
-        </div>
-        <div class="specs">
-          ${specialties.map(s => `<span class="spec">${s.trim()}</span>`).join('')}
-        </div>
+      <div class="broker-name">${broker.name}</div>
+      <div class="broker-loc">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        ${broker.city}
+      </div>
+      <div class="specs">
+        ${specialties.map(s => `<span class="spec">${s.trim()}</span>`).join('')}
       </div>
     </div>
     <div class="stats">
       <div class="stat">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
         <span class="stat-val">${experience}</span>
         <span class="stat-lbl">Experience</span>
       </div>
       <div class="stat">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
         <span class="stat-val">${properties}</span>
-        <span class="stat-lbl">Deals</span>
+        <span class="stat-lbl">Deals Closed</span>
       </div>
       <div class="stat">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        <span class="stat-val">Verified</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span class="stat-val">Verified Pro</span>
         <span class="stat-lbl">Status</span>
       </div>
     </div>
   </div>
 
-  <!-- CHAT -->
   <div class="chat">
     <div class="chat-bar">
       <div class="chat-bar-av">
@@ -682,25 +678,22 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
         <div class="chat-bar-dot"></div>
       </div>
       <div>
-        <div class="chat-bar-name">${broker.name} AI</div>
-        <div class="chat-bar-status"><span class="chat-bar-pulse"></span>Online · replies instantly</div>
+        <div class="chat-bar-name">${broker.name}</div>
+        <div class="chat-bar-status"><span class="chat-bar-pulse"></span>Online</div>
       </div>
     </div>
-
     <div class="msgs" id="msgs">
       <div class="msg-row">
         <div class="msg-av">${initials}</div>
-        <div class="bubble ai"><span class="hi">Namaste! 🙏</span><br>I'm ${broker.name.split(' ')[0]}'s AI assistant. Looking to buy, sell, or rent property in ${broker.city}? Tell me what you need, or tap a quick option below.</div>
+        <div class="bubble ai"><span class="hi">Namaste! 🙏</span><br>I'm ${broker.name.split(' ')[0]}'s AI assistant. Looking to buy, sell, or rent property in ${broker.city}? Tap a quick option below to get started.</div>
       </div>
     </div>
-
     <div class="qrs" id="qrs">
       <button class="qr" onclick="quickSend(this,'Kharidna Hai')">🏠 Kharidna Hai</button>
       <button class="qr" onclick="quickSend(this,'Rent Lena Hai')">🔑 Rent Lena Hai</button>
       <button class="qr" onclick="quickSend(this,'Sell Karna Hai')">💰 Sell Karna Hai</button>
       <button class="qr" onclick="quickSend(this,'Rent Dena Hai')">📋 Rent Dena Hai</button>
     </div>
-
     <div class="input-bar">
       <input class="msg-input" id="msgInput" placeholder="Type your message…" onkeypress="if(event.key==='Enter')sendMsg()"/>
       <button class="send" id="sendBtn" onclick="sendMsg()">
@@ -708,92 +701,66 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       </button>
     </div>
   </div>
-
   <div class="powered">Powered by <strong>EstateBotAI</strong></div>
 </div>
-
 <script>
-const sessionId = Math.random().toString(36).substr(2,9);
-const brokerId = '${brokerId}';
-const initials = '${initials}';
-let leadDone = false;
-
-function getTime(){const n=new Date();return n.getHours()+':'+String(n.getMinutes()).padStart(2,'0');}
+const sessionId=Math.random().toString(36).substr(2,9);
+const brokerId='${brokerId}';
+const ini='${initials}';
+let leadDone=false;
 
 function addMsg(text,role){
   const body=document.getElementById('msgs');
   const row=document.createElement('div');
   row.className='msg-row'+(role==='user'?' user':'');
-  if(role==='ai'){
-    row.innerHTML='<div class="msg-av">'+initials+'</div><div class="bubble ai">'+text+'</div>';
-  } else {
-    row.innerHTML='<div class="bubble user">'+text+'</div>';
-  }
+  if(role==='ai'){row.innerHTML='<div class="msg-av">'+ini+'</div><div class="bubble ai">'+text+'</div>';}
+  else{row.innerHTML='<div class="bubble user">'+text+'</div>';}
   body.appendChild(row);body.scrollTop=body.scrollHeight;
 }
-
 function showTyping(){
   const body=document.getElementById('msgs');
   const row=document.createElement('div');row.className='msg-row';row.id='typing';
-  row.innerHTML='<div class="msg-av">'+initials+'</div><div class="typing"><span></span><span></span><span></span></div>';
+  row.innerHTML='<div class="msg-av">'+ini+'</div><div class="typing"><span></span><span></span><span></span></div>';
   body.appendChild(row);body.scrollTop=body.scrollHeight;
 }
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
-
 function typeMsg(text,role){
   const body=document.getElementById('msgs');
-  const row=document.createElement('div');row.className='msg-row'+(role==='user'?' user':'');
-  if(role==='ai'){
-    row.innerHTML='<div class="msg-av">'+initials+'</div><div class="bubble ai"></div>';
-  } else {
-    row.innerHTML='<div class="bubble user"></div>';
-  }
+  const row=document.createElement('div');
+  row.className='msg-row'+(role==='user'?' user':'');
+  if(role==='ai'){row.innerHTML='<div class="msg-av">'+ini+'</div><div class="bubble ai"></div>';}
+  else{row.innerHTML='<div class="bubble user"></div>';}
   body.appendChild(row);
   const bubble=row.querySelector('.bubble');
-  let i=0;
-  function next(){if(i<text.length){bubble.innerHTML+=text.charAt(i);i++;body.scrollTop=body.scrollHeight;setTimeout(next,18);}}
+  let i=0;function next(){if(i<text.length){bubble.innerHTML+=text.charAt(i);i++;body.scrollTop=body.scrollHeight;setTimeout(next,18);}}
   next();
 }
-
 function quickSend(btn,text){
   document.getElementById('qrs').style.display='none';
-  addMsg(text,'user');
-  showTyping();
+  addMsg(text,'user');showTyping();
   fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,sessionId})})
-  .then(r=>r.json()).then(data=>{
-    removeTyping();
-    typeMsg(data.reply,'ai');
-    if(data.leadComplete){leadDone=true;disableChat();}
-  }).catch(()=>{removeTyping();addMsg('Dobara try karein.','ai');});
+  .then(r=>r.json()).then(data=>{removeTyping();typeMsg(data.reply,'ai');if(data.leadComplete){leadDone=true;disableChat();}})
+  .catch(()=>{removeTyping();addMsg('Dobara try karein.','ai');});
 }
-
 function disableChat(){
   const inp=document.getElementById('msgInput');
-  const btn=document.getElementById('sendBtn');
-  inp.disabled=true;
-  inp.placeholder='Shukriya! Hamare advisor jald contact karenge.';
-  inp.classList.add('lead-done-input');
-  btn.disabled=true;
+  inp.disabled=true;inp.placeholder='Shukriya! Hamare advisor jald contact karenge.';
+  inp.classList.add('lead-done');document.getElementById('sendBtn').disabled=true;
 }
-
 async function sendMsg(){
   const input=document.getElementById('msgInput');
   const msg=input.value.trim();if(!msg||input.disabled)return;
   if(leadDone){
     const c=msg.toLowerCase();
     if(c.includes('galat')||c.includes('wrong')||c.includes('change')||c.includes('sahi')){
-      leadDone=false;input.disabled=false;
-      input.placeholder='Type your message…';
-      input.classList.remove('lead-done-input');
-      document.getElementById('sendBtn').disabled=false;
-    } else return;
+      leadDone=false;input.disabled=false;input.placeholder='Type your message…';
+      input.classList.remove('lead-done');document.getElementById('sendBtn').disabled=false;
+    }else return;
   }
-  input.value='';
-  addMsg(msg,'user');showTyping();
+  input.value='';addMsg(msg,'user');showTyping();
   try{
     const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});
-    const data=await res.json();removeTyping();
-    typeMsg(data.reply,'ai');
+    const data=await res.json();removeTyping();typeMsg(data.reply,'ai');
     if(data.leadComplete){leadDone=true;disableChat();}
   }catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','ai');}
 }
