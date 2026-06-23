@@ -613,7 +613,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .chat-wrap{width:100%;max-width:100%;background:#F7F4ED;display:flex;flex-direction:column;position:relative;overflow:hidden;}
 .chat-wrap-inner{background:#F7F4ED;padding:20px 16px 16px;position:relative;z-index:1;background-image:radial-gradient(circle at 50% 100%,rgba(212,162,76,.07),transparent 60%);}
 .skyline-wm{position:absolute;bottom:0;left:0;right:0;height:130px;opacity:.15;pointer-events:none;z-index:0;}
-.agent-card{width:100%;background:#fff;border-radius:14px;padding:11px 13px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 16px rgba(14,27,48,.08);border:1px solid #EDE7D8;margin-bottom:16px;position:relative;z-index:1;}
+.agent-card{width:calc(100% + 32px);margin-left:-16px;margin-right:-16px;margin-bottom:16px;background:#fff;border-radius:0;padding:14px 20px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 16px rgba(14,27,48,.08);border-top:1px solid #EDE7D8;border-bottom:1px solid #EDE7D8;position:relative;z-index:1;}
 .agent-av{width:38px;height:38px;border-radius:10px;background:#0E1B30;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#D4A24C;font-family:'Fraunces',serif;font-weight:700;font-size:16px;}
 .agent-name{color:#0E1B30;font-weight:800;font-size:10px;font-family:'Fraunces',serif;line-height:1.3;}
 .agent-status{display:flex;align-items:center;gap:5px;font-size:9px;color:#5A6B52;margin-top:3px;}
