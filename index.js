@@ -489,7 +489,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
         'X-Title': 'EstateBot AI'
       },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        model: 'google/gemini-2.0-flash-exp:free',
         messages: [{ role: 'system', content: getSystemPrompt(broker.name) }, ...conversations[sessionId]]
       })
     });
