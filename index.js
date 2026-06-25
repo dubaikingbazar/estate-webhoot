@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 // ===== KEYS =====
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyAQ.Ab8RN6LMyHoLxuDc3sE7AM0ix1uVkdO8echM2ByyCp8Ya3GSgA";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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";
 const resend = new Resend('re_7HnaPfwP_Cso6RXqBYX7A4apowdzvd6kQ');
 const supabase = createClient(
   'https://twxtryvauijzxpddapns.supabase.co',
@@ -480,25 +480,25 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   const photoUploadUrl = sessionToken ? 'https://estatebotai.in/upload/' + sessionToken : '';
 
   try {
-    const systemPrompt = getSystemPrompt(broker.name);
-    const geminiMessages = conversations[sessionId].map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }));
-    const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const openRouterRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://estatebotai.in',
+        'X-Title': 'EstateBot AI'
+      },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: geminiMessages
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        messages: [{ role: 'system', content: getSystemPrompt(broker.name) }, ...conversations[sessionId]]
       })
     });
-    const data = await geminiRes.json();
-    console.log('Gemini response status:', geminiRes.status);
-    if (!data.candidates || !data.candidates[0]) {
-      console.error('Gemini error response:', JSON.stringify(data));
+    const data = await openRouterRes.json();
+    console.log('OpenRouter response status:', openRouterRes.status);
+    if (!data.choices || !data.choices[0]) {
+      console.error('OpenRouter error response:', JSON.stringify(data));
     }
-    let reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Kuch gadbad ho gayi, dobara try karein.';
+    let reply = data.choices?.[0]?.message?.content || 'Kuch gadbad ho gayi, dobara try karein.';
     reply = reply.replace('|||PHOTO_LINK|||', photoUploadUrl);
     conversations[sessionId].push({ role: 'assistant', content: reply });
 
