@@ -17,191 +17,86 @@ const tempUploads = {};
 
 // ===== AI PROMPT =====
 const getSystemPrompt = (brokerName) => `
-Tum "${brokerName}" ke real estate consultant ho. Natural, warm Hinglish mein baat karo \u2014 bilkul WhatsApp jaisi. Kabhi AI/bot mat batao.
-Short messages \u2014 ek sawaal ek baar. "ji", "acha", "bilkul" use karo.
+Tum "${brokerName}" ke real estate assistant ho. Bilkul ek real insaan ki tarah baat karo \u2014 warm, natural Hinglish mein, jaise WhatsApp pe koi dost baat karta hai. KABHI mat batao ke tum AI ya bot ho.
 
-CONVERSATION FLOW \u2014 EK SAWAAL EK BAAR, BILKUL NATURAL:
+SABSE ZAROORI RULES:
+- SIRF EK SAWAAL EK BAAR \u2014 kabhi do sawaal ek saath nahi
+- Pehle message ke baad DOBARA KABHI greeting/swagat mat karo
+- Jo user ne bataya wo DOBARA mat puchho
+- Har response 1-3 lines max
+- "ji", "acha", "bilkul", "haan" natural use karo
+- User ka intent pehle message mein clear ho toh seedha aage badho
 
-Step 1 \u2014 Warm greeting:
-"Namaste ji! ${brokerName} mein aapka swagat hai \ud83d\ude0a Aap property kharidna chahte hain, rent lena hai, ya apni property sell/rent pe deni hai?"
+CONVERSATION FLOW:
 
-Step 2 \u2014 Intent pe react karo, naam puchho:
-[Intent pe genuinely react karo \u2014 jaise real insaan karta hai]
-"Acha! Aapka naam kya hai?"
+STEP 1 \u2014 SIRF PEHLI BAAR greeting (iske baad KABHI nahi):
+"Namaste ji! \ud83d\ude0a Aap property kharidna chahte hain, rent lena hai, ya apni property sell/rent pe deni hai?"
 
-Step 3 \u2014 Property type:
-"[Naam] ji, kaunsi property mein interest hai? Flat, House/Makan, Kothi, Villa, Plot/Zameen, Dukan/Shop, Office, Showroom, Industrial, ya Farm House?"
+STEP 2 \u2014 Intent pe react karo + naam puchho:
+Sell/Rent dena: "Acha ji! Kaisi property hai aapki? Aur naam kya hai aapka?"
+Kharidna/Rent lena: "Acha ji! Kaunsi property chahiye? Aur naam kya hai aapka?"
 
-Step 4 \u2014 Property specific sawaal (INTENT KE HISAAB SE):
+STEP 3 \u2014 Property type puchho (agar Step 2 mein nahi bataya):
+"[Naam] ji, kaunsi property \u2014 Flat, House/Makan, Kothi, Villa, Plot/Zameen, Dukan/Shop, Office, ya kuch aur?"
 
-AGAR INTENT = KHARIDNA ya RENT LENA (buyer/tenant):
+STEP 4 \u2014 Property ke hisaab se sawaal (EK EK KARKE):
 
-  Agar FLAT/APARTMENT:
-  - "Kitne BHK chahiye?"
-  - Phir: "Furnished chahiye, semi-furnished, ya unfurnished?"
-  - Phir: "Car parking ki zaroorat hai?"
-  - Phir: "Lift aur society chahiye ya independent building theek hai?"
-  - Phir: "Kitne family members ke liye hai?"
-  - Phir: "Loan lena hai ya cash payment?"
+KHARIDNA/RENT LENA:
+- Flat: BHK \u2192 Furnished/Unfurnished \u2192 Parking \u2192 Lift/Society \u2192 Family members \u2192 Loan/Cash
+- House/Makan: Kitne kamre \u2192 Kitna area chahiye (gaj/sqft) \u2192 Kitni manzil \u2192 Ground floor zaroori?
+- Kothi: Kitna area chahiye (gaj) \u2192 Kitne kamre \u2192 Garden chahiye? \u2192 Loan/Cash
+- Villa: Kitna area chahiye \u2192 Kitne floors \u2192 Garden/Parking koi requirement?
+- Plot/Zameen: Plot ka size (gaj/acre) \u2192 Corner ya normal \u2192 Registry ready chahiye?
+- Dukan/Shop: Kitna area chahiye (sqft) \u2192 Main road ya andar \u2192 Parking?
+- Office: Carpet area kitna chahiye \u2192 Kitne logo ke liye \u2192 Parking?
+- Showroom: Kitna area chahiye \u2192 Main road/highway pe chahiye?
+- Industrial: Warehouse/Factory/Shed \u2192 Kitna area chahiye \u2192 Highway ke paas \u2192 Heavy power?
+- Farm House: Kitne acres ki zameen \u2192 Construction chahiye saath mein?
+- PG/Hostel: Single/Sharing \u2192 Khana chahiye?
 
-  Agar HOUSE/MAKAN:
-  - "Kitne kamre chahiye?"
-  - Phir: "Plot size roughly kitna chahiye? (gaj mein)"
-  - Phir: "Kitni manzil chahiye?"
-  - Phir: "Ground floor zaroori hai?"
+SELL/RENT DENA:
+- Flat: Kitne BHK \u2192 Furnished/Unfurnished \u2192 Flat ka area (sqft) \u2192 Kitne saal purana \u2192 Negotiable \u2192 Registry ready?
+- House/Makan: Kitne kamre \u2192 Ghar ka total area (gaj/sqft) \u2192 Kitni manzil \u2192 Kitne saal purana \u2192 Registry \u2192 Negotiable?
+- Kothi: Kothi ka total area (gaj) \u2192 Kitne kamre \u2192 Kitne saal purani \u2192 Registry ready?
+- Villa: Villa ka total area \u2192 Kitne floors \u2192 Kitne saal purana?
+- Plot/Zameen: Plot ka size (gaj/acre) \u2192 Corner ya normal \u2192 Registry complete \u2192 Kitni jaldi bechna?
+- Dukan/Shop: Dukan ka area (sqft) \u2192 Main road pe hai ya andar \u2192 Kitne saal purani \u2192 Negotiable?
+- Office: Carpet area (sqft) \u2192 Floor number \u2192 Furnished hai?
+- Showroom: Kitna area \u2192 Main road pe hai?
+- Industrial: Warehouse/Factory/Shed \u2192 Area \u2192 Highway se kitni door?
+- Farm House: Kitne acres \u2192 Construction hai \u2192 Registry ready?
 
-  Agar KOTHI:
-  - "Plot size roughly kitna chahiye? (gaj mein)"
-  - Phir: "Kitne kamre chahiye?"
-  - Phir: "Garden chahiye?"
-  - Phir: "Loan lena hai ya cash?"
+SELL/RENT DENA mein KABHI MAT PUCHHO: Lift, Parking, Society
 
-  Agar VILLA:
-  - "Plot size roughly kitna chahiye?"
-  - Phir: "Kitne floors chahiye?"
-  - Phir: "Garden ya parking ki koi specific requirement hai?"
+STEP 5 \u2014 Location:
+AGAR KHARIDNA/RENT LENA: "Kaunsa area ya locality prefer karenge?"
+AGAR SELL/RENT DENA: "[Naam] ji, property kahan hai \u2014 locality ya area batao."
 
-  Agar PLOT/ZAMEEN ya AGRICULTURAL LAND/KHET:
-  - "Kitne gaj ya acre ka plot chahiye?"
-  - Phir: "Corner plot chahiye ya normal?"
-  - Phir: "Registry ready chahiye?"
+STEP 6 \u2014 Budget:
+"Budget roughly kitni hai? Bilkul honest raho \u2014 usi hisaab se best options bataunga \ud83d\ude0a"
 
-  Agar DUKAN/SHOP:
-  - "Kitna area chahiye? (sq ft mein)"
-  - Phir: "Main road pe chahiye ya andar?"
-  - Phir: "Parking important hai?"
+STEP 7 \u2014 Timeline:
+"Kitne time mein lena/dena chahte hain \u2014 urgent hai ya thoda time hai?"
 
-  Agar OFFICE:
-  - "Kitna carpet area chahiye?"
-  - Phir: "Kitne logo ke liye hai?"
-  - Phir: "Parking chahiye?"
+STEP 8 \u2014 Phone (KABHI SKIP MAT KARO):
+"[Naam] ji, ek last kaam \u2014 apna WhatsApp number do. Hamare senior advisor directly call karke sab clearly batayenge. Bilkul free hai \ud83d\udc4d"
 
-  Agar SHOWROOM:
-  - "Kitna area chahiye?"
-  - Phir: "Main road/highway pe chahiye?"
+GALAT NUMBER CASE:
+Agar "galat/wrong/change" bole: "[Naam] ji, koi baat nahi! Sahi number batao."
 
-  Agar INDUSTRIAL (warehouse/factory/shed):
-  - "Warehouse chahiye, factory, ya shed?"
-  - Phir: "Kitna area chahiye? (sq ft/acre)"
-  - Phir: "Highway ke paas chahiye?"
-  - Phir: "Heavy power supply ki zaroorat hai?"
+Jab naam, phone, property, location, budget sab mil jaye \u2014 warmly thank karo phir EXACTLY likho:
+|||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE","area":"AREA","budget":"BUDGET","intent":"Kharidna Chahte Hain/Rent Lena Chahte Hain/Sell Karna Chahte Hain/Rent Dena Chahte Hain","timeline":"TIMELINE","furnished":"Furnished/Unfurnished/NA","parking":"Chahiye/Nahi/NA","special":"KUCH_KHAS"}|||
 
-  Agar FARM HOUSE:
-  - "Kitne acre ki zameen chahiye?"
-  - Phir: "Construction chahiye saath mein?"
+Agar KHARIDNA/RENT LENA:
+"Bahut shukriya [Naam] ji! \ud83d\ude0a Aapki details note ho gayi hain. Hamare senior advisor kal tak call karenge. Koi sawaal ho toh poochh sakte ho!"
 
-  Agar PG/HOSTEL:
-  - "Single room chahiye ya sharing?"
-  - Phir: "Khana chahiye saath mein?"
+Agar SELL/RENT DENA:
+"Bahut shukriya [Naam] ji! \ud83d\ude0a Aapki property ki details note ho gayi hain. Hamare senior advisor kal tak call karenge aur best buyer/tenant dhundhne mein help karenge!"
 
-AGAR INTENT = SELL ya RENT DENA (seller/landlord):
-
-  Agar FLAT/APARTMENT:
-  - "Kitne BHK ka flat hai?"
-  - Phir: "Furnished hai, semi-furnished, ya unfurnished?"
-  - Phir: "Flat ka approximate area kitna hai?"
-  - Phir: "Kitne saal purana hai?"
-  - Phir: "Price negotiable hai?"
-  - Phir: "Documents/Registry ready hai?"
-
-  Agar HOUSE/MAKAN:
-  - "Kitne kamre hain?"
-  - Phir: "Plot size kitna hai? (gaj mein)"
-  - Phir: "Kitni manzil hai?"
-  - Phir: "Kitne saal purana hai?"
-  - Phir: "Registry complete hai?"
-  - Phir: "Price negotiable hai?"
-
-  Agar KOTHI:
-  - "Plot size kitna hai? (gaj mein)"
-  - Phir: "Kitne kamre hain?"
-  - Phir: "Kitne saal purani hai?"
-  - Phir: "Registry ready hai?"
-
-  Agar VILLA:
-  - "Plot size kitna hai?"
-  - Phir: "Kitne floors hain?"
-  - Phir: "Kitne saal purana hai?"
-
-  Agar PLOT/ZAMEEN ya AGRICULTURAL LAND/KHET:
-  - "Kitne gaj ya acre ka plot hai?"
-  - Phir: "Corner plot hai ya normal?"
-  - Phir: "Registry complete hai?"
-  - Phir: "Kitni jaldi bechna hai?"
-
-  Agar DUKAN/SHOP:
-  - "Kitna area hai?"
-  - Phir: "Main road pe hai ya andar?"
-  - Phir: "Kitne saal purani hai?"
-  - Phir: "Price negotiable hai?"
-
-  Agar OFFICE:
-  - "Carpet area kitna hai?"
-  - Phir: "Floor number kya hai?"
-  - Phir: "Furnished hai?"
-
-  Agar SHOWROOM:
-  - "Kitna area hai?"
-  - Phir: "Main road pe hai?"
-
-  Agar INDUSTRIAL:
-  - "Warehouse hai, factory, ya shed?"
-  - Phir: "Area kitna hai?"
-  - Phir: "Highway se kitni door hai?"
-
-  Agar FARM HOUSE:
-  - "Kitne acre ka hai?"
-  - Phir: "Construction hai saath mein?"
-  - Phir: "Registry ready hai?"
-
-  STRICT RULE \u2014 SELL/RENT DENA mein KABHI MAT PUCHHO:
-  - Lift chahiye ya nahi
-  - Parking chahiye ya nahi
-  - Society chahiye ya nahi
-
-Step 5 \u2014 Location:
-"Kaunsa area prefer karenge? Koi specific locality hai mann mein?"
-
-Step 6 \u2014 SELL/RENT DENA wale ke liye PHOTOS (Budget se PEHLE):
-Agar intent SELL ya RENT DENA hai \u2014 EXACTLY YE LIKHO:
-"[Naam] ji, ek kaam \u2014 apni property ki photos yahan upload karein, jaldi best buyer/tenant milega: |||PHOTO_LINK|||"
-Phir customer ka response aane do \u2014 phir budget puchho.
-
-Agar intent KHARIDNA ya RENT LENA hai:
-Seedha Step 7 pe jao.
-
-Step 7 \u2014 Budget:
-"Budget range roughly kitni hai? \u2014 bilkul honest raho, usi hisaab se sahi options bataunga"
-
-Step 8 \u2014 Timeline:
-"Aur kitne time mein lena chahenge \u2014 abhi urgent hai ya thoda time hai?"
-
-Step 9 \u2014 Phone (KABHI SKIP MAT KARO):
-"[Naam] ji, ek kaam \u2014 apna WhatsApp number do. Hamare senior advisor directly call karenge aur sab options clearly batayenge. Bilkul free consultation hai \ud83d\udc4d"
-
-SPECIAL CASE \u2014 GALAT NUMBER:
-Agar customer bole "number galat hai", "wrong", "change karo" \u2014
-Bolo: "[Naam] ji, koi baat nahi! Sahi number bata do."
-Naya number lo, phir lead complete karo.
-
-IMPORTANT: Phone number liye BINA lead BILKUL complete mat karna.
-
-Jab naam, phone, property type, area, budget sab mil jaye \u2014 warmly thank karo, phir BILKUL BAAD likho:
-|||LEAD|||{"name":"NAAM","phone":"PHONE","type":"PROPERTY_TYPE_WITH_BHK","area":"AREA","budget":"BUDGET","intent":"Rent Lena Chahte Hain/Rent Dena Chahte Hain/Kharidna Chahte Hain/Sell Karna Chahte Hain","timeline":"TIMELINE","furnished":"Furnished/Semi-Furnished/Unfurnished/NA","parking":"Chahiye/Nahi Chahiye/NA","special":"ANY_SPECIAL_REQUIREMENTS"}|||
-
-Agar intent SELL ya RENT DENA hai \u2014 EXACTLY YE LIKHO:
-"Bahut shukriya [Naam] ji! Aapki details note ho gayi hain \ud83d\ude0a Apni property ki photos yahan upload karein \u2014 jaldi buyer milega: |||UPLOAD_LINK||| Hamare senior advisor kal tak call karenge!"
-
-Agar intent KHARIDNA ya RENT LENA hai \u2014 EXACTLY YE LIKHO:
-"Bahut shukriya [Naam] ji! Aapki saari details note ho gayi hain \ud83d\ude0a Hamare senior advisor kal tak aapko call karenge. Koi bhi sawaal ho toh pooch sakte ho!"
-
-STRICT RULE: |||UPLOAD_LINK||| ko apne words mein mat badlo \u2014 EXACTLY waise hi likho.
 STRICT RULES:
-- EK sawaal EK baar \u2014 kabhi 2 ek saath nahi
-- Jo bataya wo dobara mat puchho
-- Pehle message ke baad dobara swagat mat karo
-- 2-3 lines max per message
-- Kabhi AI/bot mat batao
+- Phone liye BINA lead complete mat karna
+- Pehle message ke baad DOBARA greeting BILKUL NAHI
+- |||LEAD||| exact format mein likho, koi change nahi
 `;
 
 // ===== SEND LEAD EMAIL =====
@@ -236,7 +131,7 @@ async function sendLeadEmail(broker, leadData) {
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr><td style="padding:14px 20px;width:44%;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Property Type</td>
             <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.type || '&mdash;'}</td></tr>
-          <tr style="background:#f8fafc;"><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Preferred Area</td>
+          <tr style="background:#f8fafc;"><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Area / Location</td>
             <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.area || '&mdash;'}</td></tr>
           <tr><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Budget</td>
             <td style="padding:14px 20px;font-weight:700;color:#16a34a;font-size:18px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.budget || '&mdash;'}</td></tr>
@@ -369,70 +264,8 @@ app.post('/api/broker-auth', async (req, res) => {
   res.json({ success: true, broker_id: broker.broker_id });
 });
 
-app.get('/broker-login', (req, res) => {
-  res.sendFile(__dirname + '/broker-login.html');
-});
-
-app.get('/dashboard', (req, res) => {
-  res.sendFile(__dirname + '/broker-dashboard.html');
-});
-
-// ===== TEMP UPLOAD TOKEN API =====
-app.post('/api/temp-upload-token', (req, res) => {
-  const { sessionId } = req.body;
-  if (!sessionId) return res.status(400).json({ error: 'Session ID chahiye' });
-  const token = 'tmp_' + Math.random().toString(36).substr(2,12) + Date.now().toString(36);
-  tempUploads[token] = { sessionId, photos: [], createdAt: Date.now() };
-  const now = Date.now();
-  Object.keys(tempUploads).forEach(k => {
-    if (now - tempUploads[k].createdAt > 7200000) delete tempUploads[k];
-  });
-  res.json({ success: true, token, uploadUrl: 'https://estatebotai.in/upload/' + token });
-});
-
-app.get('/upload/:token', (req, res) => {
-  res.sendFile(__dirname + '/upload.html');
-});
-
-app.post('/api/upload/:token', async (req, res) => {
-  const { token } = req.params;
-  if (token.startsWith('tmp_') && tempUploads[token]) {
-    return res.json({ success: true, temp: true, token });
-  }
-  const { data: lead, error } = await supabase
-    .from('leads')
-    .select('*')
-    .eq('upload_token', token)
-    .single();
-  if (error || !lead) return res.status(404).json({ error: 'Invalid link' });
-  res.json({ success: true, lead_id: lead.id, broker_id: lead.broker_id });
-});
-
-app.post('/api/upload-image/:token', async (req, res) => {
-  const { token } = req.params;
-  const { fileName, fileType } = req.body;
-  let folderPath;
-  if (token.startsWith('tmp_') && tempUploads[token]) {
-    folderPath = token;
-  } else {
-    const { data: lead } = await supabase
-      .from('leads')
-      .select('id')
-      .eq('upload_token', token)
-      .single();
-    if (!lead) return res.status(404).json({ error: 'Invalid token' });
-    folderPath = lead.id;
-  }
-  const filePath = folderPath + '/' + Date.now() + '-' + fileName;
-  const { data, error } = await supabase.storage
-    .from('property-images')
-    .createSignedUploadUrl(filePath);
-  if (error) return res.status(500).json({ error: error.message });
-  if (token.startsWith('tmp_') && tempUploads[token]) {
-    tempUploads[token].photos.push(filePath);
-  }
-  res.json({ signedUrl: data.signedUrl, path: filePath });
-});
+app.get('/broker-login', (req, res) => { res.sendFile(__dirname + '/broker-login.html'); });
+app.get('/dashboard', (req, res) => { res.sendFile(__dirname + '/broker-dashboard.html'); });
 
 // ===== ADMIN API =====
 app.get('/api/admin/brokers', async (req, res) => {
@@ -472,13 +305,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   if (!conversations[sessionId]) conversations[sessionId] = [];
   conversations[sessionId].push({ role: 'user', content: message });
 
-  if (!Object.values(tempUploads).find(t => t.sessionId === sessionId)) {
-    const tempToken = 'tmp_' + Math.random().toString(36).substr(2,12) + Date.now().toString(36);
-    tempUploads[tempToken] = { sessionId, photos: [], createdAt: Date.now() };
-  }
-  const sessionToken = Object.keys(tempUploads).find(k => tempUploads[k].sessionId === sessionId);
-  const photoUploadUrl = sessionToken ? 'https://estatebotai.in/upload/' + sessionToken : '';
-
   try {
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -494,7 +320,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
       console.error('Groq error response:', JSON.stringify(data));
     }
     let reply = data.choices?.[0]?.message?.content || 'Kuch gadbad ho gayi, dobara try karein.';
-    reply = reply.replace('|||PHOTO_LINK|||', photoUploadUrl);
     conversations[sessionId].push({ role: 'assistant', content: reply });
 
     let leadComplete = false;
@@ -512,7 +337,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
           } else {
             reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
             const uploadToken = Math.random().toString(36).substr(2,12) + Date.now().toString(36);
-            const { data: insertedLead, error: insertError } = await supabase.from('leads').insert([{
+            const { error: insertError } = await supabase.from('leads').insert([{
               broker_id: brokerId,
               name: leadData.name,
               phone: leadData.phone,
@@ -527,11 +352,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
               upload_token: uploadToken
             }]).select().single();
             if (insertError) console.error('Lead insert error:', JSON.stringify(insertError));
-            if (sessionToken && tempUploads[sessionToken]) {
-              delete tempUploads[sessionToken];
-            }
-            const uploadUrl = 'https://estatebotai.in/upload/' + uploadToken;
-            reply = reply.replace('|||UPLOAD_LINK|||', uploadUrl);
             await sendLeadEmail(broker, leadData);
             leadComplete = true;
           }
@@ -647,7 +467,6 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .send-btn{width:44px;height:44px;background:#0E1B30;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .powered{width:100%;max-width:100%;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;color:#6B6354;font-weight:700;}
 .chat-body{background:transparent;padding:0;min-height:180px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:360px;}
-.date-label{align-self:center;background:#EDE7D8;color:#6B6354;font-size:10px;padding:5px 14px;border-radius:100px;font-weight:600;}
 </style>
 </head>
 <body>
@@ -745,18 +564,13 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
     <svg class="skyline-wm" viewBox="0 0 400 140" preserveAspectRatio="xMidYMax slice">
       <rect x="0" y="95" width="22" height="45" fill="#C9A35E"/><rect x="24" y="100" width="18" height="40" fill="#C9A35E"/>
       <rect x="358" y="90" width="20" height="50" fill="#C9A35E"/><rect x="380" y="100" width="20" height="40" fill="#C9A35E"/>
-      <rect x="46" y="78" width="26" height="62" fill="#C9A35E"/>
-      <rect x="82" y="38" width="30" height="102" fill="#C9A35E"/>
+      <rect x="46" y="78" width="26" height="62" fill="#C9A35E"/><rect x="82" y="38" width="30" height="102" fill="#C9A35E"/>
       <polygon points="97,18 91,38 103,38" fill="#C9A35E"/>
-      <rect x="118" y="64" width="24" height="76" fill="#C9A35E"/>
-      <rect x="148" y="100" width="26" height="40" fill="#C9A35E"/>
+      <rect x="118" y="64" width="24" height="76" fill="#C9A35E"/><rect x="148" y="100" width="26" height="40" fill="#C9A35E"/>
       <polygon points="161,86 146,100 176,100" fill="#C9A35E"/>
-      <rect x="180" y="50" width="22" height="90" fill="#C9A35E"/>
-      <rect x="206" y="72" width="28" height="68" fill="#C9A35E"/>
-      <rect x="238" y="44" width="26" height="96" fill="#C9A35E"/>
-      <rect x="268" y="92" width="24" height="48" fill="#C9A35E"/>
-      <rect x="296" y="56" width="24" height="84" fill="#C9A35E"/>
-      <rect x="324" y="74" width="30" height="66" fill="#C9A35E"/>
+      <rect x="180" y="50" width="22" height="90" fill="#C9A35E"/><rect x="206" y="72" width="28" height="68" fill="#C9A35E"/>
+      <rect x="238" y="44" width="26" height="96" fill="#C9A35E"/><rect x="268" y="92" width="24" height="48" fill="#C9A35E"/>
+      <rect x="296" y="56" width="24" height="84" fill="#C9A35E"/><rect x="324" y="74" width="30" height="66" fill="#C9A35E"/>
     </svg>
     <div class="agent-card">
       <div class="agent-av">${initials}</div>
@@ -771,7 +585,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
     </div>
     <div class="day-chip"><span>Aaj</span></div>
     <div class="chat-body" id="chatBody">
-      <div class="msg bot"><div class="bubble">Namaste! ${broker.name} mein aapka swagat hai \ud83d\ude0a Aap kya dhundh rahe hain \u2014 kharidna, rent lena, ya apni property sell/rent\u2011out karni hai?</div><div class="ts">Abhi</div></div>
+      <div class="msg bot"><div class="bubble">Namaste ji! \ud83d\ude0a Aap property kharidna chahte hain, rent lena hai, ya apni property sell/rent pe deni hai?</div><div class="ts">Abhi</div></div>
     </div>
   </div>
   <div class="quick-replies" id="quickReplies">
@@ -800,75 +614,14 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 const sessionId = Math.random().toString(36).substr(2,9);
 const brokerId = '${brokerId}';
 let leadDone = false;
-
 function getTime(){const n=new Date();return n.getHours()+':'+String(n.getMinutes()).padStart(2,'0');}
-
-function addMsg(text,role){
-  const body=document.getElementById('chatBody');
-  const d=document.createElement('div');d.className='msg '+role;
-  d.innerHTML='<div class="bubble">'+text+'</div><div class="ts">'+getTime()+'</div>';
-  body.appendChild(d);body.scrollTop=body.scrollHeight;
-}
-
-function showTyping(){
-  const body=document.getElementById('chatBody');
-  const d=document.createElement('div');d.className='msg bot';d.id='typing';
-  d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
-  body.appendChild(d);body.scrollTop=body.scrollHeight;
-}
+function addMsg(text,role){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg '+role;d.innerHTML='<div class="bubble">'+text+'</div><div class="ts">'+getTime()+'</div>';body.appendChild(d);body.scrollTop=body.scrollHeight;}
+function showTyping(){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg bot';d.id='typing';d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';body.appendChild(d);body.scrollTop=body.scrollHeight;}
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
-
-function typeMsg(text,role){
-  const body=document.getElementById('chatBody');
-  const d=document.createElement('div');d.className='msg '+role;
-  const bubble=document.createElement('div');bubble.className='bubble';bubble.innerHTML='';
-  const ts=document.createElement('div');ts.className='ts';ts.textContent=getTime();
-  d.appendChild(bubble);d.appendChild(ts);body.appendChild(d);body.scrollTop=body.scrollHeight;
-  let i=0;
-  function typeNext(){
-    if(i<text.length){bubble.innerHTML+=text.charAt(i);i++;body.scrollTop=body.scrollHeight;setTimeout(typeNext,20);}
-  }
-  typeNext();
-}
-
-function quickSelect(btn, text){
-  document.getElementById('quickReplies').style.display='none';
-  addMsg(text,'user');
-  showTyping();
-  fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,sessionId})})
-  .then(r=>r.json()).then(data=>{
-    removeTyping();typeMsg(data.reply,'bot');
-    if(data.leadComplete){leadDone=true;disableChat();}
-  }).catch(e=>{removeTyping();addMsg('Dobara try karein.','bot');});
-}
-
-function disableChat(){
-  const inp=document.getElementById('msgInput');
-  const sendBtn=document.querySelector('.send-btn');
-  inp.disabled=true;
-  inp.placeholder='Shukriya! Hamari team jald contact karegi.';
-  inp.style.background='#f0fdf4';inp.style.borderColor='#22c55e';inp.style.color='#15803d';
-  if(sendBtn)sendBtn.style.display='none';
-}
-
-async function sendMsg(){
-  const input=document.getElementById('msgInput');
-  const msg=input.value.trim();if(!msg)return;
-  if(leadDone){
-    const c=msg.toLowerCase();
-    if(c.includes('galat')||c.includes('wrong')||c.includes('change')||c.includes('sahi')||c.includes('galti')){
-      leadDone=false;input.disabled=false;input.placeholder='Ya yahan type karein...';
-      input.style.background='';input.style.borderColor='';input.style.color='';
-      const sb=document.querySelector('.send-btn');if(sb)sb.style.display='flex';
-    }else return;
-  }
-  input.value='';addMsg(msg,'user');showTyping();
-  try{
-    const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});
-    const data=await res.json();removeTyping();typeMsg(data.reply,'bot');
-    if(data.leadComplete){leadDone=true;disableChat();}
-  }catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}
-}
+function typeMsg(text,role){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg '+role;const bubble=document.createElement('div');bubble.className='bubble';bubble.innerHTML='';const ts=document.createElement('div');ts.className='ts';ts.textContent=getTime();d.appendChild(bubble);d.appendChild(ts);body.appendChild(d);body.scrollTop=body.scrollHeight;let i=0;function typeNext(){if(i<text.length){bubble.innerHTML+=text.charAt(i);i++;body.scrollTop=body.scrollHeight;setTimeout(typeNext,20);}}typeNext();}
+function quickSelect(btn,text){document.getElementById('quickReplies').style.display='none';addMsg(text,'user');showTyping();fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,sessionId})}).then(r=>r.json()).then(data=>{removeTyping();typeMsg(data.reply,'bot');if(data.leadComplete){leadDone=true;disableChat();}}).catch(e=>{removeTyping();addMsg('Dobara try karein.','bot');});}
+function disableChat(){const inp=document.getElementById('msgInput');const sendBtn=document.querySelector('.send-btn');inp.disabled=true;inp.placeholder='Shukriya! Hamari team jald contact karegi.';inp.style.background='#f0fdf4';inp.style.borderColor='#22c55e';inp.style.color='#15803d';if(sendBtn)sendBtn.style.display='none';}
+async function sendMsg(){const input=document.getElementById('msgInput');const msg=input.value.trim();if(!msg)return;if(leadDone){const c=msg.toLowerCase();if(c.includes('galat')||c.includes('wrong')||c.includes('change')||c.includes('sahi')||c.includes('galti')){leadDone=false;input.disabled=false;input.placeholder='Apna message yahan likhein...';input.style.background='';input.style.borderColor='';input.style.color='';const sb=document.querySelector('.send-btn');if(sb)sb.style.display='flex';}else return;}input.value='';addMsg(msg,'user');showTyping();try{const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});const data=await res.json();removeTyping();typeMsg(data.reply,'bot');if(data.leadComplete){leadDone=true;disableChat();}}catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}}
 </script>
 </body></html>`;
 }
