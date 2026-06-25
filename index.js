@@ -8,8 +8,8 @@ app.use(express.json());
 const GROQ_API_KEY = process.env.GROQ_API_KEY || "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";
 const resend = new Resend('re_7HnaPfwP_Cso6RXqBYX7A4apowdzvd6kQ');
 const supabase = createClient(
-  'https://rpswzqgzcautmfjpgohh.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc3d6cWd6Y2F1dG1manBnb2hoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTkyMjYzMCwiZXhwIjoyMDk3NDk4NjMwfQ.v48pCXRn0DTb2dUJv8bhBgoB-vxINiWR-wqlDc7vAFQ'
+  'https://twxtryvauijzxpddapns.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3eHRyeXZhdWlqenhwZGRhcG5zIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjM5OTAwNCwiZXhwIjoyMDk3OTc1MDA0fQ.zkX_8GrePNcZB1YbAb9YmnUO06g_GJ4HeT0wlDkn0rI'
 );
 
 const conversations = {};
