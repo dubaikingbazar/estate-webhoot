@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 // ===== KEYS =====
-const GROQ_API_KEY = process.env.GROQ_API_KEY || "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";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyAQ.Ab8RN6LMyHoLxuDc3sE7AM0ix1uVkdO8echM2ByyCp8Ya3GSgA";
 const resend = new Resend('re_7HnaPfwP_Cso6RXqBYX7A4apowdzvd6kQ');
 const supabase = createClient(
   'https://twxtryvauijzxpddapns.supabase.co',
@@ -480,20 +480,25 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   const photoUploadUrl = sessionToken ? 'https://estatebotai.in/upload/' + sessionToken : '';
 
   try {
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const systemPrompt = getSystemPrompt(broker.name);
+    const geminiMessages = conversations[sessionId].map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+    const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-        messages: [{ role: 'system', content: getSystemPrompt(broker.name) }, ...conversations[sessionId]]
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: geminiMessages
       })
     });
-    const data = await groqRes.json();
-    console.log('Groq response status:', groqRes.status);
-    if (!data.choices || !data.choices[0]) {
-      console.error('Groq error response:', JSON.stringify(data));
+    const data = await geminiRes.json();
+    console.log('Gemini response status:', geminiRes.status);
+    if (!data.candidates || !data.candidates[0]) {
+      console.error('Gemini error response:', JSON.stringify(data));
     }
-    let reply = data.choices?.[0]?.message?.content || 'Kuch gadbad ho gayi, dobara try karein.';
+    let reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Kuch gadbad ho gayi, dobara try karein.';
     reply = reply.replace('|||PHOTO_LINK|||', photoUploadUrl);
     conversations[sessionId].push({ role: 'assistant', content: reply });
 
