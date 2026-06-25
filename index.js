@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 // ===== KEYS =====
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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";
+const GROQ_API_KEY = process.env.GROQ_API_KEY || "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";
 const resend = new Resend('re_7HnaPfwP_Cso6RXqBYX7A4apowdzvd6kQ');
 const supabase = createClient(
   'https://twxtryvauijzxpddapns.supabase.co',
@@ -480,23 +480,18 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   const photoUploadUrl = sessionToken ? 'https://estatebotai.in/upload/' + sessionToken : '';
 
   try {
-    const openRouterRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://estatebotai.in',
-        'X-Title': 'EstateBot AI'
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-exp:free',
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
         messages: [{ role: 'system', content: getSystemPrompt(broker.name) }, ...conversations[sessionId]]
       })
     });
-    const data = await openRouterRes.json();
-    console.log('OpenRouter response status:', openRouterRes.status);
+    const data = await groqRes.json();
+    console.log('Groq response status:', groqRes.status);
     if (!data.choices || !data.choices[0]) {
-      console.error('OpenRouter error response:', JSON.stringify(data));
+      console.error('Groq error response:', JSON.stringify(data));
     }
     let reply = data.choices?.[0]?.message?.content || 'Kuch gadbad ho gayi, dobara try karein.';
     reply = reply.replace('|||PHOTO_LINK|||', photoUploadUrl);
