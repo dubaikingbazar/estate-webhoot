@@ -347,10 +347,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input class="search-input" id="searchInput2" placeholder="Search naam, phone, area..." oninput="applyFilter2()" style="width:200px;">
           </div>
+          <select class="filter-select" id="budgetFilter" onchange="applyFilter2()">
+            <option value="all">All Budgets</option>
+            <option value="low">Below ₹50L</option>
+            <option value="mid">₹50L – ₹1Cr</option>
+            <option value="high">Above ₹1Cr</option>
+          </select>
           <button class="export-btn" onclick="exportCSV()">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Export CSV
           </button>
+          <button class="export-btn" style="background:var(--gold);" onclick="toggleBulkMode()">☑ Bulk</button>
+          <button class="export-btn" style="background:#7C3AED;" onclick="showMonthlyReport()">📊 Report</button>
         </div>
       </div>
       <div class="leads-table">
@@ -444,6 +452,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="detail-body" id="detailBody"></div>
 </div>
 
+<!-- BULK ACTION BAR -->
+<div id="bulkBar" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);border-radius:12px;padding:10px 16px;gap:10px;align-items:center;z-index:300;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+  <span style="color:#fff;font-size:12px;font-weight:600;" id="bulkCount">0 selected</span>
+  <button onclick="bulkUpdateStatus('converted')" style="background:#10B981;color:#fff;border:none;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">✓ Converted</button>
+  <button onclick="bulkUpdateStatus('in_progress')" style="background:#F59E0B;color:#fff;border:none;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">In Progress</button>
+  <button onclick="bulkUpdateStatus('not_interested')" style="background:#EF4444;color:#fff;border:none;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Not Interested</button>
+  <button onclick="toggleBulkMode()" style="background:rgba(255,255,255,0.15);color:#fff;border:none;padding:7px 12px;border-radius:7px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;">Cancel</button>
+</div>
+
+<!-- MONTHLY REPORT MODAL -->
+<div class="modal-overlay" id="reportModal">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="modal-title">📊 Monthly Report</div>
+      <button onclick="document.getElementById('reportModal').classList.remove('show')" style="background:none;border:1px solid var(--border);border-radius:7px;padding:5px 9px;cursor:pointer;font-size:13px;">✕</button>
+    </div>
+    <div id="reportContent"></div>
+  </div>
+</div>
+
+<!-- DAILY SUMMARY MODAL -->
+<div class="modal-overlay" id="summaryModal">
+  <div class="modal-box" style="text-align:center;">
+    <div id="summaryContent"></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="fuModal">
   <div class="modal-box">
     <div class="modal-title">Add Follow Up Reminder</div>
@@ -524,6 +559,7 @@ async function initDashboard(brokerId){
   await loadLeads(brokerId);
   checkFollowUpNotifications();
   if(Notification.permission==='granted')setupLeadPolling(brokerId);
+  setTimeout(()=>{checkDailySummary();checkAutoFollowUp();},1500);
 }
 
 async function loadLeads(brokerId){
@@ -566,17 +602,20 @@ function showPage(page){
   if(page==='settings')renderSettings();
 }
 
-// ===== RENDER LEAD ROW =====
-function buildLeadRow(lead,onclick){
+// Lead store for detail panel
+const leadStore = {};
+
+function buildLeadRow(lead, onclick){
+  leadStore[lead.id] = lead;
   const score=lead.score,scoreType=lead.scoreType,scoreColor=getScoreColor(scoreType);
   const av=getInitials(lead.name),avColor=getAvColor(lead.name);
   const intentShort=(lead.intent||'').replace(' Chahte Hain','').replace(' Chahte Hai','');
   const statusLabels={new:'New',in_progress:'In Progress',converted:'Converted',not_interested:'Not Interested',follow_up:'Follow Up'};
   const statusColors={new:'#7C3AED',in_progress:'#D97706',converted:'#065F46',not_interested:'#DC2626',follow_up:'#1D4ED8'};
   const statusBg={new:'#EDE9FE',in_progress:'#FEF3C7',converted:'#D1FAE5',not_interested:'#FEE2E2',follow_up:'#DBEAFE'};
-  const hasNote=notes[lead.id]?'💬':'' ;
+  const hasNote=notes[lead.id]?'💬':'';
   const hasLog=callLogs[lead.id]&&callLogs[lead.id].length?'📞':'';
-  return `<div class="lead-row${lead.isDuplicate?' duplicate':''}" onclick='${onclick}'>
+  return `<div class="lead-row${lead.isDuplicate?' duplicate':''}" onclick="openDetail('${lead.id}')">
     <div class="lead-col-badge"><span class="badge ${scoreType}">${scoreType.toUpperCase()}</span></div>
     <div class="lead-av" style="background:${avColor};">${av}</div>
     <div class="lead-main-info">
@@ -618,7 +657,7 @@ function renderTable(){
   const pageLeads=filteredLeads.slice(start,start+PER_PAGE);
   const total=filteredLeads.length;
   if(!total){document.getElementById('leadsBody').innerHTML='<div class="empty-state"><h3>Koi lead nahi mila</h3><p>Filter change karein ya apna bot share karein</p></div>';document.getElementById('paginationWrap').style.display='none';return;}
-  document.getElementById('leadsBody').innerHTML=pageLeads.map(l=>buildLeadRow(l,`openDetail(${JSON.stringify(l).replace(/'/g,"\\'")})`)).join('');
+  document.getElementById('leadsBody').innerHTML=pageLeads.map(l=>buildLeadRow(l)).join('');
   renderPagination('pageInfo','pageBtns',currentPage,total,p=>{currentPage=p;renderTable();});
 }
 
@@ -629,6 +668,7 @@ function applyFilter2(){
   const type=document.getElementById('filterType2').value;
   const sort=document.getElementById('sortType').value;
   const search=document.getElementById('searchInput2').value.toLowerCase();
+  const budget=document.getElementById('budgetFilter')?.value||'all';
   filteredLeads2=allLeads.filter(l=>{
     const ms=!search||(l.name||'').toLowerCase().includes(search)||(l.phone||'').includes(search)||(l.area||'').toLowerCase().includes(search);
     let mt=true;
@@ -639,7 +679,9 @@ function applyFilter2(){
     else if(type==='sell')mt=(l.intent||'').toLowerCase().includes('sell')||(l.intent||'').toLowerCase().includes('bech');
     else if(type==='rent')mt=(l.intent||'').toLowerCase().includes('rent');
     else if(['new','in_progress','converted','not_interested','follow_up'].includes(type))mt=(l.status||'new')===type;
-    return ms&&mt;
+    let mb=true;
+    if(budget!=='all'){const bv=getBudgetValue(l.budget);if(budget==='low')mb=bv>0&&bv<5000000;else if(budget==='mid')mb=bv>=5000000&&bv<=10000000;else if(budget==='high')mb=bv>10000000;}
+    return ms&&mt&&mb;
   });
   // Sort
   filteredLeads2.sort((a,b)=>{
@@ -657,26 +699,26 @@ function renderTable2(){
   const pageLeads=filteredLeads2.slice(start,start+PER_PAGE);
   const total=filteredLeads2.length;
   if(!total){document.getElementById('leadsBody2').innerHTML='<div class="empty-state"><h3>Koi lead nahi mila</h3><p>Filter change karein</p></div>';document.getElementById('paginationWrap2').style.display='none';return;}
-  document.getElementById('leadsBody2').innerHTML=pageLeads.map(l=>buildLeadRow(l,`openDetail(${JSON.stringify(l).replace(/'/g,"\\'")})`)).join('');
+  document.getElementById('leadsBody2').innerHTML=pageLeads.map(l=>buildLeadRow(l)).join('');
   renderPagination('pageInfo2','pageBtns2',currentPage2,total,p=>{currentPage2=p;renderTable2();});
 }
 
 function renderPagination(infoId,btnsId,cur,total,cb){
   const totalPages=Math.ceil(total/PER_PAGE);
-  document.getElementById(infoId.replace('pageInfo','paginationWrap').replace('2','')+'' ).style.display='flex';
-  // find correct wrap
   const wrapId=infoId.includes('2')?'paginationWrap2':'paginationWrap';
   document.getElementById(wrapId).style.display='flex';
   document.getElementById(infoId).textContent=`Showing ${(cur-1)*PER_PAGE+1}–${Math.min(cur*PER_PAGE,total)} of ${total}`;
-  let btns=`<button class="page-btn" onclick="(${cb})(${cur-1})" ${cur===1?'disabled':''}>‹</button>`;
-  for(let i=1;i<=Math.min(totalPages,5);i++)btns+=`<button class="page-btn ${i===cur?'active':''}" onclick="(${cb})(${i})">${i}</button>`;
-  if(totalPages>5)btns+=`<button class="page-btn" disabled>...</button>`;
-  btns+=`<button class="page-btn" onclick="(${cb})(${cur+1})" ${cur===totalPages?'disabled':''}>›</button>`;
+  let btns=`<button class="page-btn" ${cur===1?'disabled':''} onclick="(${cb.toString()})(${cur-1})">‹</button>`;
+  for(let i=1;i<=Math.min(totalPages,5);i++)btns+=`<button class="page-btn ${i===cur?'active':''}" onclick="(${cb.toString()})(${i})">${i}</button>`;
+  if(totalPages>5)btns+=`<span style="font-size:11px;color:var(--muted);padding:0 4px;">...</span>`;
+  btns+=`<button class="page-btn" ${cur>=totalPages?'disabled':''} onclick="(${cb.toString()})(${cur+1})">›</button>`;
   document.getElementById(btnsId).innerHTML=btns;
 }
 
 // ===== LEAD DETAIL PANEL =====
-function openDetail(lead){
+function openDetail(leadId){
+  const lead = leadStore[leadId];
+  if(!lead) return;
   const score=lead.score||getScore(lead);
   const scoreType=lead.scoreType||getScoreType(score);
   const scoreColor=getScoreColor(scoreType);
@@ -721,6 +763,11 @@ function openDetail(lead){
       <div class="detail-row"><span class="detail-key">Added</span><span class="detail-val">${new Date(lead.created_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div>
     </div>
     <div class="detail-section">
+      <div class="detail-section-title">Score Breakdown (${score}%)</div>
+      <div style="margin-bottom:6px;"><div class="score-bar"><div class="score-bar-fill" style="width:${score}%;background:${scoreColor};"></div></div></div>
+      ${getScoreExplain(lead).map(r=>`<div style="font-size:11px;color:var(--muted);padding:3px 0;">${r}</div>`).join('')}
+    </div>
+    <div class="detail-section">
       <div class="detail-section-title">Lead Status</div>
       <select class="status-select" id="statusSelect_${lead.id}" onchange="updateStatus('${lead.id}',this.value)" onclick="event.stopPropagation()">
         <option value="new" ${(lead.status||'new')==='new'?'selected':''}>🔵 New</option>
@@ -752,7 +799,11 @@ function openDetail(lead){
       <button class="btn-gold" onclick="openAddFollowUp('${lead.id}','${lead.name||''}')">
         ⏰ Set Follow Up Reminder
       </button>
+      <button class="btn-secondary" style="color:#EF4444;border-color:rgba(239,68,68,0.3);" onclick="if(confirm('Is lead ko archive karo?'))archiveLead('${lead.id}')">
+        🗄 Archive Lead
+      </button>
     </div>
+    ${renderTagsSection(lead.id)}
     <div class="detail-section" style="margin-top:14px;">
       <div class="detail-section-title">WhatsApp Templates</div>
       <div class="wa-templates">
@@ -1003,8 +1054,257 @@ function setupLeadPolling(brokerId){
   },30000); // Check every 30 seconds
 }
 
-// Modal overlay click
+// ===== LEAD SCORE EXPLAIN =====
+function getScoreExplain(lead){
+  const reasons=[];
+  if(lead.phone) reasons.push('✅ Phone number mila');
+  else reasons.push('❌ Phone number missing');
+  if(lead.budget) reasons.push('✅ Budget bataya: '+lead.budget);
+  else reasons.push('❌ Budget nahi bataya');
+  if(lead.area) reasons.push('✅ Location bataya: '+lead.area);
+  else reasons.push('❌ Location nahi bataya');
+  if(lead.timeline){
+    const t=lead.timeline.toLowerCase();
+    if(t.includes('urgent')||t.includes('15')||t.includes('1 month')) reasons.push('✅ Timeline urgent hai');
+    else reasons.push('⚠️ Timeline: '+lead.timeline);
+  } else reasons.push('❌ Timeline nahi bataya');
+  if((lead.intent||'').toLowerCase().includes('kharid')) reasons.push('✅ Kharidna chahta hai (buyer)');
+  return reasons;
+}
+
+// ===== LEAD TAGS =====
+let leadTags = JSON.parse(localStorage.getItem('eb_tags')||'{}');
+const TAG_OPTIONS = ['🔥 VIP','⚡ Urgent','🏡 Site Visit Done','📞 Callback','💰 High Budget','🤝 Negotiating','❌ Not Reachable'];
+
+function saveTags(leadId){
+  localStorage.setItem('eb_tags',JSON.stringify(leadTags));
+}
+
+function renderTagsSection(leadId){
+  const currentTags = leadTags[leadId]||[];
+  return `<div class="detail-section">
+    <div class="detail-section-title">Tags</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;" id="tagDisplay_${leadId}">
+      ${currentTags.length ? currentTags.map(t=>`<span style="background:#EDE9FE;color:#5B3DF5;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;" onclick="removeTag('${leadId}','${t}')">${t} ×</span>`).join('') : '<span style="font-size:12px;color:var(--muted);">No tags yet</span>'}
+    </div>
+    <select onchange="addTag('${leadId}',this.value);this.value='';" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;font-family:'Inter',sans-serif;outline:none;color:var(--text);">
+      <option value="">+ Add Tag</option>
+      ${TAG_OPTIONS.map(t=>`<option value="${t}">${t}</option>`).join('')}
+    </select>
+  </div>`;
+}
+
+function addTag(leadId, tag){
+  if(!tag) return;
+  if(!leadTags[leadId]) leadTags[leadId]=[];
+  if(!leadTags[leadId].includes(tag)) leadTags[leadId].push(tag);
+  saveTags(leadId);
+  const el = document.getElementById('tagDisplay_'+leadId);
+  if(el) el.innerHTML = leadTags[leadId].map(t=>`<span style="background:#EDE9FE;color:#5B3DF5;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;" onclick="removeTag('${leadId}','${t}')">${t} ×</span>`).join('');
+  showToast('Tag added!');
+}
+
+function removeTag(leadId, tag){
+  if(!leadTags[leadId]) return;
+  leadTags[leadId]=leadTags[leadId].filter(t=>t!==tag);
+  saveTags(leadId);
+  const el = document.getElementById('tagDisplay_'+leadId);
+  if(el) el.innerHTML = leadTags[leadId].length ? leadTags[leadId].map(t=>`<span style="background:#EDE9FE;color:#5B3DF5;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;" onclick="removeTag('${leadId}','${t}')">${t} ×</span>`).join('') : '<span style="font-size:12px;color:var(--muted);">No tags yet</span>';
+}
+
+// ===== LEAD ARCHIVE =====
+let archivedLeads = JSON.parse(localStorage.getItem('eb_archived')||'[]');
+
+function archiveLead(leadId){
+  if(!archivedLeads.includes(leadId)){
+    archivedLeads.push(leadId);
+    localStorage.setItem('eb_archived',JSON.stringify(archivedLeads));
+  }
+  allLeads = allLeads.filter(l=>l.id!==leadId);
+  filteredLeads = filteredLeads.filter(l=>l.id!==leadId);
+  filteredLeads2 = filteredLeads2.filter(l=>l.id!==leadId);
+  updateStats();
+  renderTable();
+  closeDetail();
+  showToast('Lead archived!');
+}
+
+// ===== BULK STATUS UPDATE =====
+let selectedLeads = new Set();
+
+function toggleBulkMode(){
+  const isBulk = document.getElementById('bulkBar').style.display==='flex';
+  if(isBulk){
+    selectedLeads.clear();
+    document.getElementById('bulkBar').style.display='none';
+    document.querySelectorAll('.lead-checkbox').forEach(c=>c.style.display='none');
+  } else {
+    document.getElementById('bulkBar').style.display='flex';
+    document.querySelectorAll('.lead-checkbox').forEach(c=>c.style.display='flex');
+  }
+}
+
+async function bulkUpdateStatus(status){
+  if(!selectedLeads.size){showToast('Pehle leads select karo','error');return;}
+  const promises = [...selectedLeads].map(id=>supaPatch(`/rest/v1/leads?id=eq.${id}`,{status}));
+  await Promise.all(promises);
+  allLeads = allLeads.map(l=>selectedLeads.has(l.id)?{...l,status}:l);
+  filteredLeads = filteredLeads.map(l=>selectedLeads.has(l.id)?{...l,status}:l);
+  filteredLeads2 = filteredLeads2.map(l=>selectedLeads.has(l.id)?{...l,status}:l);
+  updateStats();renderTable();
+  showToast(`${selectedLeads.size} leads updated to ${status}! ✅`);
+  selectedLeads.clear();
+  document.getElementById('bulkBar').style.display='none';
+}
+
+// ===== MONTHLY REPORT =====
+function showMonthlyReport(){
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthLeads = allLeads.filter(l=>new Date(l.created_at)>=monthStart);
+  const converted = monthLeads.filter(l=>l.status==='converted').length;
+  const hot = monthLeads.filter(l=>l.scoreType==='hot').length;
+  // Best day
+  const dayCounts={};
+  monthLeads.forEach(l=>{const d=new Date(l.created_at).toLocaleDateString('en-IN',{weekday:'long'});dayCounts[d]=(dayCounts[d]||0)+1;});
+  const bestDay = Object.entries(dayCounts).sort((a,b)=>b[1]-a[1])[0];
+  // Revenue estimate
+  const revEst = converted * 15000;
+
+  const modal = document.getElementById('reportModal');
+  document.getElementById('reportContent').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="background:#F8FAFC;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:var(--navy);">${monthLeads.length}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Total Leads This Month</div>
+      </div>
+      <div style="background:#F8FAFC;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:#10B981;">${converted}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Converted</div>
+      </div>
+      <div style="background:#F8FAFC;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:#EF4444;">${hot}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Hot Leads</div>
+      </div>
+      <div style="background:#F8FAFC;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:var(--gold);">${monthLeads.length?Math.round((converted/monthLeads.length)*100):0}%</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Conversion Rate</div>
+      </div>
+    </div>
+    <div style="background:#F8FAFC;border-radius:10px;padding:14px;margin-bottom:12px;">
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px;">📅 ${now.toLocaleString('en-IN',{month:'long',year:'numeric'})} Summary</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.8;">
+        ${bestDay?`🏆 Best day: <b>${bestDay[0]}</b> (${bestDay[1]} leads)<br>`:''}
+        💰 Est. Commission: <b>₹${revEst.toLocaleString('en-IN')}</b> (@₹15k/deal)<br>
+        📊 Avg per day: <b>${(monthLeads.length/now.getDate()).toFixed(1)} leads</b>
+      </div>
+    </div>
+    <button onclick="exportMonthlyReport()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">📥 Download Report</button>`;
+  modal.classList.add('show');
+}
+
+function exportMonthlyReport(){
+  const now=new Date();
+  const monthStart=new Date(now.getFullYear(),now.getMonth(),1);
+  const monthLeads=allLeads.filter(l=>new Date(l.created_at)>=monthStart);
+  const headers=['Name','Phone','Intent','Property','Location','Budget','Status','Score','Added'];
+  const rows=monthLeads.map(l=>[l.name,l.phone,(l.intent||'').replace(' Chahte Hain',''),l.property_type,l.area,l.budget,l.status||'new',l.score+'%',new Date(l.created_at).toLocaleDateString('en-IN')].map(v=>`"${v||''}"`).join(','));
+  const csv=[headers.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`report_${now.toLocaleString('en-IN',{month:'short',year:'numeric'}).replace(' ','_')}.csv`;a.click();
+  showToast('Report download ho gaya!');
+}
+
+// ===== BUDGET RANGE FILTER =====
+function getBudgetValue(budget){
+  if(!budget) return 0;
+  const n=parseFloat(budget.replace(/[^0-9.]/g,''))||0;
+  if(budget.toLowerCase().includes('cr')) return n*10000000;
+  if(budget.toLowerCase().includes('lakh')||budget.toLowerCase().includes('lac')||budget.toLowerCase().includes('l')) return n*100000;
+  return n;
+}
+
+// ===== KEYBOARD SHORTCUTS =====
+let shortcutEnabled = true;
+document.addEventListener('keydown',e=>{
+  if(!shortcutEnabled) return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+  if(e.key==='1') showPage('dashboard');
+  else if(e.key==='2') showPage('leads');
+  else if(e.key==='3') showPage('analytics');
+  else if(e.key==='4') showPage('followups');
+  else if(e.key==='5') showPage('settings');
+  else if(e.key==='Escape') closeDetail();
+  else if(e.key==='r'||e.key==='R'){
+    if(currentBroker){loadLeads(currentBroker.broker_id);showToast('Refreshed! 🔄');}
+  }
+});
+
+// ===== DAILY SUMMARY POPUP =====
+function checkDailySummary(){
+  const lastShown = localStorage.getItem('eb_summary_date');
+  const today = new Date().toDateString();
+  if(lastShown===today) return; // Already shown today
+  const brokerId = currentBroker?.broker_id;
+  const todayFUs = followUps.filter(f=>f.brokerId===brokerId&&!f.done&&f.date<=new Date().toISOString().split('T')[0]);
+  const todayLeads = allLeads.filter(l=>new Date(l.created_at).toDateString()===today);
+  if(todayFUs.length===0&&todayLeads.length===0) return;
+  document.getElementById('summaryContent').innerHTML=`
+    <div style="font-size:28px;margin-bottom:12px;">☀️</div>
+    <div style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px;">Good morning, ${currentBroker?.name?.split(' ')[0]||''}!</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Aaj ka summary</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+      <div style="background:#FEF3C7;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:#D97706;">${todayFUs.length}</div>
+        <div style="font-size:11px;color:#92400E;margin-top:3px;">Follow Ups Today</div>
+      </div>
+      <div style="background:#EDE9FE;border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:#5B3DF5;">${todayLeads.length}</div>
+        <div style="font-size:11px;color:#3730A3;margin-top:3px;">New Leads Today</div>
+      </div>
+    </div>
+    ${todayFUs.length>0?`<div style="background:#FEE2E2;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#DC2626;font-weight:600;">⚠️ ${todayFUs.length} follow up${todayFUs.length>1?'s':''} pending!</div>`:''}
+    <button onclick="document.getElementById('summaryModal').classList.remove('show');showPage('followups');" style="width:100%;background:var(--navy);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px;">View Follow Ups</button>
+    <button onclick="document.getElementById('summaryModal').classList.remove('show');" style="width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);padding:10px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;">Dismiss</button>`;
+  document.getElementById('summaryModal').classList.add('show');
+  localStorage.setItem('eb_summary_date',today);
+}
+
+// ===== AUTO FOLLOW UP =====
+function checkAutoFollowUp(){
+  const brokerId = currentBroker?.broker_id;
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(threeDaysAgo.getDate()-3);
+  const existingFULeadIds = new Set(followUps.filter(f=>f.brokerId===brokerId&&!f.done).map(f=>f.leadId));
+  const needsFollowUp = allLeads.filter(l=>{
+    if(existingFULeadIds.has(l.id)) return false;
+    if(l.status==='converted'||l.status==='not_interested') return false;
+    if(!l.created_at) return false;
+    const logsForLead = callLogs[l.id]||[];
+    const daysSince = (Date.now()-new Date(l.created_at))/(1000*60*60*24);
+    return daysSince>=3 && logsForLead.length===0;
+  });
+  if(needsFollowUp.length>0){
+    const tomorrow = new Date();tomorrow.setDate(tomorrow.getDate()+1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    let added=0;
+    needsFollowUp.slice(0,5).forEach(l=>{
+      if(!followUps.find(f=>f.leadId===l.id&&!f.done)){
+        followUps.push({id:Date.now().toString()+Math.random(),brokerId,leadId:l.id,leadName:l.name||'Lead',date:tomorrowStr,note:'Auto: 3 din se call nahi hua',done:false});
+        added++;
+      }
+    });
+    if(added>0){
+      localStorage.setItem('eb_followups',JSON.stringify(followUps));
+      showToast(`${added} auto follow up set ho gaye!`);
+    }
+  }
+}
+
+// Modal overlay clicks
 document.getElementById('fuModal').onclick=e=>{if(e.target===document.getElementById('fuModal'))closeFuModal();};
+document.getElementById('reportModal').onclick=e=>{if(e.target===document.getElementById('reportModal'))e.target.classList.remove('show');};
+document.getElementById('summaryModal').onclick=e=>{if(e.target===document.getElementById('summaryModal'))e.target.classList.remove('show');};
 
 // Auto-login
 const savedId=sessionStorage.getItem('broker_id');
