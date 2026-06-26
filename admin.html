@@ -715,26 +715,39 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL = 'https://twxtryvauijzxpddapns.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3eHRyeXZhdWlqenhwZGRhcG5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzOTkwMDQsImV4cCI6MjA5Nzk3NTAwNH0.o08UXLFnurPhhmgXScdjNsjojyUcKqY9J_SIAwp8T3w';
-
 let allBrokers = [];
 let allLeads = [];
 
-async function supaFetch(path) {
-  const r = await fetch(SUPABASE_URL + path, {
-    headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON }
-  });
+// Use backend API routes (service role key on server)
+async function apiFetch(path) {
+  const r = await fetch(path);
+  if (!r.ok) return [];
   return r.json();
 }
 
-async function supaPatch(path, body) {
-  const r = await fetch(SUPABASE_URL + path, {
+async function apiPatch(brokerId, body) {
+  const r = await fetch('/api/admin/brokers/' + brokerId, {
     method: 'PATCH',
-    headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
   return r.ok;
+}
+
+async function apiDelete(brokerId) {
+  const r = await fetch('/api/admin/delete/' + brokerId, {
+    method: 'DELETE'
+  });
+  return r.ok;
+}
+
+async function apiAddBroker(data) {
+  const r = await fetch('/api/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return r.json();
 }
 
 // DATE
@@ -793,8 +806,8 @@ function showPage(page) {
 // LOAD DATA
 async function loadDashboard() {
   const [brokers, leads] = await Promise.all([
-    supaFetch('/rest/v1/brokers?select=*&order=created_at.desc'),
-    supaFetch('/rest/v1/leads?select=*&order=created_at.desc')
+    apiFetch('/api/admin/brokers'),
+    apiFetch('/api/admin/leads')
   ]);
   allBrokers = brokers || [];
   allLeads = leads || [];
@@ -1166,7 +1179,7 @@ function changeStatus(brokerId, currentStatus) {
 }
 
 async function confirmStatusChange(brokerId, newStatus) {
-  const ok = await supaPatch(`/rest/v1/brokers?broker_id=eq.${brokerId}`, { status: newStatus });
+  const ok = await apiPatch(brokerId, { status: newStatus });
   closeModal();
   if(ok) {
     const b = allBrokers.find(x=>x.broker_id===brokerId);
@@ -1191,7 +1204,7 @@ function resetPassword(brokerId) {
 async function confirmResetPass(brokerId) {
   const pass = document.getElementById('newPassInput').value;
   if(!pass) return;
-  const ok = await supaPatch(`/rest/v1/brokers?broker_id=eq.${brokerId}`, { password: pass });
+  const ok = await apiPatch(brokerId, { password: pass });
   closeModal();
   toast(ok ? 'Password updated!' : 'Failed to update', ok ? 'success' : 'error');
 }
@@ -1208,12 +1221,9 @@ function deleteBroker(brokerId) {
 }
 
 async function confirmDelete(brokerId) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/brokers?broker_id=eq.${brokerId}`, {
-    method: 'DELETE',
-    headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON }
-  });
+  const ok = await apiDelete(brokerId);
   closeModal();
-  if(r.ok) {
+  if(ok) {
     allBrokers = allBrokers.filter(b=>b.broker_id!==brokerId);
     toast('Broker deleted');
     showPage('brokers');
@@ -1244,16 +1254,12 @@ async function confirmAddBroker() {
   const pass = document.getElementById('ab_pass').value.trim();
   if(!name||!email) return;
   const broker_id = name.toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,'-').substring(0,30);
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/brokers`, {
-    method: 'POST',
-    headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-    body: JSON.stringify({ broker_id, name, email, phone, city, status: 'trial', password: pass, stats: { experience: '5 Yrs', properties: '100+' } })
-  });
+  const result = await apiAddBroker({ name, business: name, email, phone, city, password: pass });
   closeModal();
-  if(r.ok) {
-    const data = await r.json();
-    allBrokers.unshift(data[0]);
-    toast('Broker added! Link: estatebotai.in/'+broker_id);
+  if(result && result.success) {
+    toast('Broker added! Link: estatebotai.in/'+result.broker_id);
+    const [brokers] = await Promise.all([apiFetch('/api/admin/brokers')]);
+    allBrokers = brokers || [];
     loadBrokersPage();
   } else { toast('Failed to add broker','error'); }
 }
