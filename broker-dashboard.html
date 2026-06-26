@@ -900,11 +900,18 @@ async function updateStatus(leadId, newStatus) {
 function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  // Set active nav
-  const navItems = document.querySelectorAll('.nav-item');
-  const pageMap = {dashboard:0, leads:1, analytics:2, followups:3, settings:4};
-  if(pageMap[page] !== undefined) navItems[pageMap[page]].classList.add('active');
+  const pageEl = document.getElementById('page-' + page);
+  if(pageEl) pageEl.classList.add('active');
+  // Active nav by onclick attribute matching
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + page + "'")) {
+      n.classList.add('active');
+    }
+  });
+  // Update topbar title
+  const titles = {dashboard:'Dashboard', leads:'All Leads', analytics:'Analytics', followups:'Follow Ups', settings:'Settings'};
+  const titleEl = document.querySelector('.topbar-left h1');
+  if(titleEl && titles[page]) titleEl.textContent = titles[page] + ' 👋';
   // Load page data
   if(page === 'leads') renderLeadsPage();
   if(page === 'analytics') renderAnalytics();
