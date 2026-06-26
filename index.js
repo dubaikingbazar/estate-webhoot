@@ -759,13 +759,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
       <div class="msg bot"><div class="bubble">Namaste ji! \ud83d\ude0a Aap property kharidna chahte hain, rent lena hai, ya apni property sell/rent pe deni hai?</div><div class="ts">Abhi</div></div>
     </div>
   </div>
-  <div class="quick-replies" id="quickReplies">
-    <div class="qr-label">Jaldi select karein:</div>
-    <button class="qr-btn" onclick="quickSelect(this,'Kharidna chahta hoon')">\ud83c\udfe0 Kharidna Hai</button>
-    <button class="qr-btn" onclick="quickSelect(this,'Rent lena chahta hoon')">\ud83d\udd11 Rent Lena Hai</button>
-    <button class="qr-btn" onclick="quickSelect(this,'Property sell karni hai')">\ud83d\udcb0 Sell Karna Hai</button>
-    <button class="qr-btn" onclick="quickSelect(this,'Property rent pe deni hai')">\ud83d\udccb Rent Dena Hai</button>
-  </div>
+
   <div class="chat-footer">
     <input type="text" id="msgInput" placeholder="Apna message yahan likhein\u2026" onkeypress="if(event.key==='Enter')sendMsg()"/>
     <button class="send-btn" onclick="sendMsg()">
