@@ -4,13 +4,24 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 app.use(express.json());
 
-// ===== KEYS =====
-const GROQ_API_KEY = process.env.GROQ_API_KEY || "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";
-const resend = new Resend('re_7HnaPfwP_Cso6RXqBYX7A4apowdzvd6kQ');
+// ===== KEYS (from environment variables) =====
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const resend = new Resend(process.env.RESEND_API_KEY);
 const supabase = createClient(
-  'https://twxtryvauijzxpddapns.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3eHRyeXZhdWlqenhwZGRhcG5zIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjM5OTAwNCwiZXhwIjoyMDk3OTc1MDA0fQ.zkX_8GrePNcZB1YbAb9YmnUO06g_GJ4HeT0wlDkn0rI'
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
 );
+
+// ===== ADMIN AUTH MIDDLEWARE =====
+const ADMIN_SECRET = process.env.ADMIN_SECRET || 'change-me-please';
+
+function adminAuth(req, res, next) {
+  const secret = req.headers['x-admin-secret'] || req.query.secret;
+  if (!secret || secret !== ADMIN_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+}
 
 const conversations = {};
 const tempUploads = {};
@@ -50,7 +61,7 @@ FIRST MESSAGE:
 - Agar customer ke first message se intent clear hai (jaise "Mujhe flat kharidna hai", "Plot sell karna hai", "Ghar rent pe chahiye") to greeting mat do. Seedha naturally react karo.
   Examples: "Acha ji! Kaunsi property chahiye?" ya "Acha ji! Kaisi property hai aapki?"
 - Agar first message se intent clear nahi hai, tab sirf ek greeting do:
-  "Namaste ji \ud83d\ude0a Aap property kharidna chahte hain, rent lena hai, ya apni property sell ya rent par deni hai?"
+  "Namaste ji 😊 Aap property kharidna chahte hain, rent lena hai, ya apni property sell ya rent par deni hai?"
 
 NAME:
 - Naam sirf tab pucho jab property ka basic context mil jaye.
@@ -104,12 +115,12 @@ TIMELINE:
 "Kitne time mein lena ya dena chahte hain?" (Urgent/1 Month/3 Months/6 Months/Flexible - jo bole wahi save karo)
 
 PHONE NUMBER (KABHI SKIP MAT KARNA):
-- Naam pata ho: "[CustomerName] ji, ek last kaam \ud83d\ude0a Apna WhatsApp number share kar dijiye. Hamari team aapse contact kar legi."
-- Naam na pata ho: "Ji, ek last kaam \ud83d\ude0a Apna WhatsApp number share kar dijiye. Hamari team aapse contact kar legi."
+- Naam pata ho: "[CustomerName] ji, ek last kaam 😊 Apna WhatsApp number share kar dijiye. Hamari team aapse contact kar legi."
+- Naam na pata ho: "Ji, ek last kaam 😊 Apna WhatsApp number share kar dijiye. Hamari team aapse contact kar legi."
 
 PHONE VALIDATION:
 Indian mobile number exactly 10 digits hona chahiye.
-Agar invalid ho: "Koi baat nahi ji \ud83d\ude0a Lagta hai number complete nahi hai. Sahi 10 digit WhatsApp number bata dijiye."
+Agar invalid ho: "Koi baat nahi ji 😊 Lagta hai number complete nahi hai. Sahi 10 digit WhatsApp number bata dijiye."
 
 INDIRECT INTENT - inhe bhi samjho:
 - "Makan dekh raha hu" > Buy
@@ -124,8 +135,8 @@ Name, Phone, Intent, Property Type, Location, Budget, Timeline, aur property spe
 Phone ke bina kabhi lead complete mat karo.
 
 FINAL MESSAGE:
-Buy/Rent: "Bahut shukriya [CustomerName] ji \ud83d\ude0a Aapki details note ho gayi hain. Hamari team jaldi hi aapse contact karegi."
-Sell/Rent Out: "Bahut shukriya [CustomerName] ji \ud83d\ude0a Aapki property ki details note ho gayi hain. Hamari team jaldi hi aapse contact karegi."
+Buy/Rent: "Bahut shukriya [CustomerName] ji 😊 Aapki details note ho gayi hain. Hamari team jaldi hi aapse contact karegi."
+Sell/Rent Out: "Bahut shukriya [CustomerName] ji 😊 Aapki property ki details note ho gayi hain. Hamari team jaldi hi aapse contact karegi."
 
 Uske turant baad EXACT format mein output karo:
 |||LEAD|||{"name":"NAME","phone":"PHONE","intent":"BUY/SELL/RENT/RENT_OUT","property":"PROPERTY_TYPE","location":"LOCATION","budget":"BUDGET","timeline":"TIMELINE","details":{"bhk":"","area":"","floors":"","rooms":"","furnished":"","parking":"","lift":"","loan":"","registry":"","corner":"","age":"","garden":"","power":"","food":"","sharing":"","special":""}}|||
@@ -184,7 +195,7 @@ async function sendLeadEmail(broker, leadData, conversationMessages) {
   const { error } = await resend.emails.send({
     from: 'EstateBot <leads@estatebotai.in>',
     to: broker.email,
-    subject: `Naya Lead \u2014 ${leadData.name} | ${broker.name}`,
+    subject: `Naya Lead — ${leadData.name} | ${broker.name}`,
     html: `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="color-scheme" content="light"></head>
@@ -263,7 +274,7 @@ async function sendWelcomeEmail(broker) {
   const { error } = await resend.emails.send({
     from: 'EstateBot <welcome@estatebotai.in>',
     to: broker.email,
-    subject: `EstateBot Setup Complete \u2014 ${broker.name} ka Bot Live Hai!`,
+    subject: `EstateBot Setup Complete — ${broker.name} ka Bot Live Hai!`,
     html: `
 <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#f8fafc;padding:20px;border-radius:16px;">
   <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);padding:24px;border-radius:12px;text-align:center;margin-bottom:20px;">
@@ -281,7 +292,7 @@ async function sendWelcomeEmail(broker) {
     </div>
     <p style="color:#475569;">Is link ko apne Instagram bio, WhatsApp, ya visiting card pe lagaiye.</p>
   </div>
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:16px;">Powered by EstateBot \u2022 +91 86903 53003</p>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:16px;">Powered by EstateBot • +91 86903 53003</p>
 </div>`
   });
   if (error) console.error('Welcome email error:', error);
@@ -348,20 +359,20 @@ app.post('/api/broker-auth', async (req, res) => {
 app.get('/broker-login', (req, res) => { res.redirect('/dashboard'); });
 app.get('/dashboard', (req, res) => { res.sendFile(__dirname + '/broker-dashboard.html'); });
 
-// ===== ADMIN API =====
-app.get('/api/admin/brokers', async (req, res) => {
+// ===== ADMIN API (protected) =====
+app.get('/api/admin/brokers', adminAuth, async (req, res) => {
   const { data, error } = await supabase.from('brokers').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error });
   res.json(data);
 });
 
-app.get('/api/admin/leads', async (req, res) => {
+app.get('/api/admin/leads', adminAuth, async (req, res) => {
   const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error });
   res.json(data);
 });
 
-app.patch('/api/admin/brokers/:brokerId', async (req, res) => {
+app.patch('/api/admin/brokers/:brokerId', adminAuth, async (req, res) => {
   const { brokerId } = req.params;
   const { status, password } = req.body;
   const updateData = {};
@@ -372,7 +383,7 @@ app.patch('/api/admin/brokers/:brokerId', async (req, res) => {
   res.json({ success: true });
 });
 
-app.delete('/api/admin/delete/:brokerId', async (req, res) => {
+app.delete('/api/admin/delete/:brokerId', adminAuth, async (req, res) => {
   const { brokerId } = req.params;
   const { error } = await supabase.from('brokers').delete().eq('broker_id', brokerId);
   if (error) return res.status(500).json({ error });
@@ -436,18 +447,12 @@ function buildSystemPromptWithState(brokerName, sessionId) {
 
 // ===== RESPONSE VALIDATOR =====
 function validateReply(reply, brokerName) {
-  // Check for double questions
   const questionCount = (reply.match(/\?/g) || []).length;
   if (questionCount > 1) return false;
-
-  // Check for AI/bot disclosure
   if (/\b(AI|artificial intelligence|chatbot|bot|language model)\b/i.test(reply)) return false;
-
-  // Check for broker name used as customer name (common hallucination)
   const brokerFirstName = brokerName.split(' ')[0].toLowerCase();
   const lines = reply.toLowerCase();
   if (lines.includes(brokerFirstName + ' ji') && lines.indexOf(brokerFirstName + ' ji') < 50) return false;
-
   return true;
 }
 
@@ -491,8 +496,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
         break;
       }
       reply = data.choices[0].message.content || '';
-
-      // Validate — agar pass toh break, nahi toh retry
       if (validateReply(reply, broker.name)) break;
       console.log('Validation failed, retrying...', attempts + 1);
       attempts++;
@@ -512,7 +515,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
           leadData = JSON.parse(match[1]);
           updateLeadState(sessionId, leadData);
 
-          // Phone validate karo
           const phoneDigits = (leadData.phone || '').replace(/\D/g, '');
           if (!leadData.phone || phoneDigits.length < 10) {
             reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
@@ -521,13 +523,11 @@ app.post('/api/chat/:brokerId', async (req, res) => {
           } else {
             reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
 
-            // Check missing fields before saving
             const state = getLeadState(sessionId);
             const missing = getMissingFields(sessionId);
             const criticalMissing = missing.filter(f => !f.includes('timeline'));
 
             if (criticalMissing.length > 1) {
-              // Abhi bhi bahut saari info missing hai — lead save mat karo
               console.log('Lead incomplete, missing:', criticalMissing);
               leadComplete = false;
               leadData = null;
@@ -564,9 +564,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
         } catch (e) { console.error('Lead parse error:', e); }
       }
     } else {
-      // LEAD nahi mila — state update karne ki koshish karo conversation se
       const state = getLeadState(sessionId);
-      // Intent detect karo
       const msgLower = message.toLowerCase();
       if (!state.intent) {
         if (msgLower.includes('kharid') || msgLower.includes('lena') || msgLower.includes('buy')) state.intent = 'BUY';
@@ -618,7 +616,7 @@ function getBrokerHTML(broker, brokerId) {
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${broker.name} \u2014 EstateBot</title>
+<title>${broker.name} — EstateBot</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -675,10 +673,6 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .typing span:nth-child(2){animation-delay:0.2s;}
 .typing span:nth-child(3){animation-delay:0.4s;}
 @keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
-.quick-replies{padding:14px 16px;display:flex;gap:8px;flex-wrap:wrap;background:#F7F4ED;border-top:1px solid #EDE7D8;position:relative;z-index:1;}
-.qr-label{width:100%;font-size:10.8px;color:#8A8270;margin-bottom:6px;}
-.qr-btn{background:#fff;border:1.5px solid #D4A24C;color:#0E1B30;font-size:11.2px;font-weight:700;padding:9px 15px;border-radius:100px;cursor:pointer;font-family:'Manrope',sans-serif;display:flex;align-items:center;gap:5px;transition:all 0.2s;}
-.qr-btn:hover{background:#D4A24C;color:#fff;}
 .chat-footer{padding:14px 16px 18px;border-top:1px solid #EDE7D8;display:flex;gap:10px;align-items:center;background:#F7F4ED;position:relative;z-index:1;}
 .chat-footer input{flex:1;background:#fff;border:1.5px solid #D4A24C;border-radius:100px;padding:11px 16px;font-family:'Manrope',sans-serif;font-size:11.7px;color:#2A2A2A;outline:none;}
 .chat-footer input:focus{border-color:#0E1B30;}
@@ -803,12 +797,12 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
     </div>
     <div class="day-chip"><span>Aaj</span></div>
     <div class="chat-body" id="chatBody">
-      <div class="msg bot"><div class="bubble">Namaste ji! \ud83d\ude0a Aap property kharidna chahte hain, rent lena hai, ya apni property sell/rent pe deni hai?</div><div class="ts">Abhi</div></div>
+      <div class="msg bot"><div class="bubble">Namaste ji! 😊 Aap property kharidna chahte hain, rent lena hai, ya apni property sell/rent pe deni hai?</div><div class="ts">Abhi</div></div>
     </div>
   </div>
 
   <div class="chat-footer">
-    <input type="text" id="msgInput" placeholder="Apna message yahan likhein\u2026" onkeypress="if(event.key==='Enter')sendMsg()"/>
+    <input type="text" id="msgInput" placeholder="Apna message yahan likhein…" onkeypress="if(event.key==='Enter')sendMsg()"/>
     <button class="send-btn" onclick="sendMsg()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="#D4A24C"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
     </button>
@@ -823,7 +817,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
     <circle cx="13.2" cy="14.5" r="0.9" fill="white"/>
     <path d="M10.2 17.2L9.2 19L11.5 18.1" fill="#D4A24C"/>
   </svg>
-  EstateBot \u00b7 AI Lead Assistant
+  EstateBot · AI Lead Assistant
 </div>
 <script>
 const sessionId = Math.random().toString(36).substr(2,9);
@@ -834,7 +828,6 @@ function addMsg(text,role){const body=document.getElementById('chatBody');const 
 function showTyping(){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg bot';d.id='typing';d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';body.appendChild(d);body.scrollTop=body.scrollHeight;}
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
 function typeMsg(text,role){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg '+role;const bubble=document.createElement('div');bubble.className='bubble';bubble.innerHTML='';const ts=document.createElement('div');ts.className='ts';ts.textContent=getTime();d.appendChild(bubble);d.appendChild(ts);body.appendChild(d);body.scrollTop=body.scrollHeight;let i=0;function typeNext(){if(i<text.length){bubble.innerHTML+=text.charAt(i);i++;body.scrollTop=body.scrollHeight;setTimeout(typeNext,20);}}typeNext();}
-function quickSelect(btn,text){document.getElementById('quickReplies').style.display='none';addMsg(text,'user');showTyping();fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,sessionId})}).then(r=>r.json()).then(data=>{removeTyping();typeMsg(data.reply,'bot');if(data.leadComplete){leadDone=true;disableChat();}}).catch(e=>{removeTyping();addMsg('Dobara try karein.','bot');});}
 function disableChat(){const inp=document.getElementById('msgInput');const sendBtn=document.querySelector('.send-btn');inp.disabled=true;inp.placeholder='Shukriya! Hamari team jald contact karegi.';inp.style.background='#f0fdf4';inp.style.borderColor='#22c55e';inp.style.color='#15803d';if(sendBtn)sendBtn.style.display='none';}
 async function sendMsg(){const input=document.getElementById('msgInput');const msg=input.value.trim();if(!msg)return;if(leadDone){const c=msg.toLowerCase();if(c.includes('galat')||c.includes('wrong')||c.includes('change')||c.includes('sahi')||c.includes('galti')){leadDone=false;input.disabled=false;input.placeholder='Apna message yahan likhein...';input.style.background='';input.style.borderColor='';input.style.color='';const sb=document.querySelector('.send-btn');if(sb)sb.style.display='flex';}else return;}input.value='';addMsg(msg,'user');showTyping();try{const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});const data=await res.json();removeTyping();typeMsg(data.reply,'bot');if(data.leadComplete){leadDone=true;disableChat();}}catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}}
 </script>
@@ -842,4 +835,4 @@ async function sendMsg(){const input=document.getElementById('msgInput');const m
 }
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`\ud83c\udfe0 EstateBot running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🏠 EstateBot running on port ${PORT}`));
