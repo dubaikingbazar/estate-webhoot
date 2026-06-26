@@ -144,7 +144,43 @@ STRICTLY NEVER:
 `;
 
 // ===== SEND LEAD EMAIL =====
-async function sendLeadEmail(broker, leadData) {
+async function generateSummary(messages) {
+  try {
+    const convo = messages.map(m => `${m.role === 'user' ? 'Customer' : 'Bot'}: ${m.content}`).join('\n');
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        messages: [{
+          role: 'user',
+          content: `Ye real estate chat conversation hai. Iska ek concise summary do broker ke liye — 3-5 bullet points mein, Hinglish mein. Sirf important property details aur customer requirements batao. Format:\n• ...\n• ...\n\nConversation:\n${convo}`
+        }],
+        max_tokens: 300
+      })
+    });
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+async function sendLeadEmail(broker, leadData, conversationMessages) {
+  const summary = conversationMessages ? await generateSummary(conversationMessages) : '';
+  const summaryHtml = summary ? `
+  <tr><td height="12"></td></tr>
+  <tr><td style="background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr><td style="padding:14px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+        <p style="margin:0;font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;">Conversation Summary</p>
+      </td></tr>
+      <tr><td style="padding:16px 20px;color:#1e293b;font-size:13px;font-family:Arial,sans-serif;line-height:1.7;">
+        ${summary.replace(/\n/g, '<br>')}
+      </td></tr>
+    </table>
+  </td></tr>` : '';
+
   const { error } = await resend.emails.send({
     from: 'EstateBot <leads@estatebotai.in>',
     to: broker.email,
@@ -174,15 +210,15 @@ async function sendLeadEmail(broker, leadData) {
       <tr><td>
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr><td style="padding:14px 20px;width:44%;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Property Type</td>
-            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.type || '&mdash;'}</td></tr>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.type || leadData.property || '&mdash;'}</td></tr>
           <tr style="background:#f8fafc;"><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Area / Location</td>
-            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.area || '&mdash;'}</td></tr>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.area || leadData.location || '&mdash;'}</td></tr>
           <tr><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Budget</td>
             <td style="padding:14px 20px;font-weight:700;color:#16a34a;font-size:18px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.budget || '&mdash;'}</td></tr>
-          <tr style="background:#f8fafc;"><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Car Parking</td>
-            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.parking || 'Not specified'}</td></tr>
-          <tr><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;">Timeline</td>
-            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;">${leadData.timeline || 'Not specified'}</td></tr>
+          <tr style="background:#f8fafc;"><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Timeline</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.timeline || 'Not specified'}</td></tr>
+          <tr><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;">Intent</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;">${leadData.intent || '&mdash;'}</td></tr>
         </table>
       </td></tr>
     </table>
@@ -203,6 +239,7 @@ async function sendLeadEmail(broker, leadData) {
       </td></tr>
     </table>
   </td></tr>
+  ${summaryHtml}
   <tr><td height="16"></td></tr>
   <tr><td align="center">
     <a href="tel:${leadData.phone}" style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#ffffff;padding:16px 48px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;font-family:Arial,sans-serif;">&#128222; Call Now &mdash; ${leadData.phone}</a>
@@ -509,7 +546,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
                 budget: leadData.budget || state.budget,
                 intent: leadData.intent || state.intent,
                 timeline: leadData.timeline || state.timeline
-              });
+              }, conversations[sessionId]);
               leadComplete = true;
               delete leadStates[sessionId];
             }
