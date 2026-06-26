@@ -225,6 +225,27 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
       Settings
     </button>
+    <div style="height:1px;background:rgba(255,255,255,0.06);margin:6px 4px;"></div>
+    <button class="nav-item" onclick="showPage('properties')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Properties
+    </button>
+    <button class="nav-item" onclick="showPage('visits')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Site Visits
+    </button>
+    <button class="nav-item" onclick="showPage('revenue')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Revenue
+    </button>
+    <button class="nav-item" onclick="showPage('documents')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Documents
+    </button>
+    <button class="nav-item" onclick="showPage('calculator')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+      Calculator
+    </button>
   </nav>
   <div class="sidebar-bot">
     <div class="bot-link-card">
@@ -326,6 +347,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
     <!-- LEADS PAGE -->
     <div class="page" id="page-leads">
+      <div style="display:flex;gap:0;margin-bottom:16px;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content;">
+        <button onclick="switchLeadsTab('active')" id="tab-active" style="padding:9px 20px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;background:var(--navy);color:#fff;">All Leads</button>
+        <button onclick="switchLeadsTab('archived')" id="tab-archived" style="padding:9px 20px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;background:#fff;color:var(--muted);">🗄 Archived</button>
+      </div>
       <div class="section-header">
         <div class="section-title">All Leads</div>
         <div class="filters">
@@ -406,7 +431,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
     <!-- SETTINGS PAGE -->
     <div class="page" id="page-settings">
-      <div style="font-size:17px;font-weight:700;margin-bottom:16px;">Settings</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
         <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Your Bot Link</div>
@@ -438,6 +462,199 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
     </div>
 
+    <!-- PROPERTIES PAGE -->
+    <div class="page" id="page-properties">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-size:17px;font-weight:700;">Property Inventory</div>
+        <button onclick="openAddProperty()" style="background:var(--navy);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Add Property</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;" id="propStats"></div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:10px 14px;background:#F8FAFC;border-bottom:1px solid var(--border);display:flex;gap:8px;">
+          <select onchange="renderProperties()" id="propFilter" style="border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+            <option value="all">All</option><option value="available">Available</option><option value="sold">Sold</option><option value="rented">Rented</option>
+          </select>
+          <select onchange="renderProperties()" id="propTypeFilter" style="border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+            <option value="all">All Types</option><option value="flat">Flat</option><option value="house">House/Makan</option><option value="plot">Plot</option><option value="shop">Shop/Office</option>
+          </select>
+        </div>
+        <div id="propList"><div class="table-loading">Koi property nahi hai — Add karo!</div></div>
+      </div>
+    </div>
+
+    <!-- SITE VISITS PAGE -->
+    <div class="page" id="page-visits">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-size:17px;font-weight:700;">Site Visit Tracker</div>
+        <button onclick="openAddVisit()" style="background:var(--navy);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Schedule Visit</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;" id="visitStats"></div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:10px 14px;background:#F8FAFC;border-bottom:1px solid var(--border);">
+          <select onchange="renderVisits()" id="visitFilter" style="border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+            <option value="all">All Visits</option><option value="scheduled">Scheduled</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div id="visitList"><div class="table-loading">Koi visit nahi hai — Schedule karo!</div></div>
+      </div>
+    </div>
+
+    <!-- REVENUE PAGE -->
+    <div class="page" id="page-revenue">
+      <div style="font-size:17px;font-weight:700;margin-bottom:16px;">Revenue Tracker</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;" id="revenueStats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">💰 Add Deal</div>
+          <input class="modal-input" style="margin-bottom:9px;" id="dealClient" placeholder="Client Name">
+          <input class="modal-input" style="margin-bottom:9px;" id="dealProperty" placeholder="Property (e.g. 3 BHK Mansarovar)">
+          <input class="modal-input" style="margin-bottom:9px;" id="dealAmount" placeholder="Deal Amount (e.g. 80 Lakh)">
+          <input class="modal-input" style="margin-bottom:9px;" id="dealCommission" placeholder="Commission % (e.g. 2)">
+          <input class="modal-input" type="date" style="margin-bottom:9px;" id="dealDate">
+          <button onclick="addDeal()" style="width:100%;background:var(--green);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Save Deal</button>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">📊 Monthly Target</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Target set karo</div>
+          <input class="modal-input" id="monthlyTarget" placeholder="Monthly target (e.g. 50000)" type="number">
+          <button onclick="saveTarget()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:12px;">Set Target</button>
+          <div id="targetProgress"></div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;margin-top:14px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Recent Deals</div>
+        <div id="dealsList"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">Koi deal nahi hai — Add karo upar!</div></div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTS PAGE -->
+    <div class="page" id="page-documents">
+      <div style="font-size:17px;font-weight:700;margin-bottom:16px;">Document Checklists</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">🏠 Buyer Documents</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Property kharidne wale ke liye</div>
+          <div id="buyerDocs"></div>
+          <button onclick="copyChecklist('buyer')" style="width:100%;background:var(--navy);color:#fff;border:none;padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:12px;">📋 Copy for WhatsApp</button>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">📝 Seller Documents</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Property bechne wale ke liye</div>
+          <div id="sellerDocs"></div>
+          <button onclick="copyChecklist('seller')" style="width:100%;background:var(--navy);color:#fff;border:none;padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:12px;">📋 Copy for WhatsApp</button>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">🔑 Rental Documents</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Rent agreement ke liye</div>
+          <div id="rentalDocs"></div>
+          <button onclick="copyChecklist('rental')" style="width:100%;background:var(--navy);color:#fff;border:none;padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:12px;">📋 Copy for WhatsApp</button>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">🏗️ Plot/Land Documents</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Plot kharidne/bechne ke liye</div>
+          <div id="plotDocs"></div>
+          <button onclick="copyChecklist('plot')" style="width:100%;background:var(--navy);color:#fff;border:none;padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:12px;">📋 Copy for WhatsApp</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALCULATOR PAGE -->
+    <div class="page" id="page-calculator">
+      <div style="font-size:17px;font-weight:700;margin-bottom:16px;">Calculators</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <!-- EMI Calculator -->
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px;">🏦 EMI Calculator</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Home loan ki monthly EMI calculate karo</div>
+          <div style="margin-bottom:10px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:5px;">Loan Amount (₹)</div>
+            <input id="emiLoan" type="number" placeholder="e.g. 5000000 (50 Lakh)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;" oninput="calcEMI()">
+          </div>
+          <div style="margin-bottom:10px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:5px;">Interest Rate (% per year)</div>
+            <input id="emiRate" type="number" placeholder="e.g. 8.5" step="0.1" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;" oninput="calcEMI()">
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:5px;">Tenure (Years)</div>
+            <input id="emiTenure" type="number" placeholder="e.g. 20" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;" oninput="calcEMI()">
+          </div>
+          <div id="emiResult" style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:14px;display:none;">
+            <div style="font-size:11px;color:#065F46;font-weight:600;margin-bottom:4px;">Monthly EMI</div>
+            <div id="emiAmount" style="font-size:28px;font-weight:800;color:#10B981;"></div>
+            <div id="emiBreakdown" style="font-size:11px;color:#065F46;margin-top:6px;line-height:1.6;"></div>
+          </div>
+        </div>
+
+        <!-- Commission Calculator -->
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px;">💰 Commission Calculator</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Deal pe kitna commission milega</div>
+          <div style="margin-bottom:10px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:5px;">Property Value (₹)</div>
+            <input id="commValue" type="number" placeholder="e.g. 8000000 (80 Lakh)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;" oninput="calcCommission()">
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:5px;">Commission % </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;">
+              <button onclick="setCommRate(1)" style="padding:7px;border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;">1%</button>
+              <button onclick="setCommRate(1.5)" style="padding:7px;border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;">1.5%</button>
+              <button onclick="setCommRate(2)" style="padding:7px;border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;">2%</button>
+              <button onclick="setCommRate(2.5)" style="padding:7px;border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;">2.5%</button>
+            </div>
+            <input id="commRate" type="number" placeholder="Ya custom % enter karo" step="0.1" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;" oninput="calcCommission()">
+          </div>
+          <div id="commResult" style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:10px;padding:14px;display:none;">
+            <div style="font-size:11px;color:#92400E;font-weight:600;margin-bottom:4px;">Aapka Commission</div>
+            <div id="commAmount" style="font-size:28px;font-weight:800;color:#D97706;"></div>
+            <div id="commBreakdown" style="font-size:11px;color:#92400E;margin-top:6px;line-height:1.6;"></div>
+          </div>
+        </div>
+
+        <!-- Stamp Duty Calculator -->
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px;">📜 Stamp Duty & Registration</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Property registration charges estimate</div>
+          <div style="margin-bottom:10px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:5px;">Property Value (₹)</div>
+            <input id="stampValue" type="number" placeholder="e.g. 8000000" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;" oninput="calcStamp()">
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:5px;">State</div>
+            <select id="stampState" onchange="calcStamp()" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;">
+              <option value="RJ">Rajasthan (6%)</option>
+              <option value="MH">Maharashtra (5%)</option>
+              <option value="DL">Delhi (4-6%)</option>
+              <option value="UP">UP (7%)</option>
+              <option value="HR">Haryana (5-7%)</option>
+              <option value="KA">Karnataka (5%)</option>
+              <option value="PB">Punjab (6%)</option>
+              <option value="GJ">Gujarat (4.9%)</option>
+            </select>
+          </div>
+          <div id="stampResult" style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:10px;padding:14px;display:none;">
+            <div id="stampBreakdown" style="font-size:12px;color:#5B21B6;line-height:1.8;"></div>
+          </div>
+        </div>
+
+        <!-- Rent Yield Calculator -->
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px;">📈 Rental Yield Calculator</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Property kitna return degi rent se</div>
+          <div style="margin-bottom:10px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:5px;">Property Value (₹)</div>
+            <input id="rentPropVal" type="number" placeholder="e.g. 8000000" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;" oninput="calcRentYield()">
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:5px;">Monthly Rent (₹)</div>
+            <input id="rentMonthly" type="number" placeholder="e.g. 25000" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;" oninput="calcRentYield()">
+          </div>
+          <div id="rentYieldResult" style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px;display:none;">
+            <div id="rentYieldBreakdown" style="font-size:12px;color:#1E40AF;line-height:1.8;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -450,6 +667,50 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </button>
   </div>
   <div class="detail-body" id="detailBody"></div>
+</div>
+
+<!-- PROPERTY MODAL -->
+<div class="modal-overlay" id="propModal">
+  <div class="modal-box">
+    <div class="modal-title">Add Property</div>
+    <div class="modal-sub">Apni property inventory mein add karo</div>
+    <input class="modal-input" id="propTitle" placeholder="Property Title (e.g. 3 BHK Flat Mansarovar)">
+    <select class="modal-input" id="propType">
+      <option value="flat">Flat / Apartment</option>
+      <option value="house">House / Makan</option>
+      <option value="plot">Plot / Land</option>
+      <option value="shop">Shop / Office</option>
+    </select>
+    <input class="modal-input" id="propLocation" placeholder="Location / Area">
+    <input class="modal-input" id="propPrice" placeholder="Price (e.g. 80 Lakh, 1.2 Crore)">
+    <input class="modal-input" id="propDetails" placeholder="Details (e.g. 3 BHK, 1200 sqft, 3rd floor)">
+    <select class="modal-input" id="propStatus">
+      <option value="available">Available</option>
+      <option value="sold">Sold</option>
+      <option value="rented">Rented</option>
+    </select>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="document.getElementById('propModal').classList.remove('show')">Cancel</button>
+      <button class="modal-ok" onclick="saveProperty()">Add Property</button>
+    </div>
+  </div>
+</div>
+
+<!-- VISIT MODAL -->
+<div class="modal-overlay" id="visitModal">
+  <div class="modal-box">
+    <div class="modal-title">Schedule Site Visit</div>
+    <div class="modal-sub">Customer ke saath property visit schedule karo</div>
+    <select class="modal-input" id="visitLeadSelect"><option value="">-- Lead Select Karo --</option></select>
+    <input class="modal-input" id="visitProperty" placeholder="Property (e.g. 3 BHK Mansarovar)">
+    <input class="modal-input" type="date" id="visitDate">
+    <input class="modal-input" type="time" id="visitTime">
+    <input class="modal-input" id="visitNotes" placeholder="Notes (optional)">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="document.getElementById('visitModal').classList.remove('show')">Cancel</button>
+      <button class="modal-ok" onclick="saveVisit()">Schedule Visit</button>
+    </div>
+  </div>
 </div>
 
 <!-- BULK ACTION BAR -->
@@ -1072,6 +1333,71 @@ function getScoreExplain(lead){
   return reasons;
 }
 
+// ===== LEADS TAB =====
+let currentLeadsTab = 'active';
+
+function switchLeadsTab(tab) {
+  currentLeadsTab = tab;
+  document.getElementById('tab-active').style.background = tab==='active' ? 'var(--navy)' : '#fff';
+  document.getElementById('tab-active').style.color = tab==='active' ? '#fff' : 'var(--muted)';
+  document.getElementById('tab-archived').style.background = tab==='archived' ? 'var(--navy)' : '#fff';
+  document.getElementById('tab-archived').style.color = tab==='archived' ? '#fff' : 'var(--muted)';
+  if(tab==='active') renderLeadsPage();
+  else renderArchivedLeads();
+}
+
+function renderArchivedLeads() {
+  const brokerId = currentBroker?.broker_id;
+  // Get archived leads from leadStore
+  const archived = Object.values(leadStore).filter(l => archivedLeads.includes(l.id));
+  const body = document.getElementById('leadsBody2');
+  const wrap = document.getElementById('paginationWrap2');
+  if(!archived.length) {
+    body.innerHTML = '<div class="empty-state"><h3>Koi archived lead nahi hai</h3><p>Lead detail mein jaake "Archive" button dabao</p></div>';
+    wrap.style.display = 'none';
+    return;
+  }
+  body.innerHTML = archived.map(lead => {
+    const score = lead.score || getScore(lead);
+    const scoreType = lead.scoreType || getScoreType(score);
+    const scoreColor = getScoreColor(scoreType);
+    const av = getInitials(lead.name), avColor = getAvColor(lead.name);
+    const intentShort = (lead.intent||'').replace(' Chahte Hain','').replace(' Chahte Hai','');
+    return `<div class="lead-row" style="opacity:0.6;">
+      <div class="lead-col-badge"><span class="badge ${scoreType}">${scoreType.toUpperCase()}</span></div>
+      <div class="lead-av" style="background:${avColor};">${av}</div>
+      <div class="lead-main-info">
+        <div class="lead-name">${lead.name||'—'} <span style="font-size:9px;background:#F3F4F6;color:var(--muted);padding:2px 6px;border-radius:4px;font-weight:600;">ARCHIVED</span></div>
+        <div class="lead-sub">${lead.phone||'—'}</div>
+        <div class="lead-sub">${intentShort} · ${lead.property_type||'—'}</div>
+        <div class="lead-sub">${lead.area||'—'}</div>
+      </div>
+      <div class="lead-right">
+        <div class="lead-budget-val">${lead.budget||'—'}</div>
+        <div class="lead-score-val" style="color:${scoreColor};">${score}%</div>
+        <div class="lead-time-val">${timeAgo(lead.created_at)}</div>
+      </div>
+      <button onclick="unarchiveLead('${lead.id}')" style="background:rgba(16,185,129,0.1);color:#10B981;border:1px solid rgba(16,185,129,0.2);padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0;">Restore</button>
+    </div>`;
+  }).join('');
+  wrap.style.display = 'none';
+}
+
+function unarchiveLead(leadId) {
+  archivedLeads = archivedLeads.filter(id => id !== leadId);
+  localStorage.setItem('eb_archived', JSON.stringify(archivedLeads));
+  // Restore lead to allLeads
+  const lead = leadStore[leadId];
+  if(lead && !allLeads.find(l=>l.id===leadId)) {
+    allLeads.unshift(lead);
+    filteredLeads = [...allLeads];
+    filteredLeads2 = [...allLeads];
+    updateStats();
+  }
+  showToast('Lead restore ho gaya!');
+  renderArchivedLeads();
+}
+
 // ===== LEAD TAGS =====
 let leadTags = JSON.parse(localStorage.getItem('eb_tags')||'{}');
 const TAG_OPTIONS = ['🔥 VIP','⚡ Urgent','🏡 Site Visit Done','📞 Callback','💰 High Budget','🤝 Negotiating','❌ Not Reachable'];
@@ -1305,6 +1631,187 @@ function checkAutoFollowUp(){
 document.getElementById('fuModal').onclick=e=>{if(e.target===document.getElementById('fuModal'))closeFuModal();};
 document.getElementById('reportModal').onclick=e=>{if(e.target===document.getElementById('reportModal'))e.target.classList.remove('show');};
 document.getElementById('summaryModal').onclick=e=>{if(e.target===document.getElementById('summaryModal'))e.target.classList.remove('show');};
+document.getElementById('propModal').onclick=e=>{if(e.target===document.getElementById('propModal'))e.target.classList.remove('show');};
+document.getElementById('visitModal').onclick=e=>{if(e.target===document.getElementById('visitModal'))e.target.classList.remove('show');};
+
+// ===== PROPERTIES =====
+let properties=JSON.parse(localStorage.getItem('eb_properties')||'[]');
+function openAddProperty(){document.getElementById('propModal').classList.add('show');}
+function saveProperty(){
+  const title=document.getElementById('propTitle').value.trim(),type=document.getElementById('propType').value,location=document.getElementById('propLocation').value.trim(),price=document.getElementById('propPrice').value.trim(),status=document.getElementById('propStatus').value,details=document.getElementById('propDetails').value.trim();
+  if(!title||!location||!price){showToast('Title, location aur price zaroori hai','error');return;}
+  properties.push({id:Date.now().toString(),title,type,location,price,status,details,addedOn:new Date().toISOString()});
+  localStorage.setItem('eb_properties',JSON.stringify(properties));
+  document.getElementById('propModal').classList.remove('show');
+  ['propTitle','propLocation','propPrice','propDetails'].forEach(id=>document.getElementById(id).value='');
+  renderProperties();showToast('Property add ho gayi!');
+}
+function renderProperties(){
+  const filter=document.getElementById('propFilter')?.value||'all',typeFilter=document.getElementById('propTypeFilter')?.value||'all';
+  const filtered=properties.filter(p=>(filter==='all'||p.status===filter)&&(typeFilter==='all'||p.type===typeFilter));
+  document.getElementById('propStats').innerHTML=`
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--navy);">${properties.length}</div><div style="font-size:11px;color:var(--muted);">Total</div></div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#10B981;">${properties.filter(p=>p.status==='available').length}</div><div style="font-size:11px;color:var(--muted);">Available</div></div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#5B3DF5;">${properties.filter(p=>p.status==='sold').length}</div><div style="font-size:11px;color:var(--muted);">Sold</div></div>`;
+  if(!filtered.length){document.getElementById('propList').innerHTML='<div class="table-loading">Koi property nahi mili — Add karo!</div>';return;}
+  const sc={available:'#10B981',sold:'#EF4444',rented:'#F59E0B'},sb={available:'#D1FAE5',sold:'#FEE2E2',rented:'#FEF3C7'};
+  document.getElementById('propList').innerHTML=filtered.map(p=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);">
+      <div style="width:36px;height:36px;border-radius:9px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${p.type==='flat'?'🏢':p.type==='house'?'🏠':p.type==='plot'?'🌍':'🏪'}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;">${p.title}</div>
+        <div style="font-size:11px;color:var(--muted);">📍 ${p.location} · ${p.type}${p.details?' · '+p.details:''}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:13px;font-weight:700;">₹${p.price}</div>
+        <span style="background:${sb[p.status]};color:${sc[p.status]};padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;">${p.status.toUpperCase()}</span>
+      </div>
+      <select onchange="updatePropStatus('${p.id}',this.value)" style="border:1px solid var(--border);border-radius:7px;padding:5px 7px;font-size:11px;font-family:'Inter',sans-serif;outline:none;">
+        <option value="available" ${p.status==='available'?'selected':''}>Available</option>
+        <option value="sold" ${p.status==='sold'?'selected':''}>Sold</option>
+        <option value="rented" ${p.status==='rented'?'selected':''}>Rented</option>
+      </select>
+      <button onclick="if(confirm('Delete?')){properties=properties.filter(x=>x.id!=='${p.id}');localStorage.setItem('eb_properties',JSON.stringify(properties));renderProperties();showToast('Deleted!')}" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:14px;">🗑</button>
+    </div>`).join('');
+}
+function updatePropStatus(id,status){properties=properties.map(p=>p.id===id?{...p,status}:p);localStorage.setItem('eb_properties',JSON.stringify(properties));renderProperties();showToast('Updated!');}
+
+// ===== SITE VISITS =====
+let siteVisits=JSON.parse(localStorage.getItem('eb_visits')||'[]');
+function openAddVisit(){
+  document.getElementById('visitModal').classList.add('show');
+  document.getElementById('visitLeadSelect').innerHTML='<option value="">-- Lead Select Karo --</option>'+allLeads.map(l=>`<option value="${l.id}|${l.name}|${l.phone||''}">${l.name} — ${l.phone||''}</option>`).join('');
+}
+function saveVisit(){
+  const lv=document.getElementById('visitLeadSelect').value,property=document.getElementById('visitProperty').value.trim(),date=document.getElementById('visitDate').value,time=document.getElementById('visitTime').value,notes=document.getElementById('visitNotes').value.trim();
+  if(!lv||!property||!date){showToast('Lead, property aur date zaroori hai','error');return;}
+  const[leadId,leadName,leadPhone]=lv.split('|');
+  siteVisits.push({id:Date.now().toString(),leadId,leadName,leadPhone,property,date,time,notes,status:'scheduled',feedback:''});
+  localStorage.setItem('eb_visits',JSON.stringify(siteVisits));
+  document.getElementById('visitModal').classList.remove('show');
+  renderVisits();showToast('Site visit schedule ho gayi!');
+}
+function renderVisits(){
+  const filter=document.getElementById('visitFilter')?.value||'all';
+  const filtered=filter==='all'?siteVisits:siteVisits.filter(v=>v.status===filter);
+  const today=new Date().toDateString();
+  document.getElementById('visitStats').innerHTML=`
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--navy);">${siteVisits.length}</div><div style="font-size:11px;color:var(--muted);">Total</div></div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--gold);">${siteVisits.filter(v=>new Date(v.date+'T00:00:00').toDateString()===today).length}</div><div style="font-size:11px;color:var(--muted);">Aaj</div></div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#5B3DF5;">${siteVisits.filter(v=>v.status==='scheduled').length}</div><div style="font-size:11px;color:var(--muted);">Scheduled</div></div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#10B981;">${siteVisits.filter(v=>v.status==='completed').length}</div><div style="font-size:11px;color:var(--muted);">Completed</div></div>`;
+  if(!filtered.length){document.getElementById('visitList').innerHTML='<div class="table-loading">Koi visit nahi hai</div>';return;}
+  const sc={scheduled:'#5B3DF5',completed:'#10B981',cancelled:'#EF4444'},sb={scheduled:'#EDE9FE',completed:'#D1FAE5',cancelled:'#FEE2E2'};
+  document.getElementById('visitList').innerHTML=filtered.sort((a,b)=>a.date.localeCompare(b.date)).map(v=>`
+    <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">${v.leadName} <span style="background:${sb[v.status]};color:${sc[v.status]};padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;">${v.status.toUpperCase()}</span></div>
+          <div style="font-size:11px;color:var(--muted);">📞 ${v.leadPhone} · 🏠 ${v.property}</div>
+          <div style="font-size:11px;color:var(--muted);">📅 ${new Date(v.date+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'})} ${v.time?'⏰ '+v.time:''}</div>
+          ${v.feedback?`<div style="font-size:11px;color:#10B981;">💬 ${v.feedback}</div>`:''}
+        </div>
+        <button onclick="if(confirm('Delete?')){siteVisits=siteVisits.filter(x=>x.id!=='${v.id}');localStorage.setItem('eb_visits',JSON.stringify(siteVisits));renderVisits();}" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:13px;">🗑</button>
+      </div>
+      ${v.status==='scheduled'?`<div style="display:flex;gap:6px;">
+        <button onclick="siteVisits=siteVisits.map(x=>x.id==='${v.id}'?{...x,status:'completed'}:x);localStorage.setItem('eb_visits',JSON.stringify(siteVisits));renderVisits();showToast('✅ Completed!')" style="background:#D1FAE5;color:#065F46;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✓ Done</button>
+        <button onclick="const fb=prompt('Feedback:');if(fb){siteVisits=siteVisits.map(x=>x.id==='${v.id}'?{...x,feedback:fb}:x);localStorage.setItem('eb_visits',JSON.stringify(siteVisits));renderVisits();}" style="background:#EDE9FE;color:#5B3DF5;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">💬 Feedback</button>
+        <button onclick="siteVisits=siteVisits.map(x=>x.id==='${v.id}'?{...x,status:'cancelled'}:x);localStorage.setItem('eb_visits',JSON.stringify(siteVisits));renderVisits();" style="background:#FEE2E2;color:#DC2626;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✕ Cancel</button>
+      </div>`:''}
+    </div>`).join('');
+}
+
+// ===== REVENUE =====
+let deals=JSON.parse(localStorage.getItem('eb_deals')||'[]');
+function addDeal(){
+  const client=document.getElementById('dealClient').value.trim(),property=document.getElementById('dealProperty').value.trim(),amount=document.getElementById('dealAmount').value.trim(),commPct=parseFloat(document.getElementById('dealCommission').value)||2,date=document.getElementById('dealDate').value||new Date().toISOString().split('T')[0];
+  if(!client||!property||!amount){showToast('Client, property aur amount zaroori hai','error');return;}
+  const n=parseFloat(amount.replace(/[^0-9.]/g,''))||0;
+  const amtRs=amount.toLowerCase().includes('lakh')||amount.toLowerCase().includes('lac')?n*100000:amount.toLowerCase().includes('cr')?n*10000000:n;
+  const comm=Math.round(amtRs*(commPct/100));
+  deals.push({id:Date.now().toString(),client,property,amount,amtRs,commPct,commission:comm,date});
+  localStorage.setItem('eb_deals',JSON.stringify(deals));
+  ['dealClient','dealProperty','dealAmount','dealCommission'].forEach(id=>document.getElementById(id).value='');
+  renderRevenue();showToast('Deal save ho gayi! 💰');
+}
+function saveTarget(){const t=document.getElementById('monthlyTarget').value;if(!t)return;localStorage.setItem('eb_target',t);renderRevenue();showToast('Target set!');}
+function renderRevenue(){
+  const now=new Date(),ms=new Date(now.getFullYear(),now.getMonth(),1);
+  const md=deals.filter(d=>new Date(d.date)>=ms);
+  const tc=deals.reduce((s,d)=>s+(d.commission||0),0),mc=md.reduce((s,d)=>s+(d.commission||0),0),target=parseInt(localStorage.getItem('eb_target'))||0;
+  document.getElementById('revenueStats').innerHTML=`
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--navy);">${deals.length}</div><div style="font-size:11px;color:var(--muted);">Total Deals</div></div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#10B981;">₹${(tc/100000).toFixed(1)}L</div><div style="font-size:11px;color:var(--muted);">Total Earnings</div></div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--gold);">₹${(mc/100000).toFixed(1)}L</div><div style="font-size:11px;color:var(--muted);">This Month</div></div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#5B3DF5;">${md.length}</div><div style="font-size:11px;color:var(--muted);">Deals This Month</div></div>`;
+  if(target>0){const pct=Math.min((mc/target)*100,100);document.getElementById('targetProgress').innerHTML=`<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${mc.toLocaleString('en-IN')} / ₹${target.toLocaleString('en-IN')}</div><div style="height:8px;background:var(--border);border-radius:100px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${pct>=100?'#10B981':'#5B3DF5'};border-radius:100px;"></div></div><div style="font-size:12px;font-weight:700;color:${pct>=100?'#10B981':'#5B3DF5'};margin-top:6px;">${pct.toFixed(0)}% of target</div>`;}
+  document.getElementById('dealsList').innerHTML=deals.length?deals.slice().reverse().map(d=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);"><div style="flex:1;"><div style="font-size:13px;font-weight:600;">${d.client}</div><div style="font-size:11px;color:var(--muted);">${d.property} · ${new Date(d.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div></div><div style="text-align:right;"><div style="font-size:13px;font-weight:700;color:#10B981;">+₹${d.commission.toLocaleString('en-IN')}</div><div style="font-size:10px;color:var(--muted);">${d.commPct}% of ${d.amount}</div></div><button onclick="deals=deals.filter(x=>x.id!=='${d.id}');localStorage.setItem('eb_deals',JSON.stringify(deals));renderRevenue();" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:13px;">🗑</button></div>`).join(''):'<div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">Koi deal nahi — Add karo!</div>';
+}
+
+// ===== DOCUMENTS =====
+const DOCS={
+  buyer:['✅ Aadhaar Card (buyer)','✅ PAN Card','✅ Passport size photos (4)','✅ Bank statements (6 months)','✅ Salary slips / ITR (last 2 years)','✅ Sale deed / Agreement','✅ NOC from society','✅ Loan sanction letter (if applicable)','✅ Cheque for registration fees'],
+  seller:['✅ Original title deed / Registry','✅ Aadhaar Card (seller)','✅ PAN Card','✅ Encumbrance certificate','✅ Property tax receipts (last 3 years)','✅ NOC from society / builder','✅ Approved building plan','✅ Possession letter','✅ Bank NOC (if loan on property)','✅ Capital gains tax document'],
+  rental:['✅ Aadhaar Card (tenant)','✅ PAN Card (tenant)','✅ 2 Passport photos','✅ Employment / salary proof','✅ Rent agreement (stamp paper)','✅ Police verification form','✅ Security deposit cheque','✅ Aadhaar of owner','✅ Property ownership proof'],
+  plot:['✅ Sale deed / Registry','✅ Khasra / Khatauni copy','✅ Map / Layout plan','✅ NOC from municipality','✅ Mutation certificate','✅ Land use certificate','✅ Encumbrance certificate','✅ Aadhaar + PAN (both parties)','✅ Jamabandi (last 15 years)']
+};
+function renderDocuments(){
+  ['buyer','seller','rental','plot'].forEach(t=>{document.getElementById(t+'Docs').innerHTML=DOCS[t].map(d=>`<div style="font-size:12px;padding:6px 0;border-bottom:1px solid #F1F5F9;">${d}</div>`).join('');});
+}
+function copyChecklist(type){navigator.clipboard.writeText(DOCS[type].join('\n'));showToast('Checklist copy ho gaya! 📋');}
+
+// ===== CALCULATORS =====
+function calcEMI(){
+  const loan=parseFloat(document.getElementById('emiLoan').value)||0,rate=parseFloat(document.getElementById('emiRate').value)||0,years=parseFloat(document.getElementById('emiTenure').value)||0;
+  if(!loan||!rate||!years)return;
+  const r=rate/(12*100),n=years*12,emi=Math.round(loan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)),totalPay=emi*n,totalInt=totalPay-loan;
+  document.getElementById('emiResult').style.display='block';
+  document.getElementById('emiAmount').textContent='₹'+emi.toLocaleString('en-IN')+'/month';
+  document.getElementById('emiBreakdown').innerHTML=`Loan: ₹${loan.toLocaleString('en-IN')}<br>Total Payment: ₹${totalPay.toLocaleString('en-IN')}<br>Total Interest: ₹${totalInt.toLocaleString('en-IN')}`;
+}
+function setCommRate(rate){document.getElementById('commRate').value=rate;calcCommission();}
+function calcCommission(){
+  const val=parseFloat(document.getElementById('commValue').value)||0,rate=parseFloat(document.getElementById('commRate').value)||0;
+  if(!val||!rate)return;
+  const comm=Math.round(val*(rate/100)),gst=Math.round(comm*0.18);
+  document.getElementById('commResult').style.display='block';
+  document.getElementById('commAmount').textContent='₹'+comm.toLocaleString('en-IN');
+  document.getElementById('commBreakdown').innerHTML=`Property: ₹${val.toLocaleString('en-IN')}<br>Commission @${rate}%: ₹${comm.toLocaleString('en-IN')}<br>GST @18%: ₹${gst.toLocaleString('en-IN')}<br>Net: ₹${(comm-gst).toLocaleString('en-IN')}`;
+}
+function calcStamp(){
+  const val=parseFloat(document.getElementById('stampValue').value)||0,state=document.getElementById('stampState').value;
+  if(!val)return;
+  const rates={RJ:6,MH:5,DL:5,UP:7,HR:6,KA:5,PB:6,GJ:4.9},r=rates[state]||5;
+  const stamp=Math.round(val*(r/100)),reg=Math.round(val*0.01);
+  document.getElementById('stampResult').style.display='block';
+  document.getElementById('stampBreakdown').innerHTML=`Property: ₹${val.toLocaleString('en-IN')}<br>Stamp Duty @${r}%: ₹${stamp.toLocaleString('en-IN')}<br>Registration @1%: ₹${reg.toLocaleString('en-IN')}<br><b>Total: ₹${(stamp+reg).toLocaleString('en-IN')}</b>`;
+}
+function calcRentYield(){
+  const pv=parseFloat(document.getElementById('rentPropVal').value)||0,rm=parseFloat(document.getElementById('rentMonthly').value)||0;
+  if(!pv||!rm)return;
+  const annual=rm*12,yld=((annual/pv)*100).toFixed(2),payback=Math.round(pv/annual);
+  document.getElementById('rentYieldResult').style.display='block';
+  document.getElementById('rentYieldBreakdown').innerHTML=`Annual Rent: ₹${annual.toLocaleString('en-IN')}<br>Rental Yield: <b>${yld}%/year</b><br>Payback: ~${payback} years<br>${parseFloat(yld)>=3?'✅ Achha return!':'⚠️ Return kam hai'}`;
+}
+
+// ===== OVERRIDE SHOWPAGE for new pages =====
+showPage = function(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('page-'+page);
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'"))n.classList.add('active');});
+  const titles={dashboard:'Dashboard',leads:'All Leads',analytics:'Analytics',followups:'Follow Ups',settings:'Settings',properties:'Property Inventory',visits:'Site Visits',revenue:'Revenue',documents:'Documents',calculator:'Calculators'};
+  document.getElementById('pageTitle').textContent=titles[page]||page;
+  if(page==='leads')renderLeadsPage();
+  if(page==='analytics')renderAnalytics();
+  if(page==='followups')renderFollowUps();
+  if(page==='settings')renderSettings();
+  if(page==='properties')renderProperties();
+  if(page==='visits')renderVisits();
+  if(page==='revenue')renderRevenue();
+  if(page==='documents')renderDocuments();
+};
 
 // Auto-login
 const savedId=sessionStorage.getItem('broker_id');
