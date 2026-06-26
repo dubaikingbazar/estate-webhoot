@@ -3,531 +3,718 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Broker Dashboard — EstateBot</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>EstateBot — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'Poppins', sans-serif;
-  background: #f0f4f8;
-  min-height: 100vh;
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#0E1B30;
+  --gold:#C8952A;
+  --gold-light:#F0B84B;
+  --bg:#F4F6FA;
+  --white:#FFFFFF;
+  --text:#1A2332;
+  --muted:#6B7A90;
+  --border:#E2E8F0;
+  --hot:#EF4444;
+  --warm:#F59E0B;
+  --cold:#3B82F6;
+  --green:#10B981;
+  --sidebar-w:240px;
 }
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
 
-/* HEADER */
-.header {
-  background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.header-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.header-logo span {
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-.header-logo small {
-  display: block;
-  color: #c8a96e;
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-.logout-btn {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fff;
-  padding: 7px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--navy);height:100vh;position:fixed;left:0;top:0;display:flex;flex-direction:column;z-index:100;}
+.sidebar-logo{padding:22px 18px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.logo-row{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),#a07830);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.logo-text{color:#fff;font-size:14px;font-weight:700;}
+.logo-sub{color:rgba(255,255,255,0.4);font-size:10px;margin-top:1px;}
+.nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:7px;color:rgba(255,255,255,0.5);font-size:12.5px;font-weight:500;cursor:pointer;transition:all 0.15s;text-decoration:none;}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;}
+.nav-item.active{background:rgba(200,149,42,0.15);color:var(--gold-light);}
+.nav-badge{margin-left:auto;background:var(--gold);color:#000;font-size:10px;font-weight:700;padding:2px 6px;border-radius:100px;min-width:20px;text-align:center;}
+.sidebar-bot{padding:14px 10px;border-top:1px solid rgba(255,255,255,0.08);}
+.bot-link-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;}
+.bot-link-label{color:rgba(255,255,255,0.4);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+.bot-link-url{color:var(--gold-light);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:4px;word-break:break-all;}
+.copy-btn{background:rgba(200,149,42,0.2);border:none;color:var(--gold-light);padding:3px 7px;border-radius:4px;font-size:10px;cursor:pointer;flex-shrink:0;font-family:'Inter',sans-serif;}
+.preview-btn{width:100%;margin-top:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:7px;border-radius:7px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
+.plan-info{margin-top:8px;font-size:10px;color:rgba(255,255,255,0.35);}
+.plan-bar{height:3px;background:rgba(255,255,255,0.1);border-radius:100px;margin:5px 0;}
+.plan-bar-fill{height:100%;background:var(--gold);border-radius:100px;transition:width 0.5s;}
+.logout-btn{width:100%;margin-top:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:rgba(239,68,68,0.7);padding:7px;border-radius:7px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;}
 
-/* BROKER INFO CARD */
-.broker-card {
-  background: #fff;
-  margin: 16px;
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-}
-.broker-card-top {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
-}
-.broker-avatar {
-  width: 52px;
-  height: 52px;
-  background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #c8a96e;
-  font-size: 20px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-.broker-name {
-  font-size: 17px;
-  font-weight: 700;
-  color: #1e293b;
-}
-.broker-city {
-  font-size: 12px;
-  color: #64748b;
-  margin-top: 2px;
-}
-.status-badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 100px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 4px;
-}
-.status-trial { background: #fef3c7; color: #d97706; }
-.status-active { background: #dcfce7; color: #16a34a; }
-.status-inactive { background: #fee2e2; color: #dc2626; }
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-left h1{font-size:18px;font-weight:700;}
+.topbar-left p{font-size:11px;color:var(--muted);margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.broker-chip{display:flex;align-items:center;gap:8px;}
+.broker-av{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#a07830);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;}
+.broker-name{font-size:13px;font-weight:600;}
+.broker-role{font-size:10px;color:var(--muted);}
 
-/* BOT LINK */
-.bot-link-box {
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-.bot-link-label {
-  font-size: 10px;
-  color: #0369a1;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 6px;
-}
-.bot-link-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.bot-link-url {
-  font-size: 12px;
-  color: #1e3a5f;
-  font-weight: 600;
-  flex: 1;
-  word-break: break-all;
-}
-.copy-btn {
-  background: #1e3a5f;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 11px;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  white-space: nowrap;
-}
-.copy-btn.copied { background: #16a34a; }
+/* CONTENT */
+.content{padding:20px 24px;flex:1;}
 
-/* STATS ROW */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin: 0 16px 16px;
-}
-.stat-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 14px 10px;
-  text-align: center;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
-}
-.stat-num {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1e3a5f;
-  line-height: 1;
-}
-.stat-lbl {
-  font-size: 10px;
-  color: #94a3b8;
-  margin-top: 4px;
-  font-weight: 500;
-}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+.stat-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:6px;}
+.stat-value{font-size:24px;font-weight:800;color:var(--text);line-height:1;}
+.stat-change{font-size:11px;margin-top:5px;}
+.stat-change.up{color:var(--green);}
+.stat-change.down{color:var(--hot);}
+.stat-icon-wrap{float:right;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-top:-2px;}
 
-/* SECTION TITLE */
-.section-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #1e293b;
-  padding: 0 16px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.section-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #e2e8f0;
-}
+/* SECTION */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.section-title{font-size:15px;font-weight:700;}
+.filters{display:flex;align-items:center;gap:8px;}
+.filter-select{border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--text);background:#fff;cursor:pointer;font-family:'Inter',sans-serif;outline:none;}
+.search-wrap{position:relative;}
+.search-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);}
+.search-input{border:1px solid var(--border);border-radius:7px;padding:6px 10px 6px 28px;font-size:12px;color:var(--text);background:#fff;font-family:'Inter',sans-serif;width:180px;outline:none;}
 
-/* LEADS LIST */
-.leads-container {
-  padding: 0 16px 16px;
-}
-.lead-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 10px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
-}
-.lead-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.lead-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: #1e293b;
-}
-.lead-time {
-  font-size: 10px;
-  color: #94a3b8;
-}
-.lead-phone {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1e3a5f;
-  margin-bottom: 8px;
-}
-.lead-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-.tag {
-  background: #f1f5f9;
-  color: #475569;
-  font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-weight: 500;
-}
-.tag.intent {
-  background: #eff6ff;
-  color: #1d4ed8;
-}
-.lead-actions {
-  display: flex;
-  gap: 8px;
-}
-.btn-call {
-  flex: 1;
-  background: #1e3a5f;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 9px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  text-decoration: none;
-}
-.btn-whatsapp {
-  flex: 1;
-  background: #22c55e;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 9px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  text-decoration: none;
-}
+/* TABLE */
+.leads-table{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.table-loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+.lead-row{display:grid;grid-template-columns:70px 1fr 150px 110px 80px 80px 20px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;gap:10px;}
+.lead-row:last-child{border-bottom:none;}
+.lead-row:hover{background:#F8FAFC;}
+.lead-col-badge{display:flex;align-items:center;gap:6px;}
+.lead-av{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+.lead-name{font-size:13px;font-weight:600;}
+.lead-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.lead-loc-val{font-size:12px;color:var(--text);}
+.lead-loc-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.lead-budget-val{font-size:13px;font-weight:700;color:var(--text);}
+.lead-score-val{font-size:14px;font-weight:700;text-align:center;}
+.lead-score-lbl{font-size:10px;color:var(--muted);text-align:center;}
+.lead-time-val{font-size:11px;color:var(--muted);text-align:right;}
+.badge{display:inline-flex;align-items:center;padding:3px 7px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:0.3px;}
+.badge.hot{background:#FEE2E2;color:#DC2626;}
+.badge.warm{background:#FEF3C7;color:#D97706;}
+.badge.cold{background:#DBEAFE;color:#2563EB;}
+.empty-state{text-align:center;padding:48px 24px;color:var(--muted);}
+.empty-state h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.empty-state p{font-size:13px;}
 
-/* EMPTY STATE */
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: #94a3b8;
-}
-.empty-state svg { margin-bottom: 12px; opacity: 0.4; }
-.empty-state p { font-size: 13px; }
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border);}
+.page-info{font-size:12px;color:var(--muted);}
+.page-btns{display:flex;gap:4px;}
+.page-btn{width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;}
+.page-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.page-btn:disabled{opacity:0.4;cursor:not-allowed;}
 
-/* LOADING */
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: #94a3b8;
-  font-size: 13px;
-}
-.dot-loader {
-  display: inline-flex;
-  gap: 4px;
-  margin-bottom: 10px;
-}
-.dot-loader span {
-  width: 8px; height: 8px;
-  background: #c8a96e;
-  border-radius: 50%;
-  animation: dotbounce 1.2s infinite;
-}
-.dot-loader span:nth-child(2) { animation-delay: 0.2s; }
-.dot-loader span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes dotbounce {
-  0%,60%,100% { transform: translateY(0); }
-  30% { transform: translateY(-6px); }
-}
+/* DETAIL PANEL */
+.detail-panel{width:310px;background:#fff;border-left:1px solid var(--border);height:100vh;position:fixed;right:0;top:0;overflow-y:auto;transform:translateX(100%);transition:transform 0.25s ease;z-index:200;}
+.detail-panel.open{transform:translateX(0);}
+.detail-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;}
+.detail-title{font-size:14px;font-weight:700;}
+.close-btn{width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.detail-body{padding:18px;}
+.detail-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;}
+.detail-av{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;}
+.detail-name{font-size:15px;font-weight:700;}
+.detail-phone{font-size:12px;color:var(--muted);margin-top:3px;}
+.score-wrap{margin-left:auto;text-align:center;}
+.score-num{font-size:20px;font-weight:800;}
+.score-lbl{font-size:9px;color:var(--muted);}
+.detail-section{margin-bottom:16px;}
+.detail-section-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+.detail-row{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid #F1F5F9;}
+.detail-row:last-child{border-bottom:none;}
+.detail-key{font-size:12px;color:var(--muted);flex-shrink:0;}
+.detail-val{font-size:12px;font-weight:600;color:var(--text);text-align:right;max-width:55%;}
+.action-btns{display:flex;flex-direction:column;gap:7px;margin-top:6px;}
+.btn-call{background:var(--navy);color:#fff;border:none;padding:12px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:'Inter',sans-serif;width:100%;}
+.btn-wa{background:#fff;color:#25D366;border:1.5px solid #25D366;padding:11px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:'Inter',sans-serif;width:100%;}
+.btn-secondary{background:#fff;color:var(--text);border:1px solid var(--border);padding:11px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:'Inter',sans-serif;width:100%;}
+.summary-box{background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;color:var(--text);line-height:1.6;white-space:pre-wrap;}
 
-/* ERROR */
-.error-state {
-  text-align: center;
-  padding: 30px 20px;
-  background: #fee2e2;
-  border-radius: 12px;
-  margin: 0 16px;
-  color: #dc2626;
-  font-size: 13px;
-}
+/* OVERLAY */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.25);z-index:150;display:none;}
+.overlay.show{display:block;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity 0.2s;}
+.toast.show{opacity:1;}
+
+/* LOGIN SCREEN */
+.login-screen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.login-card{background:#fff;border-radius:16px;padding:36px 32px;width:360px;text-align:center;}
+.login-logo{width:48px;height:48px;background:linear-gradient(135deg,var(--gold),#a07830);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.login-title{font-size:20px;font-weight:700;margin-bottom:4px;}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:24px;}
+.login-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:11px 14px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:10px;color:var(--text);}
+.login-input:focus{border-color:var(--navy);}
+.login-btn{width:100%;background:var(--navy);color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px;}
+.login-err{color:var(--hot);font-size:12px;margin-top:8px;display:none;}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="header-logo">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.8">
-      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-      <polyline points="9 22 9 12 15 12 15 22"/>
-    </svg>
-    <div>
-      <span>EstateBot</span>
-      <small>Broker Dashboard</small>
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V10.5Z" fill="white"/>
+        <circle cx="12" cy="14.5" r="3.8" fill="#C8952A"/>
+        <circle cx="10.8" cy="14.5" r="0.9" fill="white"/>
+        <circle cx="12" cy="14.5" r="0.9" fill="white"/>
+        <circle cx="13.2" cy="14.5" r="0.9" fill="white"/>
+        <path d="M10.2 17.2L9.2 19L11.5 18.1" fill="#C8952A"/>
+      </svg>
+    </div>
+    <div class="login-title">EstateBot</div>
+    <div class="login-sub">Apne dashboard mein login karein</div>
+    <input class="login-input" id="loginEmail" type="email" placeholder="Email address" />
+    <input class="login-input" id="loginPass" type="password" placeholder="Password" onkeypress="if(event.key==='Enter')doLogin()" />
+    <button class="login-btn" onclick="doLogin()">Login →</button>
+    <div class="login-err" id="loginErr">Email ya password galat hai</div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar" style="display:none;">
+  <div class="sidebar-logo">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V10.5Z" fill="white"/>
+          <circle cx="12" cy="14.5" r="3.8" fill="#C8952A"/>
+          <circle cx="10.8" cy="14.5" r="0.9" fill="white"/>
+          <circle cx="12" cy="14.5" r="0.9" fill="white"/>
+          <circle cx="13.2" cy="14.5" r="0.9" fill="white"/>
+          <path d="M10.2 17.2L9.2 19L11.5 18.1" fill="#C8952A"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">EstateBot AI</div>
+        <div class="logo-sub">AI Assistant</div>
+      </div>
     </div>
   </div>
-  <button class="logout-btn" onclick="logout()">Logout</button>
-</div>
-
-<!-- CONTENT -->
-<div id="loadingState" class="loading">
-  <div class="dot-loader"><span></span><span></span><span></span></div>
-  <p>Loading your dashboard...</p>
-</div>
-
-<div id="mainContent" style="display:none;">
-
-  <!-- BROKER INFO -->
-  <div class="broker-card" id="brokerCard"></div>
-
-  <!-- STATS -->
-  <div class="stats-row" id="statsRow"></div>
-
-  <!-- LEADS -->
-  <div class="section-title">
-    Recent Leads
+  <nav class="nav">
+    <a class="nav-item active" href="#">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Leads
+      <span class="nav-badge" id="navLeadCount">0</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Analytics
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Follow Ups
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      Settings
+    </a>
+  </nav>
+  <div class="sidebar-bot">
+    <div class="bot-link-card">
+      <div class="bot-link-label">Your Bot Link</div>
+      <div class="bot-link-url">
+        <span id="botLinkText">estatebotai.in/...</span>
+        <button class="copy-btn" onclick="copyBotLink()">Copy</button>
+      </div>
+      <button class="preview-btn" onclick="previewBot()">⚡ Preview Bot</button>
+      <div class="plan-info" id="planInfo">Plan: Trial</div>
+      <div class="plan-bar"><div class="plan-bar-fill" id="planFill" style="width:10%"></div></div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Logout</button>
   </div>
-  <div class="leads-container" id="leadsContainer"></div>
-
 </div>
 
-<div id="errorState" class="error-state" style="display:none;">
-  ⚠️ Could not load dashboard. Please <a href="/broker-login" style="color:#dc2626;font-weight:700;">login again</a>.
+<!-- MAIN -->
+<div class="main" id="mainContent" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 id="greeting">Good morning! 👋</h1>
+      <p>Aapke leads ka latest update</p>
+    </div>
+    <div class="topbar-right">
+      <div class="broker-chip">
+        <div class="broker-av" id="brokerAvatar">?</div>
+        <div>
+          <div class="broker-name" id="brokerNameTop">—</div>
+          <div class="broker-role">Broker</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div class="stat-label">Total Leads</div>
+          <div class="stat-icon-wrap" style="background:#EDE9FE;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="statTotal">—</div>
+        <div class="stat-change up" id="statTotalSub">Aaj ke leads</div>
+      </div>
+      <div class="stat-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div class="stat-label">Hot Leads</div>
+          <div class="stat-icon-wrap" style="background:#FEE2E2;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><path d="M12 2c0 6-6 10-6 14a6 6 0 0012 0c0-4-6-8-6-14z"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="statHot" style="color:#EF4444;">—</div>
+        <div class="stat-change" style="color:var(--muted);">Score 70%+</div>
+      </div>
+      <div class="stat-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div class="stat-label">Warm Leads</div>
+          <div class="stat-icon-wrap" style="background:#FEF3C7;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="statWarm" style="color:#F59E0B;">—</div>
+        <div class="stat-change" style="color:var(--muted);">Score 40-70%</div>
+      </div>
+      <div class="stat-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div class="stat-label">Cold Leads</div>
+          <div class="stat-icon-wrap" style="background:#DBEAFE;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="statCold" style="color:#3B82F6;">—</div>
+        <div class="stat-change" style="color:var(--muted);">Score below 40%</div>
+      </div>
+      <div class="stat-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div class="stat-label">Aaj Aaye</div>
+          <div class="stat-icon-wrap" style="background:#D1FAE5;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="statToday" style="color:#10B981;">—</div>
+        <div class="stat-change up">Aaj ke naye leads</div>
+      </div>
+    </div>
+
+    <!-- LEADS -->
+    <div class="section-header">
+      <div class="section-title">Recent Leads</div>
+      <div class="filters">
+        <select class="filter-select" id="filterType" onchange="applyFilter()">
+          <option value="all">All Leads</option>
+          <option value="hot">🔥 Hot</option>
+          <option value="warm">⭐ Warm</option>
+          <option value="cold">❄️ Cold</option>
+          <option value="buy">Kharidna</option>
+          <option value="sell">Bechna</option>
+          <option value="rent">Rent</option>
+        </select>
+        <div class="search-wrap">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" id="searchInput" placeholder="Search naam, phone..." oninput="applyFilter()">
+        </div>
+      </div>
+    </div>
+
+    <div class="leads-table">
+      <div id="leadsBody"><div class="table-loading">⏳ Leads load ho rahe hain...</div></div>
+      <div class="pagination" id="paginationWrap" style="display:none;">
+        <div class="page-info" id="pageInfo"></div>
+        <div class="page-btns" id="pageBtns"></div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeDetail()"></div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-header">
+    <div class="detail-title">Lead Details</div>
+    <button class="close-btn" onclick="closeDetail()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7A90" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="detail-body" id="detailBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL = 'https://rpswzqgzcautmfjpgohh.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwc3d6cWd6Y2F1dG1manBnb2hoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTkyMjYzMCwiZXhwIjoyMDk3NDk4NjMwfQ.v48pCXRn0DTb2dUJv8bhBgoB-vxINiWR-wqlDc7vAFQ';
+const SUPABASE_URL = 'https://twxtryvauijzxpddapns.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3eHRyeXZhdWlqenhwZGRhcG5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzOTkwMDQsImV4cCI6MjA5Nzk3NTAwNH0.o08UXLFnurPhhmgXScdjNsjojyUcKqY9J_SIAwp8T3w';
 
-// Get broker_id from URL or localStorage
-const params = new URLSearchParams(window.location.search);
-const brokerId = params.get('broker_id') || localStorage.getItem('broker_id');
+let currentBroker = null;
+let allLeads = [];
+let filteredLeads = [];
+let currentPage = 1;
+const PER_PAGE = 10;
 
-if (!brokerId) {
-  window.location.href = '/broker-login';
-}
-
-async function fetchData(table, filter) {
-  const url = `${SUPABASE_URL}/rest/v1/${table}?${filter}&order=created_at.desc`;
-  const res = await fetch(url, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`
-    }
+async function supaFetch(path) {
+  const res = await fetch(SUPABASE_URL + path, {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
   });
   return res.json();
 }
 
-function timeAgo(dateStr) {
-  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
-  if (diff < 60) return 'Just now';
-  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  return Math.floor(diff/86400) + 'd ago';
+// GREETING
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
 }
 
-function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString('en-IN', {
-    day: 'numeric', month: 'short', year: 'numeric'
-  });
-}
-
-async function loadDashboard() {
-  try {
-    // Fetch broker info
-    const brokers = await fetchData('brokers', `broker_id=eq.${brokerId}`);
-    if (!brokers || brokers.length === 0) throw new Error('Broker not found');
-    const broker = brokers[0];
-
-    // Fetch leads
-    const leads = await fetchData('leads', `broker_id=eq.${brokerId}`);
-
-    // Hide loading, show content
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
-
-    // Render broker card
-    const botUrl = `https://estatebotai.in/${broker.broker_id}`;
-    document.getElementById('brokerCard').innerHTML = `
-      <div class="broker-card-top">
-        <div class="broker-avatar">${broker.name.substring(0,2).toUpperCase()}</div>
-        <div>
-          <div class="broker-name">${broker.name}</div>
-          <div class="broker-city">📍 ${broker.city || '—'}</div>
-          <span class="status-badge status-${broker.status || 'trial'}">${broker.status || 'Trial'}</span>
-        </div>
-      </div>
-      <div class="bot-link-box">
-        <div class="bot-link-label">🔗 Your Bot Link</div>
-        <div class="bot-link-row">
-          <div class="bot-link-url">${botUrl}</div>
-          <button class="copy-btn" id="copyBtn" onclick="copyLink('${botUrl}')">Copy</button>
-        </div>
-      </div>
-    `;
-
-    // Render stats
-    const todayLeads = leads.filter(l => {
-      const d = new Date(l.created_at);
-      const today = new Date();
-      return d.toDateString() === today.toDateString();
-    }).length;
-
-    document.getElementById('statsRow').innerHTML = `
-      <div class="stat-card">
-        <div class="stat-num">${leads.length}</div>
-        <div class="stat-lbl">Total Leads</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">${todayLeads}</div>
-        <div class="stat-lbl">Today</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">${broker.stats?.properties || '—'}</div>
-        <div class="stat-lbl">Properties</div>
-      </div>
-    `;
-
-    // Render leads
-    const container = document.getElementById('leadsContainer');
-    if (!leads || leads.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
-            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-          </svg>
-          <p>No leads yet. Share your bot link to get started!</p>
-        </div>
-      `;
-    } else {
-      container.innerHTML = leads.map(lead => `
-        <div class="lead-card">
-          <div class="lead-top">
-            <div class="lead-name">👤 ${lead.name || '—'}</div>
-            <div class="lead-time">${lead.created_at ? timeAgo(lead.created_at) : ''}</div>
-          </div>
-          <div class="lead-phone">📞 ${lead.phone || '—'}</div>
-          <div class="lead-tags">
-            ${lead.intent ? `<span class="tag intent">${lead.intent}</span>` : ''}
-            ${lead.property_type ? `<span class="tag">🏠 ${lead.property_type}</span>` : ''}
-            ${lead.area ? `<span class="tag">📍 ${lead.area}</span>` : ''}
-            ${lead.budget ? `<span class="tag">💰 ${lead.budget}</span>` : ''}
-            ${lead.timeline ? `<span class="tag">⏰ ${lead.timeline}</span>` : ''}
-          </div>
-          <div class="lead-actions">
-            <a class="btn-call" href="tel:${lead.phone}">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-              Call
-            </a>
-            <a class="btn-whatsapp" href="https://wa.me/${lead.phone?.replace(/[^0-9]/g,'')}" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.531 5.855L.057 24l6.305-1.654A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.003-1.368l-.36-.213-3.733.979 1.004-3.648-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
-              WhatsApp
-            </a>
-          </div>
-        </div>
-      `).join('');
-    }
-
-  } catch (err) {
-    console.error(err);
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'block';
+// LEAD SCORE
+function getScore(lead) {
+  let score = 30;
+  if (lead.phone) score += 20;
+  if (lead.budget) score += 15;
+  if (lead.area) score += 10;
+  if (lead.timeline) {
+    if (lead.timeline.toLowerCase().includes('urgent') || lead.timeline.includes('15') || lead.timeline.includes('1 month')) score += 20;
+    else if (lead.timeline.includes('3')) score += 10;
+    else score += 5;
   }
+  if (lead.intent && lead.intent.toLowerCase().includes('kharid')) score += 5;
+  return Math.min(score, 99);
 }
 
-function copyLink(url) {
-  navigator.clipboard.writeText(url).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = 'Copy';
-      btn.classList.remove('copied');
-    }, 2000);
+function getScoreType(score) {
+  if (score >= 70) return 'hot';
+  if (score >= 40) return 'warm';
+  return 'cold';
+}
+
+function getScoreColor(type) {
+  return type === 'hot' ? '#EF4444' : type === 'warm' ? '#F59E0B' : '#3B82F6';
+}
+
+function getInitials(name) {
+  if (!name) return '?';
+  return name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+}
+
+function getAvColor(name) {
+  const colors = [
+    'linear-gradient(135deg,#F97316,#DC2626)',
+    'linear-gradient(135deg,#8B5CF6,#6D28D9)',
+    'linear-gradient(135deg,#06B6D4,#0891B2)',
+    'linear-gradient(135deg,#EC4899,#BE185D)',
+    'linear-gradient(135deg,#10B981,#059669)',
+    'linear-gradient(135deg,#F59E0B,#D97706)'
+  ];
+  const idx = (name || '').charCodeAt(0) % colors.length;
+  return colors[idx];
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Abhi';
+  if (mins < 60) return mins + ' mins ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + ' hour' + (hrs > 1 ? 's' : '') + ' ago';
+  const days = Math.floor(hrs / 24);
+  return days + ' day' + (days > 1 ? 's' : '') + ' ago';
+}
+
+// LOGIN
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  if (!email || !pass) return;
+
+  const btn = document.querySelector('.login-btn');
+  btn.textContent = 'Checking...';
+  btn.disabled = true;
+
+  // Email se broker dhundho
+  const brokers = await supaFetch(`/rest/v1/brokers?email=eq.${encodeURIComponent(email)}&select=*`);
+  if (!brokers || !brokers[0]) {
+    document.getElementById('loginErr').style.display = 'block';
+    btn.textContent = 'Login →';
+    btn.disabled = false;
+    return;
+  }
+
+  const broker = brokers[0];
+  if (broker.password !== pass) {
+    document.getElementById('loginErr').style.display = 'block';
+    btn.textContent = 'Login →';
+    btn.disabled = false;
+    return;
+  }
+
+  sessionStorage.setItem('broker_id', broker.broker_id);
+  initDashboard(broker.broker_id);
+}
+
+function doLogout() {
+  sessionStorage.removeItem('broker_id');
+  location.reload();
+}
+
+async function initDashboard(brokerId) {
+  // Load broker
+  const brokers = await supaFetch(`/rest/v1/brokers?broker_id=eq.${brokerId}&select=*`);
+  if (!brokers || !brokers[0]) return;
+  currentBroker = brokers[0];
+
+  // Show UI
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('sidebar').style.display = 'flex';
+  document.getElementById('mainContent').style.display = 'flex';
+
+  // Set broker info
+  const initials = getInitials(currentBroker.name);
+  document.getElementById('brokerAvatar').textContent = initials;
+  document.getElementById('brokerNameTop').textContent = currentBroker.name;
+  document.getElementById('greeting').textContent = getGreeting() + ', ' + currentBroker.name.split(' ')[0] + '! 👋';
+  document.getElementById('botLinkText').textContent = 'estatebotai.in/' + brokerId;
+  document.getElementById('planInfo').textContent = 'Plan: ' + (currentBroker.status === 'active' ? 'Active' : currentBroker.status === 'trial' ? 'Trial' : 'Inactive');
+
+  // Load leads
+  await loadLeads(brokerId);
+}
+
+async function loadLeads(brokerId) {
+  const data = await supaFetch(`/rest/v1/leads?broker_id=eq.${brokerId}&select=*&order=created_at.desc`);
+  allLeads = data || [];
+
+  // Stats
+  const today = new Date().toDateString();
+  const todayLeads = allLeads.filter(l => new Date(l.created_at).toDateString() === today);
+  const scored = allLeads.map(l => ({ ...l, score: getScore(l), scoreType: getScoreType(getScore(l)) }));
+  const hot = scored.filter(l => l.scoreType === 'hot').length;
+  const warm = scored.filter(l => l.scoreType === 'warm').length;
+  const cold = scored.filter(l => l.scoreType === 'cold').length;
+
+  document.getElementById('statTotal').textContent = allLeads.length;
+  document.getElementById('statHot').textContent = hot;
+  document.getElementById('statWarm').textContent = warm;
+  document.getElementById('statCold').textContent = cold;
+  document.getElementById('statToday').textContent = todayLeads.length;
+  document.getElementById('navLeadCount').textContent = allLeads.length;
+  document.getElementById('planFill').style.width = Math.min((allLeads.length / 500) * 100, 100) + '%';
+
+  allLeads = scored;
+  filteredLeads = [...allLeads];
+  currentPage = 1;
+  renderTable();
+}
+
+function applyFilter() {
+  const type = document.getElementById('filterType').value;
+  const search = document.getElementById('searchInput').value.toLowerCase();
+
+  filteredLeads = allLeads.filter(l => {
+    const matchSearch = !search ||
+      (l.name || '').toLowerCase().includes(search) ||
+      (l.phone || '').includes(search) ||
+      (l.area || '').toLowerCase().includes(search);
+
+    let matchType = true;
+    if (type === 'hot') matchType = l.scoreType === 'hot';
+    else if (type === 'warm') matchType = l.scoreType === 'warm';
+    else if (type === 'cold') matchType = l.scoreType === 'cold';
+    else if (type === 'buy') matchType = (l.intent || '').toLowerCase().includes('kharid') || (l.intent || '').toLowerCase().includes('buy') || (l.intent || '').toLowerCase().includes('rent lena');
+    else if (type === 'sell') matchType = (l.intent || '').toLowerCase().includes('sell') || (l.intent || '').toLowerCase().includes('bech');
+    else if (type === 'rent') matchType = (l.intent || '').toLowerCase().includes('rent');
+
+    return matchSearch && matchType;
   });
+
+  currentPage = 1;
+  renderTable();
 }
 
-function logout() {
-  localStorage.removeItem('broker_id');
-  window.location.href = '/broker-login';
+function renderTable() {
+  const start = (currentPage - 1) * PER_PAGE;
+  const pageLeads = filteredLeads.slice(start, start + PER_PAGE);
+  const total = filteredLeads.length;
+
+  if (total === 0) {
+    document.getElementById('leadsBody').innerHTML = `
+      <div class="empty-state">
+        <h3>Koi lead nahi mila</h3>
+        <p>Filter change karein ya apna bot share karein</p>
+      </div>`;
+    document.getElementById('paginationWrap').style.display = 'none';
+    return;
+  }
+
+  let html = '';
+  for (const lead of pageLeads) {
+    const score = lead.score;
+    const scoreType = lead.scoreType;
+    const scoreColor = getScoreColor(scoreType);
+    const av = getInitials(lead.name);
+    const avColor = getAvColor(lead.name);
+    const intentShort = (lead.intent || '').replace(' Chahte Hain', '').replace(' Chahte Hai', '');
+
+    html += `<div class="lead-row" onclick='openDetail(${JSON.stringify(lead)})'>
+      <div class="lead-col-badge">
+        <span class="badge ${scoreType}">${scoreType.toUpperCase()}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+        <div class="lead-av" style="background:${avColor};">${av}</div>
+        <div style="min-width:0;">
+          <div class="lead-name">${lead.name || '—'}</div>
+          <div class="lead-sub">${lead.phone || '—'}</div>
+          <div class="lead-sub">${intentShort} · ${lead.property_type || '—'}</div>
+        </div>
+      </div>
+      <div>
+        <div class="lead-loc-val">${lead.area || '—'}</div>
+        <div class="lead-loc-sub">${timeAgo(lead.created_at)}</div>
+      </div>
+      <div>
+        <div class="lead-budget-val">${lead.budget || '—'}</div>
+        <div class="lead-sub">${lead.timeline || '—'}</div>
+      </div>
+      <div>
+        <div class="lead-score-val" style="color:${scoreColor};">${score}%</div>
+        <div class="lead-score-lbl">Score</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="lead-time-val">${timeAgo(lead.created_at)}</div>
+      </div>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E0" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`;
+  }
+
+  document.getElementById('leadsBody').innerHTML = html;
+
+  // Pagination
+  const totalPages = Math.ceil(total / PER_PAGE);
+  document.getElementById('pageInfo').textContent = `Showing ${start + 1}–${Math.min(start + PER_PAGE, total)} of ${total} leads`;
+  document.getElementById('paginationWrap').style.display = 'flex';
+
+  let pageBtns = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1) {
+      pageBtns += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+    } else if (Math.abs(i - currentPage) === 2) {
+      pageBtns += `<button class="page-btn" disabled>...</button>`;
+    }
+  }
+  pageBtns += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+  document.getElementById('pageBtns').innerHTML = pageBtns;
 }
 
-loadDashboard();
+function goPage(p) {
+  const totalPages = Math.ceil(filteredLeads.length / PER_PAGE);
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  renderTable();
+}
+
+function openDetail(lead) {
+  const score = lead.score || getScore(lead);
+  const scoreType = lead.scoreType || getScoreType(score);
+  const scoreColor = getScoreColor(scoreType);
+  const av = getInitials(lead.name);
+  const avColor = getAvColor(lead.name);
+  const phone = (lead.phone || '').replace(/\s/g, '');
+
+  document.getElementById('detailBody').innerHTML = `
+    <div style="margin-bottom:14px;"><span class="badge ${scoreType}" style="font-size:11px;padding:4px 10px;">${scoreType.toUpperCase()} LEAD</span></div>
+    <div class="detail-top">
+      <div class="detail-av" style="background:${avColor};">${av}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="detail-name">${lead.name || '—'}</div>
+        <div class="detail-phone">${lead.phone || '—'}</div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-num" style="color:${scoreColor};">${score}%</div>
+        <div class="score-lbl">Score</div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Property Details</div>
+      <div class="detail-row"><span class="detail-key">Intent</span><span class="detail-val">${(lead.intent || '—').replace(' Chahte Hain','')}</span></div>
+      <div class="detail-row"><span class="detail-key">Property</span><span class="detail-val">${lead.property_type || '—'}</span></div>
+      <div class="detail-row"><span class="detail-key">Location</span><span class="detail-val">${lead.area || '—'}</span></div>
+      <div class="detail-row"><span class="detail-key">Budget</span><span class="detail-val" style="color:#10B981;font-weight:700;">${lead.budget || '—'}</span></div>
+      <div class="detail-row"><span class="detail-key">Timeline</span><span class="detail-val">${lead.timeline || '—'}</span></div>
+      ${lead.furnished && lead.furnished !== 'NA' ? `<div class="detail-row"><span class="detail-key">Furnished</span><span class="detail-val">${lead.furnished}</span></div>` : ''}
+      ${lead.parking && lead.parking !== 'NA' ? `<div class="detail-row"><span class="detail-key">Parking</span><span class="detail-val">${lead.parking}</span></div>` : ''}
+      ${lead.special_requirements ? `<div class="detail-row"><span class="detail-key">Special</span><span class="detail-val">${lead.special_requirements}</span></div>` : ''}
+      <div class="detail-row"><span class="detail-key">Created</span><span class="detail-val">${new Date(lead.created_at).toLocaleString('en-IN')}</span></div>
+    </div>
+
+    <div class="action-btns">
+      <button class="btn-call" onclick="window.location='tel:${phone}'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Call Now
+      </button>
+      <button class="btn-wa" onclick="window.open('https://wa.me/91${phone}','_blank')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </button>
+      <button class="btn-secondary" onclick="openBotChat('${currentBroker ? currentBroker.broker_id : ''}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Bot Link Dekhein
+      </button>
+    </div>
+  `;
+
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function copyBotLink() {
+  if (!currentBroker) return;
+  navigator.clipboard.writeText('https://estatebotai.in/' + currentBroker.broker_id);
+  showToast('Link copy ho gaya!');
+}
+
+function previewBot() {
+  if (!currentBroker) return;
+  window.open('https://estatebotai.in/' + currentBroker.broker_id, '_blank');
+}
+
+function openBotChat(brokerId) {
+  window.open('https://estatebotai.in/' + brokerId, '_blank');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Auto-login check
+const savedId = sessionStorage.getItem('broker_id');
+if (savedId) initDashboard(savedId);
 </script>
-
 </body>
 </html>
