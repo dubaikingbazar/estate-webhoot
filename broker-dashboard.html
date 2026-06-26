@@ -109,9 +109,31 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .status-badge.not_interested{background:#FEE2E2;color:#DC2626;}
 .status-badge.follow_up{background:#DBEAFE;color:#1D4ED8;}
 .status-select{border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--text);background:#fff;cursor:pointer;font-family:'Inter',sans-serif;width:100%;outline:none;margin-top:4px;}
-.empty-state{text-align:center;padding:48px 24px;color:var(--muted);}
-.empty-state h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;}
-.empty-state p{font-size:13px;}
+.page{display:none;}.page.active{display:block;}
+.bar-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;}
+.bar{width:100%;border-radius:3px 3px 0 0;background:var(--navy);min-height:4px;transition:height 0.4s;}
+.bar-lbl{font-size:9px;color:var(--muted);}
+.split-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.split-label{font-size:12px;font-weight:500;flex:1;}
+.split-count{font-size:12px;color:var(--muted);}
+.split-bar-bg{width:100px;height:6px;background:var(--border);border-radius:100px;overflow:hidden;}
+.split-bar-fill{height:100%;border-radius:100px;}
+.fu-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.fu-date{background:var(--navy);color:#fff;border-radius:8px;padding:6px 10px;text-align:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.fu-date .day{font-size:18px;font-weight:800;line-height:1;}
+.fu-name{font-size:13px;font-weight:600;}
+.fu-note{font-size:11px;color:var(--muted);margin-top:2px;}
+.fu-done-btn{margin-left:auto;background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:#fff;border-radius:14px;padding:24px;width:380px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
+.modal-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:10px;color:var(--text);}
+.modal-input:focus{border-color:var(--navy);}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;}
+.modal-cancel{background:#F3F4F6;color:var(--text);border:none;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.modal-ok{background:var(--navy);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
 
 /* PAGINATION */
 .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border);}
@@ -212,24 +234,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
   </div>
   <nav class="nav">
-    <a class="nav-item active" href="#">
+    <a class="nav-item active" onclick="showPage('dashboard')">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       Dashboard
     </a>
-    <a class="nav-item" href="#">
+    <a class="nav-item" onclick="showPage('leads')">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
       Leads
       <span class="nav-badge" id="navLeadCount">0</span>
     </a>
-    <a class="nav-item" href="#">
+    <a class="nav-item" onclick="showPage('analytics')">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Analytics
     </a>
-    <a class="nav-item" href="#">
+    <a class="nav-item" onclick="showPage('followups')">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Follow Ups
+      <span class="nav-badge" id="navFollowCount" style="display:none;">0</span>
     </a>
-    <a class="nav-item" href="#">
+    <a class="nav-item" onclick="showPage('settings')">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
       Settings
     </a>
@@ -268,7 +291,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 
   <div class="content">
-    <!-- STATS -->
+    <!-- PAGE: DASHBOARD -->
+    <div id="page-dashboard" class="page active">
     <div class="stats-grid">
       <div class="stat-card">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
@@ -359,8 +383,103 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="page-btns" id="pageBtns"></div>
       </div>
     </div>
-  </div>
-</div>
+    </div><!-- end page-dashboard -->
+
+    <!-- PAGE: LEADS (full leads with search) -->
+    <div id="page-leads" class="page">
+      <div class="section-header">
+        <div class="section-title">All Leads</div>
+        <div class="filters">
+          <select class="filter-select" id="filterType2" onchange="applyFilter2()">
+            <option value="all">All Leads</option>
+            <option value="hot">🔥 Hot</option>
+            <option value="warm">⭐ Warm</option>
+            <option value="cold">❄️ Cold</option>
+            <option value="buy">Kharidna</option>
+            <option value="sell">Bechna</option>
+            <option value="rent">Rent</option>
+            <option value="new">New</option>
+            <option value="in_progress">In Progress</option>
+            <option value="converted">Converted</option>
+          </select>
+          <div class="search-wrap">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input" id="searchInput2" placeholder="Search naam, phone, area..." oninput="applyFilter2()">
+          </div>
+        </div>
+      </div>
+      <div class="leads-table">
+        <div id="leadsBody2"><div class="table-loading">⏳ Loading...</div></div>
+        <div class="pagination" id="paginationWrap2" style="display:none;">
+          <div class="page-info" id="pageInfo2"></div>
+          <div class="page-btns" id="pageBtns2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: ANALYTICS -->
+    <div id="page-analytics" class="page">
+      <div style="font-size:18px;font-weight:700;margin-bottom:20px;">Analytics</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;" id="analyticsStats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;">📊 Leads Per Day (Last 7 Days)</div>
+          <div id="chartLeadsDay" style="display:flex;align-items:flex-end;gap:6px;height:120px;"></div>
+          <div id="chartDayLabels" style="display:flex;gap:6px;margin-top:6px;"></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;">🏠 Property Type Split</div>
+          <div id="propTypeSplit"></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;">💰 Intent Split</div>
+          <div id="intentSplit"></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;">📍 Top Locations</div>
+          <div id="topLocations"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: FOLLOW UPS -->
+    <div id="page-followups" class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div style="font-size:18px;font-weight:700;">Follow Ups</div>
+        <button onclick="openAddFollowUp()" style="background:var(--navy);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Add Reminder</button>
+      </div>
+      <div id="followUpsContainer"></div>
+    </div>
+
+    <!-- PAGE: SETTINGS -->
+    <div id="page-settings" class="page">
+      <div style="font-size:18px;font-weight:700;margin-bottom:20px;">Settings</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">Your Bot Link</div>
+          <div style="background:#F8FAFC;border-radius:8px;padding:12px;font-size:12px;color:var(--navy);font-weight:600;word-break:break-all;margin-bottom:10px;" id="settingsBotLink">—</div>
+          <button onclick="copyBotLink()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">📋 Copy Link</button>
+          <button onclick="previewBot()" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text);padding:10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px;">⚡ Preview Bot</button>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">Account Info</div>
+          <div id="settingsAccountInfo"></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">Change Password</div>
+          <input type="password" id="newPass1" placeholder="New password" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:10px;">
+          <input type="password" id="newPass2" placeholder="Confirm new password" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:10px;">
+          <button onclick="changePassword()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Update Password</button>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">Danger Zone</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Logout from all devices or contact support.</p>
+          <button onclick="doLogout()" style="width:100%;background:rgba(239,68,68,0.1);color:#EF4444;border:1px solid rgba(239,68,68,0.2);padding:10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Logout</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
 
 <!-- OVERLAY -->
 <div class="overlay" id="overlay" onclick="closeDetail()"></div>
@@ -374,6 +493,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </button>
   </div>
   <div class="detail-body" id="detailBody"></div>
+</div>
+
+<div class="modal-overlay" id="fuModal">
+  <div class="modal-box">
+    <div class="modal-title">Add Follow Up Reminder</div>
+    <div class="modal-sub">Lead ke liye reminder set karo</div>
+    <select class="modal-input" id="fuLeadSelect"><option value="">-- Lead Select Karo --</option></select>
+    <input class="modal-input" type="date" id="fuDate">
+    <input class="modal-input" type="text" id="fuNote" placeholder="Note (e.g. Call karna hai, site visit)">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeFuModal()">Cancel</button>
+      <button class="modal-ok" onclick="saveFollowUp()">Save</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -762,6 +895,322 @@ async function updateStatus(leadId, newStatus) {
     showToast('Update fail hua, dobara try karo');
   }
 }
+
+// PAGE SWITCHING
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  // Set active nav
+  const navItems = document.querySelectorAll('.nav-item');
+  const pageMap = {dashboard:0, leads:1, analytics:2, followups:3, settings:4};
+  if(pageMap[page] !== undefined) navItems[pageMap[page]].classList.add('active');
+  // Load page data
+  if(page === 'leads') renderLeadsPage();
+  if(page === 'analytics') renderAnalytics();
+  if(page === 'followups') renderFollowUps();
+  if(page === 'settings') renderSettings();
+}
+
+// ===== LEADS PAGE =====
+let filteredLeads2 = [];
+let currentPage2 = 1;
+
+function renderLeadsPage() {
+  filteredLeads2 = [...allLeads];
+  currentPage2 = 1;
+  renderTable2();
+}
+
+function applyFilter2() {
+  const type = document.getElementById('filterType2').value;
+  const search = document.getElementById('searchInput2').value.toLowerCase();
+  filteredLeads2 = allLeads.filter(l => {
+    const matchSearch = !search ||
+      (l.name||'').toLowerCase().includes(search) ||
+      (l.phone||'').includes(search) ||
+      (l.area||'').toLowerCase().includes(search);
+    let matchType = true;
+    if(type==='hot') matchType = l.scoreType==='hot';
+    else if(type==='warm') matchType = l.scoreType==='warm';
+    else if(type==='cold') matchType = l.scoreType==='cold';
+    else if(type==='buy') matchType = (l.intent||'').toLowerCase().includes('kharid')||(l.intent||'').toLowerCase().includes('buy');
+    else if(type==='sell') matchType = (l.intent||'').toLowerCase().includes('sell')||(l.intent||'').toLowerCase().includes('bech');
+    else if(type==='rent') matchType = (l.intent||'').toLowerCase().includes('rent');
+    else if(['new','in_progress','converted','not_interested','follow_up'].includes(type)) matchType = (l.status||'new')===type;
+    return matchSearch && matchType;
+  });
+  currentPage2 = 1;
+  renderTable2();
+}
+
+function renderTable2() {
+  const start = (currentPage2-1)*PER_PAGE;
+  const pageLeads = filteredLeads2.slice(start, start+PER_PAGE);
+  const total = filteredLeads2.length;
+  if(!total) {
+    document.getElementById('leadsBody2').innerHTML = '<div class="empty-state"><h3>Koi lead nahi mila</h3><p>Filter change karein</p></div>';
+    document.getElementById('paginationWrap2').style.display = 'none';
+    return;
+  }
+  const statusLabels = {new:'New',in_progress:'In Progress',converted:'Converted',not_interested:'Not Interested',follow_up:'Follow Up'};
+  const statusColors = {new:'#7C3AED',in_progress:'#D97706',converted:'#065F46',not_interested:'#DC2626',follow_up:'#1D4ED8'};
+  const statusBg = {new:'#EDE9FE',in_progress:'#FEF3C7',converted:'#D1FAE5',not_interested:'#FEE2E2',follow_up:'#DBEAFE'};
+  let html = '';
+  for(const lead of pageLeads) {
+    const score = lead.score; const scoreType = lead.scoreType;
+    const scoreColor = getScoreColor(scoreType);
+    const av = getInitials(lead.name); const avColor = getAvColor(lead.name);
+    const intentShort = (lead.intent||'').replace(' Chahte Hain','').replace(' Chahte Hai','');
+    html += `<div class="lead-row" onclick='openDetail(${JSON.stringify(lead)})'>
+      <div class="lead-col-badge"><span class="badge ${scoreType}">${scoreType.toUpperCase()}</span></div>
+      <div class="lead-av" style="background:${avColor};">${av}</div>
+      <div class="lead-main-info">
+        <div class="lead-name">${lead.name||'—'}</div>
+        <div class="lead-sub">${lead.phone||'—'}</div>
+        <div class="lead-sub">${intentShort} · ${lead.property_type||'—'}</div>
+        <div class="lead-sub">${lead.area||'—'}</div>
+      </div>
+      <div class="lead-right">
+        <div class="lead-budget-val">${lead.budget||'—'}</div>
+        <div class="lead-score-val" style="color:${scoreColor};">${score}%</div>
+        <span style="background:${statusBg[lead.status||'new']};color:${statusColors[lead.status||'new']};padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;">${statusLabels[lead.status||'new']||'New'}</span>
+        <div class="lead-time-val">${timeAgo(lead.created_at)}</div>
+      </div>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#CBD5E0" stroke-width="2" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`;
+  }
+  document.getElementById('leadsBody2').innerHTML = html;
+  const totalPages = Math.ceil(total/PER_PAGE);
+  document.getElementById('pageInfo2').textContent = `Showing ${start+1}–${Math.min(start+PER_PAGE,total)} of ${total} leads`;
+  document.getElementById('paginationWrap2').style.display = 'flex';
+  let pageBtns = `<button class="page-btn" onclick="goPage2(${currentPage2-1})" ${currentPage2===1?'disabled':''}>‹</button>`;
+  for(let i=1;i<=Math.min(totalPages,5);i++) pageBtns += `<button class="page-btn ${i===currentPage2?'active':''}" onclick="goPage2(${i})">${i}</button>`;
+  pageBtns += `<button class="page-btn" onclick="goPage2(${currentPage2+1})" ${currentPage2===totalPages?'disabled':''}>›</button>`;
+  document.getElementById('pageBtns2').innerHTML = pageBtns;
+}
+
+function goPage2(p) {
+  const totalPages = Math.ceil(filteredLeads2.length/PER_PAGE);
+  if(p<1||p>totalPages) return;
+  currentPage2 = p;
+  renderTable2();
+}
+
+// ===== ANALYTICS =====
+function renderAnalytics() {
+  // Stats
+  const converted = allLeads.filter(l=>l.status==='converted').length;
+  const convRate = allLeads.length ? Math.round((converted/allLeads.length)*100) : 0;
+  const today = new Date().toDateString();
+  const todayLeads = allLeads.filter(l=>new Date(l.created_at).toDateString()===today);
+  document.getElementById('analyticsStats').innerHTML = `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="font-size:22px;font-weight:800;color:var(--navy);">${allLeads.length}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">Total Leads</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="font-size:22px;font-weight:800;color:#10B981;">${converted}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">Converted</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="font-size:22px;font-weight:800;color:var(--gold);">${convRate}%</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">Conversion Rate</div>
+    </div>`;
+
+  // Leads per day chart
+  const days = [];
+  const counts = [];
+  for(let i=6;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toLocaleDateString('en-IN',{weekday:'short'}));
+    counts.push(allLeads.filter(l=>new Date(l.created_at).toDateString()===d.toDateString()).length);
+  }
+  const maxCount = Math.max(...counts,1);
+  document.getElementById('chartLeadsDay').innerHTML = counts.map((c,i)=>`
+    <div class="bar-wrap">
+      <div class="bar" style="height:${Math.max((c/maxCount)*110,4)}px;" title="${c} leads"></div>
+    </div>`).join('');
+  document.getElementById('chartDayLabels').innerHTML = days.map(d=>`<div class="bar-lbl" style="flex:1;text-align:center;">${d}</div>`).join('');
+
+  // Property type split
+  const props = {};
+  allLeads.forEach(l=>{ const p=l.property_type||'Other'; props[p]=(props[p]||0)+1; });
+  const sortedProps = Object.entries(props).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxProp = Math.max(...sortedProps.map(x=>x[1]),1);
+  const propColors = ['#5B3DF5','#10B981','#F59E0B','#EF4444','#06B6D4','#EC4899'];
+  document.getElementById('propTypeSplit').innerHTML = sortedProps.map(([p,n],i)=>`
+    <div class="split-row">
+      <div class="split-label">${p}</div>
+      <div class="split-count">${n}</div>
+      <div class="split-bar-bg"><div class="split-bar-fill" style="width:${(n/maxProp)*100}%;background:${propColors[i%propColors.length]};"></div></div>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:13px;">No data</div>';
+
+  // Intent split
+  const intents = {Kharidna:0,Bechna:0,'Rent Lena':0,'Rent Dena':0};
+  allLeads.forEach(l=>{
+    const i=(l.intent||'').toLowerCase();
+    if(i.includes('kharid')||i.includes('buy')) intents.Kharidna++;
+    else if(i.includes('sell')||i.includes('bech')) intents.Bechna++;
+    else if(i.includes('rent lena')) intents['Rent Lena']++;
+    else if(i.includes('rent dena')) intents['Rent Dena']++;
+  });
+  const intentColors = {Kharidna:'#5B3DF5',Bechna:'#10B981','Rent Lena':'#F59E0B','Rent Dena':'#EF4444'};
+  const totalIntents = Object.values(intents).reduce((a,b)=>a+b,1);
+  document.getElementById('intentSplit').innerHTML = Object.entries(intents).map(([k,v])=>`
+    <div class="split-row">
+      <div style="width:10px;height:10px;border-radius:50%;background:${intentColors[k]};flex-shrink:0;"></div>
+      <div class="split-label">${k}</div>
+      <div class="split-count">${Math.round((v/totalIntents)*100)}%</div>
+      <div class="split-bar-bg"><div class="split-bar-fill" style="width:${(v/totalIntents)*100}%;background:${intentColors[k]};"></div></div>
+    </div>`).join('');
+
+  // Top locations
+  const locs = {};
+  allLeads.forEach(l=>{ const a=(l.area||'').split(',')[0].trim()||'Unknown'; locs[a]=(locs[a]||0)+1; });
+  const sortedLocs = Object.entries(locs).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxLoc = Math.max(...sortedLocs.map(x=>x[1]),1);
+  document.getElementById('topLocations').innerHTML = sortedLocs.map(([l,n])=>`
+    <div class="split-row">
+      <div class="split-label">📍 ${l}</div>
+      <div class="split-count">${n}</div>
+      <div class="split-bar-bg"><div class="split-bar-fill" style="width:${(n/maxLoc)*100}%;background:var(--navy);"></div></div>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:13px;">No data</div>';
+}
+
+// ===== FOLLOW UPS =====
+let followUps = JSON.parse(localStorage.getItem('estatebot_followups') || '[]');
+
+function renderFollowUps() {
+  const brokerId = currentBroker?.broker_id;
+  const myFollowUps = followUps.filter(f=>f.brokerId===brokerId);
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  const upcoming = myFollowUps.filter(f=>!f.done).sort((a,b)=>a.date.localeCompare(b.date));
+  const done = myFollowUps.filter(f=>f.done);
+
+  // Update badge
+  const overdueOrToday = upcoming.filter(f=>f.date<=todayStr).length;
+  const badge = document.getElementById('navFollowCount');
+  if(overdueOrToday>0){ badge.style.display=''; badge.textContent=overdueOrToday; }
+  else badge.style.display='none';
+
+  if(!upcoming.length && !done.length) {
+    document.getElementById('followUpsContainer').innerHTML = `
+      <div style="text-align:center;padding:48px;color:var(--muted);">
+        <div style="font-size:32px;margin-bottom:12px;">⏰</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;">Koi follow up nahi hai</div>
+        <div style="font-size:13px;">Leads pe reminders set karo — "Add Reminder" button se</div>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  if(upcoming.length) {
+    html += `<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Upcoming (${upcoming.length})</div>`;
+    html += upcoming.map(f=>{
+      const d = new Date(f.date+'T00:00:00');
+      const isOverdue = f.date < todayStr;
+      const isToday = f.date === todayStr;
+      return `<div class="fu-card" style="${isOverdue?'border-color:#EF4444;':isToday?'border-color:var(--gold);':''}">
+        <div class="fu-date" style="background:${isOverdue?'#EF4444':isToday?'var(--gold)':'var(--navy)'};">
+          <div class="day">${d.getDate()}</div>
+          <div>${d.toLocaleString('en-IN',{month:'short'})}</div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div class="fu-name">${f.leadName}</div>
+          <div class="fu-note">${f.note||'No note'}</div>
+          ${isOverdue?'<div style="font-size:10px;color:#EF4444;font-weight:700;margin-top:3px;">OVERDUE</div>':isToday?'<div style="font-size:10px;color:var(--gold);font-weight:700;margin-top:3px;">TODAY</div>':''}
+        </div>
+        <button class="fu-done-btn" onclick="markFollowUpDone('${f.id}')">✓ Done</button>
+      </div>`;
+    }).join('');
+  }
+  if(done.length) {
+    html += `<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 10px;">Completed (${done.length})</div>`;
+    html += done.slice(0,5).map(f=>`
+      <div class="fu-card" style="opacity:0.5;">
+        <div class="fu-date"><div class="day">${new Date(f.date+'T00:00:00').getDate()}</div><div>${new Date(f.date+'T00:00:00').toLocaleString('en-IN',{month:'short'})}</div></div>
+        <div><div class="fu-name" style="text-decoration:line-through;">${f.leadName}</div><div class="fu-note">${f.note||''}</div></div>
+        <div style="margin-left:auto;font-size:11px;color:var(--green);font-weight:600;">✓ Done</div>
+      </div>`).join('');
+  }
+  document.getElementById('followUpsContainer').innerHTML = html;
+}
+
+function openAddFollowUp() {
+  const sel = document.getElementById('fuLeadSelect');
+  sel.innerHTML = '<option value="">-- Lead Select Karo --</option>' +
+    allLeads.map(l=>`<option value="${l.id}|${l.name}">${l.name} — ${l.phone||''}</option>`).join('');
+  document.getElementById('fuDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('fuNote').value = '';
+  document.getElementById('fuModal').classList.add('show');
+}
+
+function closeFuModal() { document.getElementById('fuModal').classList.remove('show'); }
+
+function saveFollowUp() {
+  const sel = document.getElementById('fuLeadSelect').value;
+  const date = document.getElementById('fuDate').value;
+  const note = document.getElementById('fuNote').value.trim();
+  if(!sel||!date) { showToast('Lead aur date select karo'); return; }
+  const [leadId, leadName] = sel.split('|');
+  const fu = { id: Date.now().toString(), brokerId: currentBroker?.broker_id, leadId, leadName, date, note, done: false };
+  followUps.push(fu);
+  localStorage.setItem('estatebot_followups', JSON.stringify(followUps));
+  closeFuModal();
+  renderFollowUps();
+  showToast('Follow up set ho gaya!');
+}
+
+function markFollowUpDone(id) {
+  followUps = followUps.map(f=>f.id===id?{...f,done:true}:f);
+  localStorage.setItem('estatebot_followups', JSON.stringify(followUps));
+  renderFollowUps();
+  showToast('Follow up complete!');
+}
+
+// ===== SETTINGS =====
+function renderSettings() {
+  if(!currentBroker) return;
+  document.getElementById('settingsBotLink').textContent = 'https://estatebotai.in/' + currentBroker.broker_id;
+  document.getElementById('settingsAccountInfo').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <span style="color:var(--muted);">Name</span><span style="font-weight:600;">${currentBroker.name}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <span style="color:var(--muted);">Email</span><span style="font-weight:600;">${currentBroker.email||'—'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <span style="color:var(--muted);">Phone</span><span style="font-weight:600;">${currentBroker.phone||'—'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <span style="color:var(--muted);">City</span><span style="font-weight:600;">${currentBroker.city||'—'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;">
+        <span style="color:var(--muted);">Plan</span><span style="font-weight:600;color:${currentBroker.status==='active'?'var(--green)':currentBroker.status==='trial'?'var(--warm)':'var(--hot)'};">${currentBroker.status?.toUpperCase()}</span>
+      </div>
+    </div>`;
+}
+
+async function changePassword() {
+  const p1 = document.getElementById('newPass1').value;
+  const p2 = document.getElementById('newPass2').value;
+  if(!p1||!p2){ showToast('Password dono fields mein likho'); return; }
+  if(p1!==p2){ showToast('Passwords match nahi kar rahe'); return; }
+  if(p1.length<6){ showToast('Password kam se kam 6 characters ka hona chahiye'); return; }
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/brokers?broker_id=eq.${currentBroker.broker_id}`, {
+    method:'PATCH',
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({password:p1})
+  });
+  if(res.ok){ showToast('Password update ho gaya!'); document.getElementById('newPass1').value=''; document.getElementById('newPass2').value=''; }
+  else showToast('Update fail hua', 'error');
+}
+
+// Close follow up modal on overlay click
+document.getElementById('fuModal').onclick = (e)=>{ if(e.target===document.getElementById('fuModal')) closeFuModal(); };
 
 // Auto-login check
 const savedId = sessionStorage.getItem('broker_id');
