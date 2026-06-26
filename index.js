@@ -363,8 +363,18 @@ app.get('/api/admin/leads', async (req, res) => {
 
 app.patch('/api/admin/brokers/:brokerId', async (req, res) => {
   const { brokerId } = req.params;
-  const { status } = req.body;
-  const { error } = await supabase.from('brokers').update({ status }).eq('broker_id', brokerId);
+  const { status, password } = req.body;
+  const updateData = {};
+  if (status !== undefined) updateData.status = status;
+  if (password !== undefined) updateData.password = password;
+  const { error } = await supabase.from('brokers').update(updateData).eq('broker_id', brokerId);
+  if (error) return res.status(500).json({ error });
+  res.json({ success: true });
+});
+
+app.delete('/api/admin/delete/:brokerId', async (req, res) => {
+  const { brokerId } = req.params;
+  const { error } = await supabase.from('brokers').delete().eq('broker_id', brokerId);
   if (error) return res.status(500).json({ error });
   res.json({ success: true });
 });
