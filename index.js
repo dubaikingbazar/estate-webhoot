@@ -805,10 +805,13 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
   </div>
 </div>
 <div class="powered">
-  <svg width="20" height="20" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="12" fill="#0E1B30"/>
-    <path d="M7 12.5L12 8L17 12.5V17C17 17.5523 16.5523 18 16 18H8C7.44772 18 7 17.5523 7 17V12.5Z" fill="#FFFFFF"/>
-    <rect x="10.7" y="13.5" width="2.6" height="2.6" rx="0.5" fill="#D4A24C"/>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V10.5Z" fill="#0E1B30"/>
+    <circle cx="12" cy="14.5" r="3.8" fill="#D4A24C"/>
+    <circle cx="10.8" cy="14.5" r="0.9" fill="white"/>
+    <circle cx="12" cy="14.5" r="0.9" fill="white"/>
+    <circle cx="13.2" cy="14.5" r="0.9" fill="white"/>
+    <path d="M10.2 17.2L9.2 19L11.5 18.1" fill="#D4A24C"/>
   </svg>
   EstateBot \u00b7 AI Lead Assistant
 </div>
