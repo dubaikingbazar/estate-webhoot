@@ -345,7 +345,7 @@ app.post('/api/broker-auth', async (req, res) => {
   res.json({ success: true, broker_id: broker.broker_id });
 });
 
-app.get('/broker-login', (req, res) => { res.sendFile(__dirname + '/broker-login.html'); });
+app.get('/broker-login', (req, res) => { res.redirect('/dashboard'); });
 app.get('/dashboard', (req, res) => { res.sendFile(__dirname + '/broker-dashboard.html'); });
 
 // ===== ADMIN API =====
