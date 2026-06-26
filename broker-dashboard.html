@@ -83,7 +83,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* TABLE */
 .leads-table{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .table-loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
-.lead-row{display:grid;grid-template-columns:70px 1fr 150px 110px 80px 80px 20px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;gap:10px;}
+.lead-row{display:grid;grid-template-columns:70px 1fr 150px 100px 80px 90px 80px 20px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;gap:10px;}
 .lead-row:last-child{border-bottom:none;}
 .lead-row:hover{background:#F8FAFC;}
 .lead-col-badge{display:flex;align-items:center;gap:6px;}
@@ -100,6 +100,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .badge.hot{background:#FEE2E2;color:#DC2626;}
 .badge.warm{background:#FEF3C7;color:#D97706;}
 .badge.cold{background:#DBEAFE;color:#2563EB;}
+.status-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;}
+.status-badge.new{background:#EDE9FE;color:#7C3AED;}
+.status-badge.in_progress{background:#FEF3C7;color:#D97706;}
+.status-badge.converted{background:#D1FAE5;color:#065F46;}
+.status-badge.not_interested{background:#FEE2E2;color:#DC2626;}
+.status-badge.follow_up{background:#DBEAFE;color:#1D4ED8;}
+.status-select{border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--text);background:#fff;cursor:pointer;font-family:'Inter',sans-serif;width:100%;outline:none;margin-top:4px;}
 .empty-state{text-align:center;padding:48px 24px;color:var(--muted);}
 .empty-state h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;}
 .empty-state p{font-size:13px;}
@@ -303,12 +310,22 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="stat-card">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div class="stat-label">Aaj Aaye</div>
+          <div class="stat-label">Converted</div>
           <div class="stat-icon-wrap" style="background:#D1FAE5;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
         </div>
-        <div class="stat-value" id="statToday" style="color:#10B981;">—</div>
+        <div class="stat-value" id="statConverted" style="color:#10B981;">—</div>
+        <div class="stat-change up">Deal ho gayi</div>
+      </div>
+      <div class="stat-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div class="stat-label">Aaj Aaye</div>
+          <div class="stat-icon-wrap" style="background:#EDE9FE;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="statToday" style="color:#7C3AED;">—</div>
         <div class="stat-change up">Aaj ke naye leads</div>
       </div>
     </div>
@@ -509,11 +526,13 @@ async function loadLeads(brokerId) {
   const hot = scored.filter(l => l.scoreType === 'hot').length;
   const warm = scored.filter(l => l.scoreType === 'warm').length;
   const cold = scored.filter(l => l.scoreType === 'cold').length;
+  const converted = allLeads.filter(l => l.status === 'converted').length;
 
   document.getElementById('statTotal').textContent = allLeads.length;
   document.getElementById('statHot').textContent = hot;
   document.getElementById('statWarm').textContent = warm;
   document.getElementById('statCold').textContent = cold;
+  document.getElementById('statConverted').textContent = converted;
   document.getElementById('statToday').textContent = todayLeads.length;
   document.getElementById('navLeadCount').textContent = allLeads.length;
   document.getElementById('planFill').style.width = Math.min((allLeads.length / 500) * 100, 100) + '%';
@@ -573,6 +592,10 @@ function renderTable() {
     const avColor = getAvColor(lead.name);
     const intentShort = (lead.intent || '').replace(' Chahte Hain', '').replace(' Chahte Hai', '');
 
+    const statusLabels = {new:'New',in_progress:'In Progress',converted:'Converted',not_interested:'Not Interested',follow_up:'Follow Up'};
+    const statusColors = {new:'#7C3AED',in_progress:'#D97706',converted:'#065F46',not_interested:'#DC2626',follow_up:'#1D4ED8'};
+    const statusBg = {new:'#EDE9FE',in_progress:'#FEF3C7',converted:'#D1FAE5',not_interested:'#FEE2E2',follow_up:'#DBEAFE'};
+
     html += `<div class="lead-row" onclick='openDetail(${JSON.stringify(lead)})'>
       <div class="lead-col-badge">
         <span class="badge ${scoreType}">${scoreType.toUpperCase()}</span>
@@ -596,6 +619,11 @@ function renderTable() {
       <div>
         <div class="lead-score-val" style="color:${scoreColor};">${score}%</div>
         <div class="lead-score-lbl">Score</div>
+      </div>
+      <div>
+        <span style="background:${statusBg[lead.status||'new']};color:${statusColors[lead.status||'new']};padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;">
+          ${statusLabels[lead.status||'new']||'New'}
+        </span>
       </div>
       <div style="text-align:right;">
         <div class="lead-time-val">${timeAgo(lead.created_at)}</div>
@@ -665,6 +693,17 @@ function openDetail(lead) {
       <div class="detail-row"><span class="detail-key">Created</span><span class="detail-val">${new Date(lead.created_at).toLocaleString('en-IN')}</span></div>
     </div>
 
+    <div class="detail-section">
+      <div class="detail-section-title">Lead Status</div>
+      <select class="status-select" id="statusSelect_${lead.id}" onchange="updateStatus('${lead.id}', this.value)" onclick="event.stopPropagation()">
+        <option value="new" ${(lead.status||'new')==='new'?'selected':''}>🔵 New</option>
+        <option value="in_progress" ${lead.status==='in_progress'?'selected':''}>🟡 In Progress</option>
+        <option value="converted" ${lead.status==='converted'?'selected':''}>🟢 Converted</option>
+        <option value="not_interested" ${lead.status==='not_interested'?'selected':''}>🔴 Not Interested</option>
+        <option value="follow_up" ${lead.status==='follow_up'?'selected':''}>🔵 Follow Up</option>
+      </select>
+    </div>
+
     <div class="action-btns">
       <button class="btn-call" onclick="window.location='tel:${phone}'">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
@@ -710,6 +749,33 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+async function updateStatus(leadId, newStatus) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/leads?id=eq.${leadId}`, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({ status: newStatus })
+  });
+  if (res.ok) {
+    // Update local data
+    const lead = allLeads.find(l => l.id === leadId);
+    if (lead) lead.status = newStatus;
+    filteredLeads = filteredLeads.map(l => l.id === leadId ? { ...l, status: newStatus } : l);
+    renderTable();
+    // Update converted count
+    const converted = allLeads.filter(l => l.status === 'converted').length;
+    document.getElementById('statConverted').textContent = converted;
+    const labels = {new:'New',in_progress:'In Progress',converted:'Converted ✅',not_interested:'Not Interested',follow_up:'Follow Up'};
+    showToast('Status updated: ' + (labels[newStatus] || newStatus));
+  } else {
+    showToast('Update fail hua, dobara try karo');
+  }
 }
 
 // Auto-login check
