@@ -83,19 +83,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* TABLE */
 .leads-table{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .table-loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
-.lead-row{display:grid;grid-template-columns:70px 1fr 150px 100px 80px 90px 80px 20px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;gap:10px;}
+.lead-row{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;gap:10px;min-width:0;}
 .lead-row:last-child{border-bottom:none;}
 .lead-row:hover{background:#F8FAFC;}
-.lead-col-badge{display:flex;align-items:center;gap:6px;}
+.lead-col-badge{flex-shrink:0;}
 .lead-av{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
-.lead-name{font-size:13px;font-weight:600;}
-.lead-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-.lead-loc-val{font-size:12px;color:var(--text);}
-.lead-loc-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.lead-main-info{flex:1;min-width:0;overflow:hidden;}
+.lead-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lead-sub{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lead-right{flex-shrink:0;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
 .lead-budget-val{font-size:13px;font-weight:700;color:var(--text);}
-.lead-score-val{font-size:14px;font-weight:700;text-align:center;}
+.lead-score-val{font-size:12px;font-weight:700;text-align:center;}
 .lead-score-lbl{font-size:10px;color:var(--muted);text-align:center;}
-.lead-time-val{font-size:11px;color:var(--muted);text-align:right;}
+.lead-time-val{font-size:10px;color:var(--muted);}
+.lead-loc-val{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lead-loc-sub{font-size:11px;color:var(--muted);margin-top:1px;}
 .badge{display:inline-flex;align-items:center;padding:3px 7px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:0.3px;}
 .badge.hot{background:#FEE2E2;color:#DC2626;}
 .badge.warm{background:#FEF3C7;color:#D97706;}
@@ -583,6 +585,10 @@ function renderTable() {
     return;
   }
 
+  const statusLabels = {new:'New',in_progress:'In Progress',converted:'Converted',not_interested:'Not Interested',follow_up:'Follow Up'};
+  const statusColors = {new:'#7C3AED',in_progress:'#D97706',converted:'#065F46',not_interested:'#DC2626',follow_up:'#1D4ED8'};
+  const statusBg = {new:'#EDE9FE',in_progress:'#FEF3C7',converted:'#D1FAE5',not_interested:'#FEE2E2',follow_up:'#DBEAFE'};
+
   let html = '';
   for (const lead of pageLeads) {
     const score = lead.score;
@@ -592,43 +598,22 @@ function renderTable() {
     const avColor = getAvColor(lead.name);
     const intentShort = (lead.intent || '').replace(' Chahte Hain', '').replace(' Chahte Hai', '');
 
-    const statusLabels = {new:'New',in_progress:'In Progress',converted:'Converted',not_interested:'Not Interested',follow_up:'Follow Up'};
-    const statusColors = {new:'#7C3AED',in_progress:'#D97706',converted:'#065F46',not_interested:'#DC2626',follow_up:'#1D4ED8'};
-    const statusBg = {new:'#EDE9FE',in_progress:'#FEF3C7',converted:'#D1FAE5',not_interested:'#FEE2E2',follow_up:'#DBEAFE'};
-
     html += `<div class="lead-row" onclick='openDetail(${JSON.stringify(lead)})'>
-      <div class="lead-col-badge">
-        <span class="badge ${scoreType}">${scoreType.toUpperCase()}</span>
+      <div class="lead-col-badge"><span class="badge ${scoreType}">${scoreType.toUpperCase()}</span></div>
+      <div class="lead-av" style="background:${avColor};">${av}</div>
+      <div class="lead-main-info">
+        <div class="lead-name">${lead.name || '—'}</div>
+        <div class="lead-sub">${lead.phone || '—'}</div>
+        <div class="lead-sub">${intentShort} · ${lead.property_type || '—'}</div>
+        <div class="lead-sub">${lead.area || '—'}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-        <div class="lead-av" style="background:${avColor};">${av}</div>
-        <div style="min-width:0;">
-          <div class="lead-name">${lead.name || '—'}</div>
-          <div class="lead-sub">${lead.phone || '—'}</div>
-          <div class="lead-sub">${intentShort} · ${lead.property_type || '—'}</div>
-        </div>
-      </div>
-      <div>
-        <div class="lead-loc-val">${lead.area || '—'}</div>
-        <div class="lead-loc-sub">${timeAgo(lead.created_at)}</div>
-      </div>
-      <div>
+      <div class="lead-right">
         <div class="lead-budget-val">${lead.budget || '—'}</div>
-        <div class="lead-sub">${lead.timeline || '—'}</div>
-      </div>
-      <div>
         <div class="lead-score-val" style="color:${scoreColor};">${score}%</div>
-        <div class="lead-score-lbl">Score</div>
-      </div>
-      <div>
-        <span style="background:${statusBg[lead.status||'new']};color:${statusColors[lead.status||'new']};padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;">
-          ${statusLabels[lead.status||'new']||'New'}
-        </span>
-      </div>
-      <div style="text-align:right;">
+        <span style="background:${statusBg[lead.status||'new']};color:${statusColors[lead.status||'new']};padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;">${statusLabels[lead.status||'new']||'New'}</span>
         <div class="lead-time-val">${timeAgo(lead.created_at)}</div>
       </div>
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E0" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#CBD5E0" stroke-width="2" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`;
   }
 
