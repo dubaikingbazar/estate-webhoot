@@ -332,6 +332,78 @@ app.patch('/api/admin/brokers/:brokerId', async (req, res) => {
   res.json({ success: true });
 });
 
+// ===== STATE MACHINE =====
+const leadStates = {};
+
+function getLeadState(sessionId) {
+  if (!leadStates[sessionId]) {
+    leadStates[sessionId] = {
+      intent: '', name: '', propertyType: '',
+      location: '', budget: '', timeline: '', phone: ''
+    };
+  }
+  return leadStates[sessionId];
+}
+
+function updateLeadState(sessionId, leadData) {
+  const state = getLeadState(sessionId);
+  if (leadData.intent) state.intent = leadData.intent;
+  if (leadData.name && leadData.name !== 'NAAM' && leadData.name !== 'NAME') state.name = leadData.name;
+  if (leadData.property || leadData.propertyType) state.propertyType = leadData.property || leadData.propertyType;
+  if (leadData.location) state.location = leadData.location;
+  if (leadData.budget) state.budget = leadData.budget;
+  if (leadData.timeline) state.timeline = leadData.timeline;
+  if (leadData.phone) state.phone = leadData.phone;
+}
+
+function getMissingFields(sessionId) {
+  const s = getLeadState(sessionId);
+  const missing = [];
+  if (!s.intent) missing.push('intent (kharidna/bechna/rent)');
+  if (!s.propertyType) missing.push('property type');
+  if (!s.name) missing.push('customer name');
+  if (!s.location) missing.push('location');
+  if (!s.budget) missing.push('budget');
+  if (!s.timeline) missing.push('timeline');
+  if (!s.phone) missing.push('phone number');
+  return missing;
+}
+
+function buildSystemPromptWithState(brokerName, sessionId) {
+  const state = getLeadState(sessionId);
+  const missing = getMissingFields(sessionId);
+  let stateNote = '\n\nCURRENT LEAD STATE (jo pehle se collect ho chuka hai):\n';
+  stateNote += `- Intent: ${state.intent || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Customer Name: ${state.name || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Property Type: ${state.propertyType || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Location: ${state.location || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Budget: ${state.budget || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Timeline: ${state.timeline || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Phone: ${state.phone || 'NOT YET COLLECTED'}\n`;
+  if (missing.length > 0) {
+    stateNote += `\nABHI SIRF YE COLLECT KARNA HAI (ek ek karke): ${missing[0]}\n`;
+    stateNote += `IMPORTANT: Jo already collected hai usse DOBARA MAT PUCHHO.\n`;
+  }
+  return getSystemPrompt(brokerName) + stateNote;
+}
+
+// ===== RESPONSE VALIDATOR =====
+function validateReply(reply, brokerName) {
+  // Check for double questions
+  const questionCount = (reply.match(/\?/g) || []).length;
+  if (questionCount > 1) return false;
+
+  // Check for AI/bot disclosure
+  if (/\b(AI|artificial intelligence|chatbot|bot|language model)\b/i.test(reply)) return false;
+
+  // Check for broker name used as customer name (common hallucination)
+  const brokerFirstName = brokerName.split(' ')[0].toLowerCase();
+  const lines = reply.toLowerCase();
+  if (lines.includes(brokerFirstName + ' ji') && lines.indexOf(brokerFirstName + ' ji') < 50) return false;
+
+  return true;
+}
+
 // ===== CHAT API =====
 app.post('/api/chat/:brokerId', async (req, res) => {
   const { brokerId } = req.params;
@@ -350,58 +422,113 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   conversations[sessionId].push({ role: 'user', content: message });
 
   try {
-    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
-      body: JSON.stringify({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-        messages: [{ role: 'system', content: getSystemPrompt(broker.name) }, ...conversations[sessionId]]
-      })
-    });
-    const data = await groqRes.json();
-    console.log('Groq response status:', groqRes.status);
-    if (!data.choices || !data.choices[0]) {
-      console.error('Groq error response:', JSON.stringify(data));
+    let reply = '';
+    let attempts = 0;
+
+    while (attempts < 3) {
+      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+          messages: [
+            { role: 'system', content: buildSystemPromptWithState(broker.name, sessionId) },
+            ...conversations[sessionId]
+          ]
+        })
+      });
+      const data = await groqRes.json();
+      console.log('Groq response status:', groqRes.status, 'Attempt:', attempts + 1);
+      if (!data.choices || !data.choices[0]) {
+        console.error('Groq error response:', JSON.stringify(data));
+        break;
+      }
+      reply = data.choices[0].message.content || '';
+
+      // Validate — agar pass toh break, nahi toh retry
+      if (validateReply(reply, broker.name)) break;
+      console.log('Validation failed, retrying...', attempts + 1);
+      attempts++;
     }
-    let reply = data.choices?.[0]?.message?.content || 'Kuch gadbad ho gayi, dobara try karein.';
+
+    if (!reply) reply = 'Kuch gadbad ho gayi, dobara try karein.';
+
     conversations[sessionId].push({ role: 'assistant', content: reply });
 
     let leadComplete = false;
     let leadData = null;
 
     if (reply.includes('|||LEAD|||')) {
-      const match = reply.match(/\|\|\|LEAD\|\|\|(.+?)\|\|\|/);
+      const match = reply.match(/\|\|\|LEAD\|\|\|(.+?)\|\|\|/s);
       if (match) {
         try {
           leadData = JSON.parse(match[1]);
-          if (!leadData.phone || leadData.phone.length < 8) {
+          updateLeadState(sessionId, leadData);
+
+          // Phone validate karo
+          const phoneDigits = (leadData.phone || '').replace(/\D/g, '');
+          if (!leadData.phone || phoneDigits.length < 10) {
             reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
             leadComplete = false;
             leadData = null;
           } else {
             reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
-            const uploadToken = Math.random().toString(36).substr(2,12) + Date.now().toString(36);
-            const { error: insertError } = await supabase.from('leads').insert([{
-              broker_id: brokerId,
-              name: leadData.name,
-              phone: leadData.phone,
-              property_type: leadData.type,
-              area: leadData.area,
-              budget: leadData.budget,
-              intent: leadData.intent,
-              timeline: leadData.timeline || null,
-              furnished: leadData.furnished || null,
-              parking: leadData.parking || null,
-              special_requirements: leadData.special || null,
-              upload_token: uploadToken
-            }]).select().single();
-            if (insertError) console.error('Lead insert error:', JSON.stringify(insertError));
-            await sendLeadEmail(broker, leadData);
-            leadComplete = true;
+
+            // Check missing fields before saving
+            const state = getLeadState(sessionId);
+            const missing = getMissingFields(sessionId);
+            const criticalMissing = missing.filter(f => !f.includes('timeline'));
+
+            if (criticalMissing.length > 1) {
+              // Abhi bhi bahut saari info missing hai — lead save mat karo
+              console.log('Lead incomplete, missing:', criticalMissing);
+              leadComplete = false;
+              leadData = null;
+            } else {
+              const uploadToken = Math.random().toString(36).substr(2,12) + Date.now().toString(36);
+              const { error: insertError } = await supabase.from('leads').insert([{
+                broker_id: brokerId,
+                name: leadData.name || state.name,
+                phone: leadData.phone || state.phone,
+                property_type: leadData.property || leadData.type || state.propertyType,
+                area: leadData.location || state.location,
+                budget: leadData.budget || state.budget,
+                intent: leadData.intent || state.intent,
+                timeline: leadData.timeline || state.timeline || null,
+                furnished: leadData.details?.furnished || null,
+                parking: leadData.details?.parking || null,
+                special_requirements: leadData.details?.special || null,
+                upload_token: uploadToken
+              }]).select().single();
+              if (insertError) console.error('Lead insert error:', JSON.stringify(insertError));
+              await sendLeadEmail(broker, {
+                name: leadData.name || state.name,
+                phone: leadData.phone || state.phone,
+                type: leadData.property || state.propertyType,
+                area: leadData.location || state.location,
+                budget: leadData.budget || state.budget,
+                intent: leadData.intent || state.intent,
+                timeline: leadData.timeline || state.timeline
+              });
+              leadComplete = true;
+              delete leadStates[sessionId];
+            }
           }
         } catch (e) { console.error('Lead parse error:', e); }
       }
+    } else {
+      // LEAD nahi mila — state update karne ki koshish karo conversation se
+      const state = getLeadState(sessionId);
+      // Intent detect karo
+      const msgLower = message.toLowerCase();
+      if (!state.intent) {
+        if (msgLower.includes('kharid') || msgLower.includes('lena') || msgLower.includes('buy')) state.intent = 'BUY';
+        else if (msgLower.includes('sell') || msgLower.includes('bech') || msgLower.includes('nikalna')) state.intent = 'SELL';
+        else if (msgLower.includes('rent') && (msgLower.includes('lena') || msgLower.includes('chahiye'))) state.intent = 'RENT';
+        else if (msgLower.includes('rent') && (msgLower.includes('dena') || msgLower.includes('tenant'))) state.intent = 'RENT_OUT';
+      }
     }
+
     res.json({ reply, leadComplete, leadData });
   } catch (err) {
     console.error('Error:', err);
