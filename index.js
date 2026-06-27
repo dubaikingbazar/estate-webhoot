@@ -19,12 +19,11 @@ const supabase = createClient(
 // ===== CASHFREE CONFIG =====
 const CASHFREE_APP_ID = process.env.CASHFREE_APP_ID;
 const CASHFREE_SECRET = process.env.CASHFREE_SECRET;
-// Change to 'https://api.cashfree.com' for production
 const CASHFREE_BASE = process.env.CASHFREE_ENV === 'production'
   ? 'https://api.cashfree.com'
   : 'https://sandbox.cashfree.com';
 
-const PLAN_AMOUNT = 2999; // ₹2,999/month
+const PLAN_AMOUNT = 2999;
 
 // ===== ADMIN AUTH =====
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'change-me-please';
@@ -287,14 +286,13 @@ async function sendWelcomeEmail(broker) {
   else console.log(`Welcome email sent to ${broker.email}`);
 }
 
-// ===== BROKER SIGNUP — NOW CREATES ORDER =====
+// ===== BROKER SIGNUP — 7 DAY TRIAL =====
 app.post('/api/signup', async (req, res) => {
   const { name, business, city, state, specialty, email, phone, experience, properties, password } = req.body;
   if (!name || !business || !city || !email || !phone) {
     return res.status(400).json({ error: 'Saari details bharo' });
   }
 
-  // Generate broker_id
   const broker_id = business.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '-')
@@ -306,7 +304,7 @@ app.post('/api/signup', async (req, res) => {
     .single();
   const finalId = existing ? `${broker_id}-${Date.now().toString().slice(-4)}` : broker_id;
 
-  // Save broker with 'pending_payment' status
+  // CHANGE 1: Save broker with 'trial' status + trial_start date
   const { error: dbErr } = await supabase.from('brokers').insert([{
     broker_id: finalId,
     name: business,
@@ -314,7 +312,9 @@ app.post('/api/signup', async (req, res) => {
     phone,
     city: city + (state ? ', ' + state : ''),
     specialty: specialty || 'Residential',
-    status: 'pending_payment',    // <-- blocked until payment done
+    status: 'trial',
+    trial_start: new Date().toISOString(),
+    trial_days: 7,
     password: password || null,
     stats: {
       experience: experience ? experience + ' Yrs' : '5 Yrs',
@@ -326,66 +326,21 @@ app.post('/api/signup', async (req, res) => {
     return res.status(500).json({ error: 'Database error' });
   }
 
-  // Create Cashfree order
-  try {
-    const orderId = `EB_${finalId}_${Date.now()}`;
-    const cfRes = await fetch(`${CASHFREE_BASE}/pg/orders`, {
-      method: 'POST',
-      headers: {
-        'x-client-id': CASHFREE_APP_ID,
-        'x-client-secret': CASHFREE_SECRET,
-        'x-api-version': '2023-08-01',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        order_id: orderId,
-        order_amount: PLAN_AMOUNT,
-        order_currency: 'INR',
-        customer_details: {
-          customer_id: finalId,
-          customer_name: name,
-          customer_email: email,
-          customer_phone: phone.replace(/\D/g, '').slice(-10)
-        },
-        order_meta: {
-          return_url: `https://estatebotai.in/payment/status?order_id={order_id}&broker_id=${finalId}`,
-          notify_url: `https://estatebotai.in/api/payment/webhook`
-        },
-        order_note: `EstateBot subscription — ${finalId}`
-      })
-    });
+  // Send welcome email
+  await sendWelcomeEmail({ name: business, broker_id: finalId, email });
 
-    const cfData = await cfRes.json();
-    console.log('Cashfree order response:', JSON.stringify(cfData));
-
-    if (!cfData.payment_session_id) {
-      console.error('Cashfree error:', cfData);
-      return res.status(500).json({ error: 'Payment gateway error. Please try again.' });
-    }
-
-    // Save order_id in broker record for reference
-    await supabase.from('brokers')
-      .update({ cashfree_order_id: orderId })
-      .eq('broker_id', finalId);
-
-    res.json({
-      success: true,
-      broker_id: finalId,
-      payment_session_id: cfData.payment_session_id,
-      order_id: orderId,
-      amount: PLAN_AMOUNT
-    });
-
-  } catch (cfErr) {
-    console.error('Cashfree fetch error:', cfErr);
-    return res.status(500).json({ error: 'Payment gateway unreachable. Please try again.' });
-  }
+  res.json({
+    success: true,
+    broker_id: finalId,
+    trial: true,
+    trial_days: 7,
+    message: '7 din ka free trial shuru ho gaya!'
+  });
 });
 
 // ===== CASHFREE WEBHOOK — ACTIVATES SUBSCRIPTION =====
 app.post('/api/payment/webhook', async (req, res) => {
   try {
-    // Verify Cashfree signature
     const rawBody = req.body.toString('utf8');
     const signature = req.headers['x-webhook-signature'];
     const timestamp = req.headers['x-webhook-timestamp'];
@@ -411,14 +366,11 @@ app.post('/api/payment/webhook', async (req, res) => {
 
       if (!order?.order_id) return res.status(200).json({ status: 'ok' });
 
-      // Extract broker_id from order_id format: EB_brokerid_timestamp
       const parts = order.order_id.split('_');
-      // broker_id could have dashes so join middle parts
       const brokerId = parts.slice(1, -1).join('_');
 
       console.log(`Payment SUCCESS for broker: ${brokerId}, order: ${order.order_id}`);
 
-      // Activate broker subscription
       const validTill = new Date();
       validTill.setMonth(validTill.getMonth() + 1);
 
@@ -430,7 +382,7 @@ app.post('/api/payment/webhook', async (req, res) => {
 
       if (fetchErr || !broker) {
         console.error('Broker not found for webhook:', brokerId);
-        return res.status(200).json({ status: 'ok' }); // Return 200 to stop retries
+        return res.status(200).json({ status: 'ok' });
       }
 
       await supabase.from('brokers').update({
@@ -443,7 +395,6 @@ app.post('/api/payment/webhook', async (req, res) => {
 
       console.log(`Broker ${brokerId} activated till ${validTill.toISOString()}`);
 
-      // Send welcome email
       await sendWelcomeEmail({ name: broker.name, broker_id: brokerId, email: broker.email });
     }
 
@@ -460,7 +411,7 @@ app.post('/api/payment/webhook', async (req, res) => {
     res.status(200).json({ status: 'ok' });
   } catch (err) {
     console.error('Webhook error:', err);
-    res.status(200).json({ status: 'ok' }); // Always 200 to Cashfree
+    res.status(200).json({ status: 'ok' });
   }
 });
 
@@ -472,7 +423,6 @@ app.get('/payment/status', async (req, res) => {
     return res.redirect('/');
   }
 
-  // Verify payment status with Cashfree
   try {
     const cfRes = await fetch(`${CASHFREE_BASE}/pg/orders/${order_id}`, {
       headers: {
@@ -487,7 +437,6 @@ app.get('/payment/status', async (req, res) => {
     console.log(`Payment status check: order=${order_id}, status=${status}`);
 
     if (status === 'PAID') {
-      // Activate if not already done by webhook
       const { data: broker } = await supabase
         .from('brokers').select('status,name,email').eq('broker_id', broker_id).single();
 
@@ -569,7 +518,16 @@ app.post('/api/broker-auth', async (req, res) => {
   const { data: broker, error } = await supabase.from('brokers').select('*').eq('broker_id', broker_id).single();
   if (error || !broker) return res.status(404).json({ error: 'Broker nahi mila' });
   if (broker.password !== password) return res.status(401).json({ error: 'Password galat hai' });
-  res.json({ success: true, broker_id: broker.broker_id });
+
+  // CHANGE 2: Trial days remaining calculate karo
+  let trialDaysLeft = null;
+  if (broker.status === 'trial' && broker.trial_start) {
+    const trialEnd = new Date(broker.trial_start);
+    trialEnd.setDate(trialEnd.getDate() + (broker.trial_days || 7));
+    trialDaysLeft = Math.max(0, Math.ceil((trialEnd - new Date()) / (1000 * 60 * 60 * 24)));
+  }
+
+  res.json({ success: true, broker_id: broker.broker_id, status: broker.status, trial_days_left: trialDaysLeft });
 });
 
 app.get('/broker-login', (req, res) => { res.redirect('/dashboard'); });
@@ -670,9 +628,19 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   const { data: broker, error } = await supabase.from('brokers').select('*').eq('broker_id', brokerId).single();
   if (error || !broker) return res.status(404).json({ error: 'Broker not found' });
 
-  // Block if payment not done
-  if (broker.status === 'inactive' || broker.status === 'pending_payment' || broker.status === 'payment_failed') {
+  // Block if inactive/failed
+  if (broker.status === 'inactive' || broker.status === 'pending_payment' || broker.status === 'payment_failed' || broker.status === 'expired') {
     return res.status(403).json({ error: 'Subscription not active' });
+  }
+
+  // CHANGE 3: Trial expire check
+  if (broker.status === 'trial' && broker.trial_start) {
+    const trialEnd = new Date(broker.trial_start);
+    trialEnd.setDate(trialEnd.getDate() + (broker.trial_days || 7));
+    if (new Date() > trialEnd) {
+      await supabase.from('brokers').update({ status: 'expired' }).eq('broker_id', brokerId);
+      return res.status(403).json({ error: 'Trial expired', trial_expired: true });
+    }
   }
 
   if (!conversations[sessionId]) conversations[sessionId] = [];
