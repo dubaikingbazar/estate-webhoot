@@ -458,7 +458,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="page" id="page-properties">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div style="font-size:17px;font-weight:700;">Property Inventory</div>
-        <button onclick="openAddProperty()" style="background:var(--navy);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Add Property</button>
+        <div style="display:flex;gap:8px;">
+          <button onclick="showLeadMatch()" style="background:#EDE9FE;color:#5B3DF5;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">🎯 Lead Match</button>
+          <button onclick="openAddProperty()" style="background:var(--navy);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Add Property</button>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;" id="propStats"></div>
       <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
@@ -471,6 +474,37 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           </select>
         </div>
         <div id="propList"><div class="table-loading">Koi property nahi hai — Add karo!</div></div>
+      </div>
+    </div>
+
+    <!-- LEAD MATCH MODAL -->
+    <div class="modal-overlay" id="leadMatchModal" style="z-index:600;">
+      <div class="modal-box" style="max-width:500px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div class="modal-title">🎯 Lead Match</div>
+          <button onclick="document.getElementById('leadMatchModal').classList.remove('show')" style="background:none;border:1px solid var(--border);border-radius:7px;padding:5px 9px;cursor:pointer;font-size:13px;">✕</button>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Lead select karo — uske budget/type ke hisaab se matching properties dikhayenge</div>
+        <select class="modal-input" id="matchLeadSelect" onchange="runLeadMatch()">
+          <option value="">-- Lead Select Karo --</option>
+        </select>
+        <div id="matchResults"></div>
+      </div>
+    </div>
+
+    <!-- PROP NOTES MODAL -->
+    <div class="modal-overlay" id="propNotesModal" style="z-index:600;">
+      <div class="modal-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div class="modal-title">📝 Property Notes</div>
+          <button onclick="document.getElementById('propNotesModal').classList.remove('show')" style="background:none;border:1px solid var(--border);border-radius:7px;padding:5px 9px;cursor:pointer;font-size:13px;">✕</button>
+        </div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;" id="propNoteTitle"></div>
+        <textarea id="propNoteArea" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px;font-size:13px;font-family:'Inter',sans-serif;outline:none;resize:vertical;min-height:100px;" placeholder="Notes likhو (e.g. Owner urgent hai, price negotiate ho sakti, 2nd floor pe lift nahi)"></textarea>
+        <div class="modal-actions" style="margin-top:10px;">
+          <button class="modal-cancel" onclick="document.getElementById('propNotesModal').classList.remove('show')">Cancel</button>
+          <button class="modal-ok" onclick="savePropNote()">Save Note</button>
+        </div>
       </div>
     </div>
 
@@ -968,6 +1002,13 @@ function renderPagination(infoId,btnsId,cur,total,cb){
   document.getElementById(btnsId).innerHTML=btns;
 }
 
+
+function renderCallLog(leadId){
+  const logs = callLogs[leadId]||[];
+  if(!logs.length) return "<div style='font-size:12px;color:var(--muted);'>No calls logged yet</div>";
+  return logs.slice(-3).map(function(l){return "<div style='font-size:11px;color:var(--muted);padding:4px 0;border-bottom:1px solid #F1F5F9;'>"+l+"</div>";}).join("");
+}
+
 // ===== LEAD DETAIL PANEL =====
 function openDetail(leadId){
   const lead = leadStore[leadId];
@@ -982,7 +1023,7 @@ function openDetail(leadId){
 
   // WhatsApp templates
   const brokerName=currentBroker?.name||'Broker';
-  const templates=[
+  currentTemplates=[
     `Namaste ${lead.name||'ji'}! Main ${brokerName} hoon. Aapne ${lead.property_type||'property'} ke baare mein enquiry ki thi. Kya aap abhi baat kar sakte hain?`,
     `Namaste ${lead.name||'ji'}! Aapke budget (${lead.budget||'—'}) ke hisaab se ${lead.area||'aapke area'} mein kuch achhe options hain. Interested hain?`,
     `Hi ${lead.name||'ji'}, koi update hai ${lead.property_type||'property'} ke baare mein? Hamare paas kuch naye options aaye hain.`,
@@ -1037,7 +1078,7 @@ function openDetail(leadId){
     </div>
     <div class="detail-section">
       <div class="detail-section-title">Call Log</div>
-      <div id="callLogDisplay_${lead.id}" style="margin-bottom:8px;">${logs.length?logs.slice(-3).map(l=>`<div style="font-size:11px;color:var(--muted);padding:4px 0;border-bottom:1px solid #F1F5F9;">${l}</div>`).join(''):'<div style="font-size:12px;color:var(--muted);">No calls logged yet</div>'}</div>
+      <div id="callLogDisplay_${lead.id}" style="margin-bottom:8px;">${renderCallLog(lead.id)}</div>
       <button class="save-note-btn" onclick="logCall('${lead.id}','${lead.name||''}')" style="color:var(--green);border-color:rgba(16,185,129,0.3);">📞 Log a Call</button>
     </div>
     <div class="action-btns">
@@ -1045,7 +1086,7 @@ function openDetail(leadId){
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
         Call Now
       </button>
-      <button class="btn-wa" onclick="sendWhatsApp('${phone}','${templates[0].replace(/'/g,"\\'")}')">
+      <button class="btn-wa" onclick="sendWhatsApp('${phone}',currentTemplates[0])">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         WhatsApp
       </button>
@@ -1060,7 +1101,7 @@ function openDetail(leadId){
     <div class="detail-section" style="margin-top:14px;">
       <div class="detail-section-title">WhatsApp Templates</div>
       <div class="wa-templates">
-        ${templates.map((t,i)=>`<div class="wa-tpl" onclick="sendWhatsApp('${phone}','${t.replace(/'/g,"\\'").replace(/\n/g,' ')}')">${t.substring(0,80)}${t.length>80?'...':''}</div>`).join('')}
+        ${templates.map((t,i)=>`<div class="wa-tpl" onclick="sendWhatsApp('${phone}',currentTemplates[${i}])">${t.substring(0,80)}${t.length>80?'...':''}</div>`).join('')}
       </div>
     </div>
   `;
@@ -1203,11 +1244,7 @@ function renderFollowUps(){
   }
   if(done.length){
     html+=`<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:14px 0 10px;">Completed (${done.length})</div>`;
-    html+=done.slice(0,5).map(f=>`<div class="fu-card" style="opacity:0.5;">
-      <div class="fu-date"><div class="day">${new Date(f.date+'T00:00:00').getDate()}</div><div>${new Date(f.date+'T00:00:00').toLocaleString('en-IN',{month:'short'})}</div></div>
-      <div><div class="fu-name" style="text-decoration:line-through;">${f.leadName}</div><div class="fu-note">${f.note||''}</div></div>
-      <div style="margin-left:auto;font-size:11px;color:var(--green);font-weight:600;">✓ Done</div>
-    </div>`).join('');
+    html+=done.slice(0,5).map(function(f){const dd=new Date(f.date+'T00:00:00');return '<div class="fu-card" style="opacity:0.5;"><div class="fu-date"><div class="day">'+dd.getDate()+'</div><div>'+dd.toLocaleString('en-IN',{month:'short'})+'</div></div><div><div class="fu-name" style="text-decoration:line-through;">'+f.leadName+'</div><div class="fu-note">'+(f.note||'')+'</div></div><div style="margin-left:auto;font-size:11px;color:var(--green);font-weight:600;">✓ Done</div></div>';}).join('');
   }
   document.getElementById('followUpsContainer').innerHTML=html;
 }
@@ -1625,9 +1662,12 @@ document.getElementById('reportModal').onclick=e=>{if(e.target===document.getEle
 document.getElementById('summaryModal').onclick=e=>{if(e.target===document.getElementById('summaryModal'))e.target.classList.remove('show');};
 document.getElementById('propModal').onclick=e=>{if(e.target===document.getElementById('propModal'))e.target.classList.remove('show');};
 document.getElementById('visitModal').onclick=e=>{if(e.target===document.getElementById('visitModal'))e.target.classList.remove('show');};
+document.getElementById('leadMatchModal').onclick=e=>{if(e.target===document.getElementById('leadMatchModal'))e.target.classList.remove('show');};
+document.getElementById('propNotesModal').onclick=e=>{if(e.target===document.getElementById('propNotesModal'))e.target.classList.remove('show');};
 
-// ===== PROPERTIES =====
-let properties=JSON.parse(localStorage.getItem('eb_properties')||'[]');
+let propNotes=JSON.parse(localStorage.getItem('eb_prop_notes')||'{}');
+let currentPropNoteId='';
+
 function openAddProperty(){document.getElementById('propModal').classList.add('show');}
 function saveProperty(){
   const title=document.getElementById('propTitle').value.trim(),type=document.getElementById('propType').value,location=document.getElementById('propLocation').value.trim(),price=document.getElementById('propPrice').value.trim(),status=document.getElementById('propStatus').value,details=document.getElementById('propDetails').value.trim();
@@ -1638,6 +1678,50 @@ function saveProperty(){
   ['propTitle','propLocation','propPrice','propDetails'].forEach(id=>document.getElementById(id).value='');
   renderProperties();showToast('Property add ho gayi!');
 }
+
+function openPropNotes(id,title){
+  currentPropNoteId=id;
+  document.getElementById('propNoteTitle').textContent=title;
+  document.getElementById('propNoteArea').value=propNotes[id]||'';
+  document.getElementById('propNotesModal').classList.add('show');
+}
+
+function savePropNote(){
+  propNotes[currentPropNoteId]=document.getElementById('propNoteArea').value;
+  localStorage.setItem('eb_prop_notes',JSON.stringify(propNotes));
+  document.getElementById('propNotesModal').classList.remove('show');
+  renderProperties();showToast('Note saved!');
+}
+
+function sharePropertyWA(id){
+  const p=properties.find(x=>x.id===id);
+  if(!p)return;
+  const msg=`🏠 *Property Available*\n\n*${p.title}*\n📍 Location: ${p.location}\n💰 Price: ₹${p.price}\n🏗️ Type: ${p.type}${p.details?'\n📋 Details: '+p.details:''}\n\n_Contact us for more details_`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+// Template and property helpers
+let currentTemplates = [];
+
+function openPropNotesById(id){
+  const p = properties.find(x=>x.id===id);
+  if(!p) return;
+  openPropNotes(id, p.title);
+}
+
+function deletePropertyById(id){
+  if(!confirm('Delete karo?')) return;
+  properties = properties.filter(x=>x.id!==id);
+  localStorage.setItem('eb_properties', JSON.stringify(properties));
+  renderProperties();
+  showToast('Property deleted!');
+}
+
+
+function getDaysOnMarket(addedOn){
+  if(!addedOn)return 0;
+  return Math.floor((Date.now()-new Date(addedOn))/(1000*60*60*24));
+}
+
 function renderProperties(){
   const filter=document.getElementById('propFilter')?.value||'all',typeFilter=document.getElementById('propTypeFilter')?.value||'all';
   const filtered=properties.filter(p=>(filter==='all'||p.status===filter)&&(typeFilter==='all'||p.type===typeFilter));
@@ -1647,26 +1731,87 @@ function renderProperties(){
     <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#5B3DF5;">${properties.filter(p=>p.status==='sold').length}</div><div style="font-size:11px;color:var(--muted);">Sold</div></div>`;
   if(!filtered.length){document.getElementById('propList').innerHTML='<div class="table-loading">Koi property nahi mili — Add karo!</div>';return;}
   const sc={available:'#10B981',sold:'#EF4444',rented:'#F59E0B'},sb={available:'#D1FAE5',sold:'#FEE2E2',rented:'#FEF3C7'};
-  document.getElementById('propList').innerHTML=filtered.map(p=>`
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);">
-      <div style="width:36px;height:36px;border-radius:9px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${p.type==='flat'?'🏢':p.type==='house'?'🏠':p.type==='plot'?'🌍':'🏪'}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:600;">${p.title}</div>
-        <div style="font-size:11px;color:var(--muted);">📍 ${p.location} · ${p.type}${p.details?' · '+p.details:''}</div>
+  document.getElementById('propList').innerHTML=filtered.map(p=>{
+    const days=getDaysOnMarket(p.addedOn);
+    const hasNote=propNotes[p.id];
+    const daysColor=days>30?'#EF4444':days>14?'#F59E0B':'#10B981';
+    return `<div style="padding:13px 14px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:8px;">
+        <div style="width:36px;height:36px;border-radius:9px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${p.type==='flat'?'🏢':p.type==='house'?'🏠':p.type==='plot'?'🌍':'🏪'}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;">${p.title} ${hasNote?'📝':''}</div>
+          <div style="font-size:11px;color:var(--muted);">📍 ${p.location}${p.details?' · '+p.details:''}</div>
+          ${hasNote?`<div style="font-size:11px;color:#5B3DF5;margin-top:2px;">💬 ${propNotes[p.id].substring(0,50)}${propNotes[p.id].length>50?'...':''}</div>`:''}
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:13px;font-weight:700;">₹${p.price}</div>
+          <span style="background:${sb[p.status]};color:${sc[p.status]};padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;">${p.status.toUpperCase()}</span>
+          <div style="font-size:10px;color:${daysColor};margin-top:2px;font-weight:600;">${days}d listed</div>
+        </div>
       </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-size:13px;font-weight:700;">₹${p.price}</div>
-        <span style="background:${sb[p.status]};color:${sc[p.status]};padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;">${p.status.toUpperCase()}</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <select onchange="updatePropStatus('${p.id}',this.value)" style="border:1px solid var(--border);border-radius:7px;padding:5px 7px;font-size:11px;font-family:'Inter',sans-serif;outline:none;">
+          <option value="available" ${p.status==='available'?'selected':''}>Available</option>
+          <option value="sold" ${p.status==='sold'?'selected':''}>Sold</option>
+          <option value="rented" ${p.status==='rented'?'selected':''}>Rented</option>
+        </select>
+        <button onclick="sharePropertyWA('${p.id}')" style="background:#25D366;color:#fff;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">📲 WhatsApp</button>
+        <button onclick="openPropNotesById('${p.id}')" style="background:#EDE9FE;color:#5B3DF5;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">📝 Notes</button>
+        <button onclick="deletePropertyById('${p.id}')" style="background:#FEE2E2;color:#DC2626;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">🗑 Delete</button>
       </div>
-      <select onchange="updatePropStatus('${p.id}',this.value)" style="border:1px solid var(--border);border-radius:7px;padding:5px 7px;font-size:11px;font-family:'Inter',sans-serif;outline:none;">
-        <option value="available" ${p.status==='available'?'selected':''}>Available</option>
-        <option value="sold" ${p.status==='sold'?'selected':''}>Sold</option>
-        <option value="rented" ${p.status==='rented'?'selected':''}>Rented</option>
-      </select>
-      <button onclick="if(confirm('Delete?')){properties=properties.filter(x=>x.id!=='${p.id}');localStorage.setItem('eb_properties',JSON.stringify(properties));renderProperties();showToast('Deleted!')}" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:14px;">🗑</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
+
 function updatePropStatus(id,status){properties=properties.map(p=>p.id===id?{...p,status}:p);localStorage.setItem('eb_properties',JSON.stringify(properties));renderProperties();showToast('Updated!');}
+
+// ===== LEAD MATCH =====
+function showLeadMatch(){
+  const sel=document.getElementById('matchLeadSelect');
+  sel.innerHTML='<option value="">-- Lead Select Karo --</option>'+allLeads.filter(l=>l.status!=='converted'&&l.status!=='not_interested').map(l=>`<option value="${l.id}">${l.name} — ${l.budget||'—'} — ${l.property_type||'—'}</option>`).join('');
+  document.getElementById('matchResults').innerHTML='';
+  document.getElementById('leadMatchModal').classList.add('show');
+}
+
+function runLeadMatch(){
+  const leadId=document.getElementById('matchLeadSelect').value;
+  if(!leadId){document.getElementById('matchResults').innerHTML='';return;}
+  const lead=allLeads.find(l=>l.id===leadId);
+  if(!lead)return;
+  const available=properties.filter(p=>p.status==='available');
+  if(!available.length){document.getElementById('matchResults').innerHTML='<div style="color:var(--muted);font-size:13px;padding:14px 0;">Koi available property nahi hai</div>';return;}
+
+  // Score each property
+  const scored=available.map(p=>{
+    let score=0;
+    // Type match
+    const lt=(lead.property_type||'').toLowerCase(),pt=p.type.toLowerCase();
+    if(lt.includes('flat')&&pt==='flat')score+=40;
+    else if((lt.includes('house')||lt.includes('makan'))&&pt==='house')score+=40;
+    else if(lt.includes('plot')&&pt==='plot')score+=40;
+    else if((lt.includes('shop')||lt.includes('office'))&&pt==='shop')score+=40;
+    // Location match
+    const la=(lead.area||'').toLowerCase(),pl=p.location.toLowerCase();
+    if(la&&pl&&(la.includes(pl.split(' ')[0])||pl.includes(la.split(' ')[0])))score+=35;
+    // Basic match if same city
+    if(la&&pl&&la.split(' ').some(w=>pl.includes(w)&&w.length>3))score+=15;
+    return {...p,matchScore:score};
+  }).filter(p=>p.matchScore>0).sort((a,b)=>b.matchScore-a.matchScore);
+
+  if(!scored.length){
+    document.getElementById('matchResults').innerHTML=`<div style="background:#FEF3C7;border-radius:8px;padding:12px;font-size:13px;color:#92400E;margin-top:12px;">⚠️ Exact match nahi mila — lekin ye properties available hain:</div>`+available.slice(0,3).map(p=>`<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;"><b>${p.title}</b><br><span style="color:var(--muted);">₹${p.price} · ${p.location}</span><button onclick="sharePropertyWA('${p.id}')" style="margin-left:8px;background:#25D366;color:#fff;border:none;padding:3px 8px;border-radius:5px;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;">Send</button></div>`).join('');
+    return;
+  }
+
+  document.getElementById('matchResults').innerHTML=`<div style="font-size:12px;font-weight:700;color:var(--navy);margin:12px 0 8px;">${scored.length} matching properties found:</div>`+scored.map(p=>`
+    <div style="padding:10px 12px;background:#F8FAFC;border-radius:8px;margin-bottom:8px;border:1px solid ${p.matchScore>=60?'#BBF7D0':'var(--border)}'};">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="font-size:13px;font-weight:600;">${p.title}</div>
+        <span style="background:${p.matchScore>=60?'#D1FAE5':'#FEF3C7'};color:${p.matchScore>=60?'#065F46':'#92400E'};padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;">${p.matchScore>=60?'Best Match':'Good Match'}</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);">📍 ${p.location} · ₹${p.price}${p.details?' · '+p.details:''}</div>
+      <button onclick="sharePropertyWA('${p.id}')" style="margin-top:7px;background:#25D366;color:#fff;border:none;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">📲 Send on WhatsApp</button>
+    </div>`).join('');
 
 // ===== SITE VISITS =====
 let siteVisits=JSON.parse(localStorage.getItem('eb_visits')||'[]');
@@ -1703,12 +1848,12 @@ function renderVisits(){
           <div style="font-size:11px;color:var(--muted);">📅 ${new Date(v.date+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'})} ${v.time?'⏰ '+v.time:''}</div>
           ${v.feedback?`<div style="font-size:11px;color:#10B981;">💬 ${v.feedback}</div>`:''}
         </div>
-        <button onclick="if(confirm('Delete?')){siteVisits=siteVisits.filter(x=>x.id!=='${v.id}');localStorage.setItem('eb_visits',JSON.stringify(siteVisits));renderVisits();}" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:13px;">🗑</button>
+        <button onclick="deleteVisitById(\'${v.id}\')" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:13px;">🗑</button>
       </div>
       ${v.status==='scheduled'?`<div style="display:flex;gap:6px;">
-        <button onclick="siteVisits=siteVisits.map(x=>x.id==='${v.id}'?{...x,status:'completed'}:x);localStorage.setItem('eb_visits',JSON.stringify(siteVisits));renderVisits();showToast('✅ Completed!')" style="background:#D1FAE5;color:#065F46;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✓ Done</button>
-        <button onclick="const fb=prompt('Feedback:');if(fb){siteVisits=siteVisits.map(x=>x.id==='${v.id}'?{...x,feedback:fb}:x);localStorage.setItem('eb_visits',JSON.stringify(siteVisits));renderVisits();}" style="background:#EDE9FE;color:#5B3DF5;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">💬 Feedback</button>
-        <button onclick="siteVisits=siteVisits.map(x=>x.id==='${v.id}'?{...x,status:'cancelled'}:x);localStorage.setItem('eb_visits',JSON.stringify(siteVisits));renderVisits();" style="background:#FEE2E2;color:#DC2626;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✕ Cancel</button>
+        <button onclick=\"markVisitDone('${v.id}')\" style="background:#D1FAE5;color:#065F46;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✓ Done</button>
+        <button onclick=\"addVisitFeedbackById('${v.id}')\" style="background:#EDE9FE;color:#5B3DF5;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">💬 Feedback</button>
+        <button onclick=\"cancelVisitById('${v.id}')\" style="background:#FEE2E2;color:#DC2626;border:none;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✕ Cancel</button>
       </div>`:''}
     </div>`).join('');
 }
@@ -1737,7 +1882,7 @@ function renderRevenue(){
     <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--gold);">₹${(mc/100000).toFixed(1)}L</div><div style="font-size:11px;color:var(--muted);">This Month</div></div>
     <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#5B3DF5;">${md.length}</div><div style="font-size:11px;color:var(--muted);">Deals This Month</div></div>`;
   if(target>0){const pct=Math.min((mc/target)*100,100);document.getElementById('targetProgress').innerHTML=`<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${mc.toLocaleString('en-IN')} / ₹${target.toLocaleString('en-IN')}</div><div style="height:8px;background:var(--border);border-radius:100px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${pct>=100?'#10B981':'#5B3DF5'};border-radius:100px;"></div></div><div style="font-size:12px;font-weight:700;color:${pct>=100?'#10B981':'#5B3DF5'};margin-top:6px;">${pct.toFixed(0)}% of target</div>`;}
-  document.getElementById('dealsList').innerHTML=deals.length?deals.slice().reverse().map(d=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);"><div style="flex:1;"><div style="font-size:13px;font-weight:600;">${d.client}</div><div style="font-size:11px;color:var(--muted);">${d.property} · ${new Date(d.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div></div><div style="text-align:right;"><div style="font-size:13px;font-weight:700;color:#10B981;">+₹${d.commission.toLocaleString('en-IN')}</div><div style="font-size:10px;color:var(--muted);">${d.commPct}% of ${d.amount}</div></div><button onclick="deals=deals.filter(x=>x.id!=='${d.id}');localStorage.setItem('eb_deals',JSON.stringify(deals));renderRevenue();" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:13px;">🗑</button></div>`).join(''):'<div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">Koi deal nahi — Add karo!</div>';
+  document.getElementById('dealsList').innerHTML=deals.length?deals.slice().reverse().map(d=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);"><div style="flex:1;"><div style="font-size:13px;font-weight:600;">${d.client}</div><div style="font-size:11px;color:var(--muted);">${d.property} · ${new Date(d.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div></div><div style="text-align:right;"><div style="font-size:13px;font-weight:700;color:#10B981;">+₹${d.commission.toLocaleString('en-IN')}</div><div style="font-size:10px;color:var(--muted);">${d.commPct}% of ${d.amount}</div></div><button onclick="deleteDealById('${d.id}')" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:13px;">🗑</button></div>`).join(''):'<div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">Koi deal nahi — Add karo!</div>';
 }
 
 // ===== DOCUMENTS =====
@@ -1805,9 +1950,360 @@ showPage = function(page){
   if(page==='documents')renderDocuments();
 };
 
-// Auto-login
-const savedId=sessionStorage.getItem('broker_id');
-if(savedId)initDashboard(savedId);
+
+function deleteDealById(id){
+  deals=deals.filter(x=>x.id!==id);
+  localStorage.setItem('eb_deals',JSON.stringify(deals));
+  renderRevenue();showToast('Deal deleted!');
+}
+
+function deleteVisitById(id){
+  if(!confirm('Delete karo?')) return;
+  siteVisits=siteVisits.filter(x=>x.id!==id);
+  localStorage.setItem('eb_visits',JSON.stringify(siteVisits));
+  renderVisits();showToast('Deleted!');
+}
+function markVisitDone(id){
+  siteVisits=siteVisits.map(x=>x.id===id?{...x,status:'completed'}:x);
+  localStorage.setItem('eb_visits',JSON.stringify(siteVisits));
+  renderVisits();showToast('✅ Completed!');
+}
+function addVisitFeedbackById(id){
+  const fb=prompt('Feedback likhو:');
+  if(fb===null) return;
+  siteVisits=siteVisits.map(x=>x.id===id?{...x,feedback:fb}:x);
+  localStorage.setItem('eb_visits',JSON.stringify(siteVisits));
+  renderVisits();showToast('Feedback saved!');
+}
+function cancelVisitById(id){
+  siteVisits=siteVisits.map(x=>x.id===id?{...x,status:'cancelled'}:x);
+  localStorage.setItem('eb_visits',JSON.stringify(siteVisits));
+  renderVisits();showToast('Cancelled!');
+}
+
+(function(l){return l.status==='converted';}).length;
+  var convRate=allLeads.length?Math.round((conv/allLeads.length)*100):0;
+  document.getElementById('an_stats').innerHTML=
+    '<div class="stat-card"><div class="stat-lbl">Total Leads</div><div class="stat-val">'+allLeads.length+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Converted</div><div class="stat-val" style="color:#10B981">'+conv+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Conversion Rate</div><div class="stat-val" style="color:var(--gold)">'+convRate+'%</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Aaj</div><div class="stat-val" style="color:#7C3AED">'+todayL.length+'</div></div>';
+  var days=[],counts=[];
+  for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);days.push(d.toLocaleDateString('en-IN',{weekday:'short'}));counts.push(allLeads.filter(function(l){return new Date(l.created_at).toDateString()===d.toDateString();}).length);}
+  var maxC=Math.max.apply(null,counts.concat([1]));
+  var chartH='',lblH='';
+  for(var ci=0;ci<counts.length;ci++){chartH+='<div class="chart-col"><div class="bar" style="height:'+Math.max((counts[ci]/maxC)*95,4)+'px" title="'+counts[ci]+'"></div></div>';lblH+='<div class="chart-col"><div class="lbl">'+days[ci]+'</div></div>';}
+  document.getElementById('an_chart').innerHTML=chartH;
+  document.getElementById('an_chart_lbl').innerHTML=lblH;
+  function splitChart(id,items,colors){
+    var maxV=Math.max.apply(null,items.map(function(x){return x[1];}).concat([1]));
+    document.getElementById(id).innerHTML=items.slice(0,6).map(function(item,idx){
+      return '<div class="split-row"><div style="width:9px;height:9px;border-radius:50%;background:'+(colors?colors[idx%colors.length]:'var(--navy)')+';flex-shrink:0"></div><div class="split-label">'+item[0]+'</div><div class="split-count">'+item[1]+'</div><div class="split-bar-bg"><div class="split-bar-fill" style="width:'+((item[1]/maxV)*100)+'%;background:'+(colors?colors[idx%colors.length]:'var(--navy)')+'"></div></div></div>';
+    }).join('')||'<div style="color:var(--muted);font-size:13px">No data</div>';
+  }
+  var props={};allLeads.forEach(function(l){var p=l.property_type||'Other';props[p]=(props[p]||0)+1;});
+  splitChart('an_props',Object.entries(props).sort(function(a,b){return b[1]-a[1];}),'#5B3DF5,#10B981,#F59E0B,#EF4444,#06B6D4'.split(','));
+  var im={Kharidna:0,Bechna:0,'Rent Lena':0,'Rent Dena':0};
+  allLeads.forEach(function(l){var it=(l.intent||'').toLowerCase();if(it.indexOf('kharid')>=0)im.Kharidna++;else if(it.indexOf('sell')>=0||it.indexOf('bech')>=0)im.Bechna++;else if(it.indexOf('rent lena')>=0)im['Rent Lena']++;else if(it.indexOf('rent dena')>=0)im['Rent Dena']++;});
+  splitChart('an_intent',Object.entries(im),'#5B3DF5,#10B981,#F59E0B,#EF4444'.split(','));
+  var locs={};allLeads.forEach(function(l){var a=(l.area||'').split(',')[0].trim()||'Unknown';locs[a]=(locs[a]||0)+1;});
+  splitChart('an_locs',Object.entries(locs).sort(function(a,b){return b[1]-a[1];}),null);
+}
+
+function checkFUBadge(){
+  if(!broker)return;
+  var bid=broker.broker_id,today=new Date().toISOString().split('T')[0];
+  var urgent=followUps.filter(function(f){return f.bid===bid&&!f.done&&f.date<=today;}).length;
+  var badge=document.getElementById('navFU');
+  if(urgent>0){badge.classList.remove('hide');badge.textContent=urgent;}else badge.classList.add('hide');
+}
+function openFUModal(){openFUModalFor('','');}
+function openFUModalFor(lid,lname){
+  var sel=document.getElementById('fu_lead');
+  sel.innerHTML='<option value="">-- Lead Select Karo --</option>';
+  allLeads.forEach(function(l){var opt=document.createElement('option');opt.value=l.id+'|'+(l.name||'');if(l.id===lid)opt.selected=true;opt.textContent=(l.name||'—')+' — '+(l.phone||'');sel.appendChild(opt);});
+  if(lid)sel.value=lid+'|'+lname;
+  document.getElementById('fu_date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('fu_note').value='';
+  document.getElementById('fuModal').classList.add('show');
+}
+function saveFU(){
+  var sel=document.getElementById('fu_lead').value,date=document.getElementById('fu_date').value,note=document.getElementById('fu_note').value.trim();
+  if(!sel||!date){toast('Lead aur date zaroori hai','error');return;}
+  var parts=sel.split('|');
+  followUps.push({id:Date.now().toString(),bid:broker?broker.broker_id:'',lid:parts[0],lname:parts[1]||'',date:date,note:note,done:false});
+  saveLS('eb_fu',followUps);closeMod('fuModal');renderFU();checkFUBadge();toast('Follow up set ho gaya!');
+}
+function renderFU(){
+  if(!broker)return;
+  var bid=broker.broker_id,today=new Date().toISOString().split('T')[0];
+  var mine=followUps.filter(function(f){return f.bid===bid;});
+  var upcoming=mine.filter(function(f){return !f.done;}).sort(function(a,b){return a.date.localeCompare(b.date);});
+  var done=mine.filter(function(f){return f.done;});
+  if(!upcoming.length&&!done.length){document.getElementById('fu_list').innerHTML='<div class="empty"><h3>Koi follow up nahi</h3><p>Leads pe reminders set karo</p></div>';return;}
+  var html='';
+  if(upcoming.length){
+    html+='<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Upcoming ('+upcoming.length+')</div>';
+    for(var i=0;i<upcoming.length;i++){
+      var f=upcoming[i];var d=new Date(f.date+'T00:00:00');
+      var isOD=f.date<today,isTD=f.date===today;
+      var bgc=isOD?'#EF4444':isTD?'var(--gold)':'var(--navy)';
+      var lbl=isOD?'<div style="font-size:10px;color:#EF4444;font-weight:700">OVERDUE</div>':isTD?'<div style="font-size:10px;color:var(--gold);font-weight:700">TODAY</div>':'';
+      html+='<div class="fu-card" style="'+(isOD?'border-color:#EF4444':isTD?'border-color:var(--gold)':'')+'">';
+      html+='<div class="fu-date" style="background:'+bgc+'"><div class="day">'+d.getDate()+'</div><div>'+d.toLocaleString('en-IN',{month:'short'})+'</div></div>';
+      html+='<div style="flex:1;min-width:0"><div class="fu-name">'+(f.lname||'Lead')+'</div><div class="fu-note">'+(f.note||'No note')+'</div>'+lbl+'</div>';
+      html+='<button class="fu-done" onclick="markFUDone(\''+f.id+'\')">✓ Done</button></div>';
+    }
+  }
+  if(done.length){
+    html+='<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:12px 0 8px">Completed ('+done.length+')</div>';
+    for(var j=0;j<Math.min(done.length,5);j++){
+      var fd=done[j];var dd=new Date(fd.date+'T00:00:00');
+      html+='<div class="fu-card" style="opacity:0.5"><div class="fu-date"><div class="day">'+dd.getDate()+'</div><div>'+dd.toLocaleString('en-IN',{month:'short'})+'</div></div><div style="flex:1"><div class="fu-name" style="text-decoration:line-through">'+(fd.lname||'Lead')+'</div><div class="fu-note">'+(fd.note||'')+'</div></div><div style="font-size:11px;color:var(--green);font-weight:600">✓ Done</div></div>';
+    }
+  }
+  document.getElementById('fu_list').innerHTML=html;
+}
+function markFUDone(id){followUps=followUps.map(function(f){return f.id===id?Object.assign({},f,{done:true}):f;});saveLS('eb_fu',followUps);renderFU();checkFUBadge();toast('Complete! ✅');}
+function checkAutoFU(){
+  if(!broker)return;
+  var bid=broker.broker_id,tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
+  var tmr=tomorrow.toISOString().split('T')[0];
+  var existFU={};followUps.filter(function(f){return f.bid===bid&&!f.done;}).forEach(function(f){existFU[f.lid]=true;});
+  var need=allLeads.filter(function(l){
+    if(existFU[l.id]||l.status==='converted'||l.status==='not_interested')return false;
+    return (Date.now()-new Date(l.created_at))/(1000*60*60*24)>=3&&!(callLogs[l.id]||[]).length;
+  }).slice(0,5);
+  if(need.length){
+    need.forEach(function(l){if(!followUps.find(function(f){return f.lid===l.id&&!f.done;})){followUps.push({id:Date.now().toString()+Math.random(),bid:bid,lid:l.id,lname:l.name||'Lead',date:tmr,note:'Auto: 3 din se call nahi hua',done:false});}});
+    saveLS('eb_fu',followUps);toast(need.length+' auto follow ups set!');checkFUBadge();
+  }
+}
+function checkDailySummary(){
+  if(!broker)return;
+  var today=new Date().toDateString();
+  if(localStorage.getItem('eb_summary')===today)return;
+  var bid=broker.broker_id,todayStr=new Date().toISOString().split('T')[0];
+  var todayFUs=followUps.filter(function(f){return f.bid===bid&&!f.done&&f.date<=todayStr;});
+  var todayL=allLeads.filter(function(l){return new Date(l.created_at).toDateString()===today;});
+  if(!todayFUs.length&&!todayL.length)return;
+  document.getElementById('summaryContent').innerHTML=
+    '<div style="font-size:28px;margin-bottom:10px">☀️</div>'
+    +'<div style="font-size:17px;font-weight:800;color:var(--navy);margin-bottom:5px">Good morning, '+broker.name.split(' ')[0]+'!</div>'
+    +'<div style="font-size:13px;color:var(--muted);margin-bottom:16px">Aaj ka summary</div>'
+    +'<div class="grid-2" style="margin-bottom:14px">'
+    +'<div style="background:#FEF3C7;border-radius:9px;padding:13px;text-align:center"><div style="font-size:22px;font-weight:800;color:#D97706">'+todayFUs.length+'</div><div style="font-size:11px;color:#92400E;margin-top:2px">Follow Ups</div></div>'
+    +'<div style="background:#EDE9FE;border-radius:9px;padding:13px;text-align:center"><div style="font-size:22px;font-weight:800;color:#5B3DF5">'+todayL.length+'</div><div style="font-size:11px;color:#3730A3;margin-top:2px">Naye Leads</div></div>'
+    +'</div>'
+    +(todayFUs.length?'<div style="background:#FEE2E2;border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:12px;color:#DC2626;font-weight:600">⚠️ '+todayFUs.length+' follow up pending!</div>':'')
+    +'<button onclick="closeMod(\'summaryModal\');goPage(\'followups\')" style="width:100%;background:var(--navy);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:7px">View Follow Ups</button>'
+    +'<button onclick="closeMod(\'summaryModal\')" style="width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);padding:9px;border-radius:8px;font-size:13px;cursor:pointer">Dismiss</button>';
+  document.getElementById('summaryModal').classList.add('show');
+  localStorage.setItem('eb_summary',today);
+}
+
+function openPropModal(){document.getElementById('propModal').classList.add('show');}
+function saveProp(){
+  var title=document.getElementById('pr_title').value.trim(),loc=document.getElementById('pr_loc').value.trim(),price=document.getElementById('pr_price').value.trim();
+  if(!title||!loc||!price){toast('Title, location aur price zaroori hai','error');return;}
+  properties.push({id:Date.now().toString(),title:title,type:document.getElementById('pr_typeinput').value,loc:loc,price:price,details:document.getElementById('pr_details').value.trim(),status:document.getElementById('pr_statusinput').value,addedOn:new Date().toISOString()});
+  saveLS('eb_props',properties);closeMod('propModal');
+  ['pr_title','pr_loc','pr_price','pr_details'].forEach(function(id){document.getElementById(id).value='';});
+  renderProps();toast('Property add ho gayi!');
+}
+function renderProps(){
+  var pf=document.getElementById('pr_filter')?document.getElementById('pr_filter').value:'all';
+  var pt=document.getElementById('pr_type')?document.getElementById('pr_type').value:'all';
+  var filtered=properties.filter(function(p){return(pf==='all'||p.status===pf)&&(pt==='all'||p.type===pt);});
+  document.getElementById('pr_stats').innerHTML=
+    '<div class="stat-card"><div class="stat-lbl">Total</div><div class="stat-val">'+properties.length+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Available</div><div class="stat-val" style="color:#10B981">'+properties.filter(function(p){return p.status==='available';}).length+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Sold</div><div class="stat-val" style="color:#5B3DF5">'+properties.filter(function(p){return p.status==='sold';}).length+'</div></div>';
+  if(!filtered.length){document.getElementById('pr_list').innerHTML='<div class="tbl-loading">Koi property nahi — Add karo!</div>';return;}
+  var sc={available:'#10B981',sold:'#EF4444',rented:'#F59E0B'},sb={available:'#D1FAE5',sold:'#FEE2E2',rented:'#FEF3C7'};
+  var html='';
+  for(var i=0;i<filtered.length;i++){
+    var p=filtered[i];
+    var days=Math.floor((Date.now()-new Date(p.addedOn))/(1000*60*60*24));
+    var dc=days>30?'#EF4444':days>14?'#F59E0B':'#10B981';
+    var icon=p.type==='flat'?'🏢':p.type==='house'?'🏠':p.type==='plot'?'🌍':'🏪';
+    var pn=propNotes[p.id]?'<div style="font-size:10px;color:#5B3DF5;margin-top:1px">📝 '+propNotes[p.id].substring(0,40)+(propNotes[p.id].length>40?'...':'')+'</div>':'';
+    html+='<div class="prop-row">';
+    html+='<div class="prop-row-top"><div class="prop-icon">'+icon+'</div><div style="flex:1;min-width:0"><div class="prop-title">'+p.title+'</div><div class="prop-sub">📍 '+p.loc+(p.details?' · '+p.details:'')+'</div>'+pn+'</div>';
+    html+='<div><div class="prop-price">₹'+p.price+'</div><span style="background:'+sb[p.status]+';color:'+sc[p.status]+';padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700">'+p.status.toUpperCase()+'</span><div class="prop-days" style="color:'+dc+'">'+days+'d listed</div></div></div>';
+    html+='<div class="prop-actions">';
+    html+='<select class="prop-status-sel" onchange="updatePropSt(\''+p.id+'\',this.value)"><option value="available"'+(p.status==='available'?' selected':'')+'>Available</option><option value="sold"'+(p.status==='sold'?' selected':'')+'>Sold</option><option value="rented"'+(p.status==='rented'?' selected':'')+'>Rented</option></select>';
+    html+='<button class="bsm bsm-wa" onclick="sharePropWA(\''+p.id+'\')">📲 WA</button>';
+    html+='<button class="bsm bsm-purple" onclick="openPropNotes(\''+p.id+'\')">📝 Notes</button>';
+    html+='<button class="bsm bsm-red" onclick="deleteProp(\''+p.id+'\')">🗑</button>';
+    html+='</div></div>';
+  }
+  document.getElementById('pr_list').innerHTML=html;
+}
+function updatePropSt(id,status){properties=properties.map(function(p){return p.id===id?Object.assign({},p,{status:status}):p;});saveLS('eb_props',properties);renderProps();toast('Updated!');}
+function deleteProp(id){if(!confirm('Delete karo?'))return;properties=properties.filter(function(p){return p.id!==id;});saveLS('eb_props',properties);renderProps();toast('Deleted!');}
+function sharePropWA(id){
+  var p=properties.find(function(x){return x.id===id;});if(!p)return;
+  var msg='🏠 *Property Available*\n\n*'+p.title+'*\n📍 Location: '+p.loc+'\n💰 Price: ₹'+p.price+'\n🏗️ Type: '+p.type+(p.details?'\n📋 Details: '+p.details:'')+'\n\n_Contact us for more details_';
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+function openPropNotes(id){
+  currentPropNoteId=id;
+  var p=properties.find(function(x){return x.id===id;});
+  document.getElementById('pnTitle').textContent=(p?p.title:'Property')+' — Notes';
+  document.getElementById('pnArea').value=propNotes[id]||'';
+  document.getElementById('propNotesModal').classList.add('show');
+}
+function savePropNote(){if(!currentPropNoteId)return;propNotes[currentPropNoteId]=document.getElementById('pnArea').value;saveLS('eb_propnotes',propNotes);closeMod('propNotesModal');renderProps();toast('Note saved!');}
+function openLeadMatch(){
+  var sel=document.getElementById('lm_lead');
+  sel.innerHTML='<option value="">-- Lead Select Karo --</option>';
+  allLeads.filter(function(l){return l.status!=='converted'&&l.status!=='not_interested';}).forEach(function(l){var opt=document.createElement('option');opt.value=l.id;opt.textContent=(l.name||'—')+' — '+(l.budget||'—')+' — '+(l.property_type||'—');sel.appendChild(opt);});
+  document.getElementById('lm_results').innerHTML='';
+  document.getElementById('leadMatchModal').classList.add('show');
+}
+function runLeadMatch(){
+  var lid=document.getElementById('lm_lead').value;if(!lid){document.getElementById('lm_results').innerHTML='';return;}
+  var lead=leadStore[lid];if(!lead)return;
+  var available=properties.filter(function(p){return p.status==='available';});
+  if(!available.length){document.getElementById('lm_results').innerHTML='<div style="color:var(--muted);font-size:13px;margin-top:10px">Koi available property nahi hai</div>';return;}
+  var scored=available.map(function(p){
+    var s=0,lt=(lead.property_type||'').toLowerCase(),pt=p.type.toLowerCase();
+    if((lt.indexOf('flat')>=0&&pt==='flat')||(lt.indexOf('house')>=0&&pt==='house')||(lt.indexOf('plot')>=0&&pt==='plot')||(lt.indexOf('shop')>=0&&pt==='shop'))s+=40;
+    var la=(lead.area||'').toLowerCase(),pl=p.loc.toLowerCase();
+    la.split(' ').forEach(function(w){if(w.length>3&&pl.indexOf(w)>=0)s+=35;});
+    return Object.assign({},p,{ms:s});
+  }).filter(function(p){return p.ms>0;}).sort(function(a,b){return b.ms-a.ms;});
+  if(!scored.length){
+    var fb='<div style="background:#FEF3C7;border-radius:8px;padding:10px;font-size:12px;color:#92400E;margin-top:10px">⚠️ Exact match nahi mila</div>';
+    available.slice(0,3).forEach(function(p){fb+='<div style="padding:9px 0;border-bottom:1px solid var(--border);font-size:12px"><b>'+p.title+'</b><br><span style="color:var(--muted)">₹'+p.price+' · '+p.loc+'</span> <button class="bsm bsm-wa" style="margin-left:6px" onclick="sharePropWA(\''+p.id+'\')">Send</button></div>';});
+    document.getElementById('lm_results').innerHTML=fb;return;
+  }
+  var html='<div style="font-size:12px;font-weight:700;color:var(--navy);margin:10px 0 8px">'+scored.length+' matching properties:</div>';
+  for(var si=0;si<scored.length;si++){
+    var sp=scored[si],isBest=sp.ms>=60;
+    html+='<div style="padding:10px 12px;background:#F8FAFC;border-radius:8px;margin-bottom:7px;border:1px solid '+(isBest?'#BBF7D0':'var(--border)')+'"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px"><div style="font-size:13px;font-weight:600">'+sp.title+'</div><span style="background:'+(isBest?'#D1FAE5':'#FEF3C7')+';color:'+(isBest?'#065F46':'#92400E')+';padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700">'+(isBest?'Best Match':'Good Match')+'</span></div><div style="font-size:11px;color:var(--muted)">📍 '+sp.loc+' · ₹'+sp.price+(sp.details?' · '+sp.details:'')+'</div><button class="bsm bsm-wa" onclick="sharePropWA(\''+sp.id+'\')" style="margin-top:7px">📲 Send on WhatsApp</button></div>';
+  }
+  document.getElementById('lm_results').innerHTML=html;
+}
+
+function openVisitModal(){
+  var sel=document.getElementById('vs_lead');
+  sel.innerHTML='<option value="">-- Lead Select Karo --</option>';
+  allLeads.forEach(function(l){var opt=document.createElement('option');opt.value=l.id+'|'+(l.name||'')+'|'+(l.phone||'');opt.textContent=(l.name||'—')+' — '+(l.phone||'');sel.appendChild(opt);});
+  document.getElementById('vs_date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('visitModal').classList.add('show');
+}
+function saveVisit(){
+  var lv=document.getElementById('vs_lead').value,prop=document.getElementById('vs_prop').value.trim(),date=document.getElementById('vs_date').value;
+  if(!lv||!prop||!date){toast('Lead, property aur date zaroori hai','error');return;}
+  var parts=lv.split('|');
+  siteVisits.push({id:Date.now().toString(),lid:parts[0],lname:parts[1]||'',lphone:parts[2]||'',prop:prop,date:date,time:document.getElementById('vs_time').value,notes:document.getElementById('vs_notes').value.trim(),status:'scheduled',feedback:''});
+  saveLS('eb_visits',siteVisits);closeMod('visitModal');renderVisits();toast('Site visit schedule ho gayi!');
+}
+function renderVisits(){
+  var vf=document.getElementById('vs_filter')?document.getElementById('vs_filter').value:'all';
+  var filtered=vf==='all'?siteVisits:siteVisits.filter(function(v){return v.status===vf;});
+  var today=new Date().toDateString();
+  document.getElementById('vs_stats').innerHTML=
+    '<div class="stat-card"><div class="stat-lbl">Total</div><div class="stat-val">'+siteVisits.length+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Aaj</div><div class="stat-val" style="color:var(--gold)">'+siteVisits.filter(function(v){return new Date(v.date+'T00:00:00').toDateString()===today;}).length+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Scheduled</div><div class="stat-val" style="color:#5B3DF5">'+siteVisits.filter(function(v){return v.status==='scheduled';}).length+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Completed</div><div class="stat-val" style="color:#10B981">'+siteVisits.filter(function(v){return v.status==='completed';}).length+'</div></div>';
+  if(!filtered.length){document.getElementById('vs_list').innerHTML='<div class="tbl-loading">Koi visit nahi</div>';return;}
+  var sc={scheduled:'#5B3DF5',completed:'#10B981',cancelled:'#EF4444'},sb={scheduled:'#EDE9FE',completed:'#D1FAE5',cancelled:'#FEE2E2'};
+  filtered.sort(function(a,b){return a.date.localeCompare(b.date);});
+  var html='';
+  for(var i=0;i<filtered.length;i++){
+    var v=filtered[i];
+    html+='<div class="visit-row"><div class="visit-name">'+v.lname+' <span style="background:'+sb[v.status]+';color:'+sc[v.status]+';padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700">'+v.status.toUpperCase()+'</span></div>';
+    html+='<div class="visit-sub">📞 '+v.lphone+' · 🏠 '+v.prop+'</div>';
+    html+='<div class="visit-sub">📅 '+new Date(v.date+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'})+(v.time?' ⏰ '+v.time:'')+'</div>';
+    if(v.feedback)html+='<div style="font-size:11px;color:#10B981;margin-top:2px">💬 '+v.feedback+'</div>';
+    if(v.status==='scheduled'){html+='<div class="visit-actions"><button class="bsm bsm-green" onclick="doVisit(\''+v.id+'\',\'completed\')">✓ Done</button><button class="bsm bsm-purple" onclick="visitFB(\''+v.id+'\')">💬 Feedback</button><button class="bsm bsm-red" onclick="doVisit(\''+v.id+'\',\'cancelled\')">✕ Cancel</button></div>';}
+    html+='<button class="bsm bsm-red" onclick="delVisit(\''+v.id+'\')" style="margin-top:5px">🗑 Delete</button></div>';
+  }
+  document.getElementById('vs_list').innerHTML=html;
+}
+function doVisit(id,status){siteVisits=siteVisits.map(function(v){return v.id===id?Object.assign({},v,{status:status}):v;});saveLS('eb_visits',siteVisits);renderVisits();toast('Updated!');}
+function visitFB(id){var fb=prompt('Visit ka feedback:');if(fb===null)return;siteVisits=siteVisits.map(function(v){return v.id===id?Object.assign({},v,{feedback:fb}):v;});saveLS('eb_visits',siteVisits);renderVisits();toast('Feedback saved!');}
+function delVisit(id){if(!confirm('Delete karo?'))return;siteVisits=siteVisits.filter(function(v){return v.id!==id;});saveLS('eb_visits',siteVisits);renderVisits();toast('Deleted!');}
+
+function addDeal(){
+  var client=document.getElementById('rv_client').value.trim(),prop=document.getElementById('rv_prop').value.trim(),amount=document.getElementById('rv_amount').value.trim();
+  var commPct=parseFloat(document.getElementById('rv_comm').value)||2,date=document.getElementById('rv_date').value||new Date().toISOString().split('T')[0];
+  if(!client||!prop||!amount){toast('Client, property aur amount zaroori hai','error');return;}
+  var amtRs=budgetVal(amount)||(parseFloat(amount)||0);
+  var comm=Math.round(amtRs*(commPct/100));
+  deals.push({id:Date.now().toString(),client:client,prop:prop,amount:amount,amtRs:amtRs,commPct:commPct,comm:comm,date:date});
+  saveLS('eb_deals',deals);
+  ['rv_client','rv_prop','rv_amount','rv_comm'].forEach(function(id){document.getElementById(id).value='';});
+  renderRevenue();toast('Deal save ho gayi! 💰');
+}
+function saveTarget(){var t=document.getElementById('rv_target').value;if(!t)return;localStorage.setItem('eb_target',t);renderRevenue();toast('Target set!');}
+function renderRevenue(){
+  var now=new Date(),ms=new Date(now.getFullYear(),now.getMonth(),1);
+  var md=deals.filter(function(d){return new Date(d.date)>=ms;});
+  var tc=deals.reduce(function(s,d){return s+(d.comm||0);},0),mc=md.reduce(function(s,d){return s+(d.comm||0);},0);
+  var target=parseInt(localStorage.getItem('eb_target'))||0;
+  document.getElementById('rv_stats').innerHTML=
+    '<div class="stat-card"><div class="stat-lbl">Total Deals</div><div class="stat-val">'+deals.length+'</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Total Earnings</div><div class="stat-val" style="color:#10B981">₹'+(tc/100000).toFixed(1)+'L</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">This Month</div><div class="stat-val" style="color:var(--gold)">₹'+(mc/100000).toFixed(1)+'L</div></div>'
+    +'<div class="stat-card"><div class="stat-lbl">Month Deals</div><div class="stat-val" style="color:#5B3DF5">'+md.length+'</div></div>';
+  if(target>0){var pct=Math.min((mc/target)*100,100);document.getElementById('rv_progress').innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:5px">₹'+mc.toLocaleString('en-IN')+' / ₹'+target.toLocaleString('en-IN')+'</div><div class="target-bar"><div class="target-fill" style="width:'+pct+'%;background:'+(pct>=100?'#10B981':'#5B3DF5')+'"></div></div><div style="font-size:12px;font-weight:700;color:'+(pct>=100?'#10B981':'#5B3DF5')+'">'+pct.toFixed(0)+'% of target</div>';}
+  if(!deals.length){document.getElementById('rv_deals').innerHTML='<div class="empty" style="padding:20px"><p>Koi deal nahi — Add karo!</p></div>';return;}
+  var html='';
+  deals.slice().reverse().forEach(function(d){html+='<div class="deal-row"><div class="deal-info"><div class="deal-client">'+d.client+'</div><div class="deal-prop">'+d.prop+' · '+new Date(d.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})+'</div></div><div><div class="deal-comm">+₹'+d.comm.toLocaleString('en-IN')+'</div><div class="deal-rate">'+d.commPct+'% of '+d.amount+'</div></div><button class="bsm bsm-red" onclick="delDeal(\''+d.id+'\')">🗑</button></div>';});
+  document.getElementById('rv_deals').innerHTML=html;
+}
+function delDeal(id){deals=deals.filter(function(d){return d.id!==id;});saveLS('eb_deals',deals);renderRevenue();toast('Deleted!');}
+
+function renderSettings(){
+  if(!broker)return;
+  document.getElementById('st_botlink').textContent='https://estatebotai.in/'+broker.broker_id;
+  var rows=[['Name',broker.name],['Email',broker.email||'—'],['Phone',broker.phone||'—'],['City',broker.city||'—'],['Plan',(broker.status||'').toUpperCase()]];
+  document.getElementById('st_info').innerHTML=rows.map(function(r){return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--muted)">'+r[0]+'</span><span style="font-weight:600">'+r[1]+'</span></div>';}).join('');
+  if(Notification.permission==='granted')document.getElementById('notifBtn').textContent='✓ Enabled';
+}
+function changePass(){
+  var p1=document.getElementById('st_p1').value,p2=document.getElementById('st_p2').value;
+  if(!p1||!p2){toast('Dono fields fill karo','error');return;}
+  if(p1!==p2){toast('Passwords match nahi kar rahe','error');return;}
+  if(p1.length<6){toast('Min 6 characters chahiye','error');return;}
+  sPatch('/rest/v1/brokers?broker_id=eq.'+broker.broker_id,{password:p1}).then(function(ok){if(ok){toast('Password update ho gaya! ✅');document.getElementById('st_p1').value='';document.getElementById('st_p2').value='';}else toast('Update fail hua','error');});
+}
+function reqNotif(){Notification.requestPermission().then(function(p){if(p==='granted'){toast('Notifications enabled! ✅');document.getElementById('notifBtn').textContent='✓ Enabled';startPolling(broker.broker_id);}else toast('Notifications blocked','error');});}
+function copyBotLink(){if(!broker)return;navigator.clipboard.writeText('https://estatebotai.in/'+broker.broker_id);toast('Link copy ho gaya! 📋');}
+function previewBot(){if(!broker)return;window.open('https://estatebotai.in/'+broker.broker_id,'_blank');}
+
+var lastPollId=null;
+function startPolling(bid){
+  setInterval(function(){
+    sGet('/rest/v1/leads?broker_id=eq.'+bid+'&select=id&order=created_at.desc&limit=1').then(function(data){
+      if(data&&data[0]&&!leadStore[data[0].id]){
+        if(Notification.permission==='granted')new Notification('🔥 Naya Lead!',{body:'Ek naya lead aaya!'});
+        toast('🔥 Naya lead aaya!');loadLeads(bid);
+      }
+    });
+  },30000);
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+  if(e.key==='1')goPage('dashboard');else if(e.key==='2')goPage('leads');else if(e.key==='3')goPage('analytics');
+  else if(e.key==='4')goPage('followups');else if(e.key==='5')goPage('properties');
+  else if(e.key==='Escape')closeDetail();
+  else if(e.key==='r'||e.key==='R'){if(broker){loadLeads(broker.broker_id);toast('Refreshed! 🔄');}}
+});
+
+['fuModal','propModal','propNotesModal','leadMatchModal','visitModal','reportModal','summaryModal'].forEach(function(id){
+  var el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===el)closeMod(id);});
+});
+
+var savedBid=sessionStorage.getItem('bid');
+if(savedBid)initDash(savedBid);
+
 </script>
 </body>
 </html>
