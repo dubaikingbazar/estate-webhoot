@@ -18,8 +18,6 @@ html{scroll-behavior:smooth;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--fg);overflow-x:hidden;}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#000;}::-webkit-scrollbar-thumb{background:#15130e;border-radius:2px;}
 a{text-decoration:none;color:inherit;}
-
-/* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;transition:all 0.3s;}
 nav.scrolled{background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
 .nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;height:100%;display:flex;align-items:center;justify-content:space-between;}
@@ -34,8 +32,6 @@ nav.scrolled{background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);border-botto
 .nav-signin:hover{color:var(--fg);}
 .nav-cta{font-size:13px;font-weight:500;color:var(--gold-fg);background:var(--gold);padding:8px 18px;border-radius:8px;transition:opacity 0.2s;}
 .nav-cta:hover{opacity:0.9;}
-
-/* HERO */
 .hero{position:relative;overflow:hidden;padding:160px 20px 100px;display:flex;flex-direction:column;align-items:center;}
 .hero-grid{position:absolute;inset:0;background-image:linear-gradient(to right,rgba(201,168,76,0.05) 1px,transparent 1px),linear-gradient(to bottom,rgba(201,168,76,0.05) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:radial-gradient(ellipse 60% 50% at 50% 0%,#000 60%,transparent 100%);mask-image:radial-gradient(ellipse 60% 50% at 50% 0%,#000 60%,transparent 100%);}
 .hero-glow{position:absolute;inset-x:0;top:0;height:500px;background:radial-gradient(ellipse 50% 50% at 50% 0%,rgba(201,168,76,0.1),transparent);pointer-events:none;}
@@ -59,8 +55,6 @@ nav.scrolled{background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);border-botto
 .avatar:first-child{margin-left:0;}
 .stars{display:flex;gap:2px;color:var(--gold);font-size:13px;}
 .social-text{font-size:12px;color:var(--muted);}
-
-/* CHAT DEMO */
 .chat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 0 0 1px rgba(201,168,76,0.12),0 1px 0 0 rgba(237,237,237,0.04) inset,0 30px 80px -32px rgba(201,168,76,0.18),0 24px 60px -24px rgba(0,0,0,0.8);}
 .chat-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);}
 .chat-agent{display:flex;align-items:center;gap:10px;}
@@ -87,8 +81,6 @@ nav.scrolled{background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);border-botto
 .composer-inner{display:flex;align-items:center;justify-content:space-between;background:var(--secondary);border:1px solid var(--border);border-radius:10px;padding:10px 14px;}
 .composer-text{font-size:13px;color:var(--muted);}
 .composer-btn{width:28px;height:28px;border-radius:8px;background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-
-/* MARQUEE */
 .marquee-section{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(11,11,12,0.4);padding:20px 0;}
 .marquee-label{text-align:center;font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
 .marquee-wrap{position:relative;overflow:hidden;-webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);}
@@ -96,58 +88,41 @@ nav.scrolled{background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);border-botto
 .marquee-item{display:flex;align-items:center;white-space:nowrap;padding:0 24px;font-size:14px;font-weight:500;color:rgba(237,237,237,0.7);}
 .marquee-sep{color:var(--muted);margin:0 4px;font-size:10px;}
 @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-
-/* SECTIONS */
 .section{padding:96px 20px;}
 .section-inner{max-width:1200px;margin:0 auto;}
 .section-tag{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
 .section-h{font-size:clamp(28px,3.5vw,40px);font-weight:600;letter-spacing:-1px;line-height:1.1;max-width:520px;margin-bottom:16px;}
 .section-sub{font-size:15px;color:var(--muted);line-height:1.7;max-width:480px;margin-bottom:56px;}
 .text-center{text-align:center;}.mx-auto{margin-left:auto;margin-right:auto;}
-
-/* FEATURES */
 .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
 .feat{background:var(--card);padding:28px;transition:background 0.2s;}
 .feat:hover{background:rgba(21,19,14,0.5);}
 .feat-icon{width:40px;height:40px;border-radius:8px;border:1px solid var(--border);background:var(--secondary);display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
 .feat h3{font-size:15px;font-weight:500;margin-bottom:8px;}
 .feat p{font-size:13px;color:var(--muted);line-height:1.7;}
-
-/* HOW IT WORKS */
 .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;}
 .step{position:relative;display:flex;flex-direction:column;}
-.step-connector{position:absolute;left:20px;top:20px;height:1px;width:100%;background:var(--border);}
 .step-icon{position:relative;z-index:1;width:40px;height:40px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;margin-bottom:20px;flex-shrink:0;}
 .step-num{font-size:11px;font-weight:500;font-family:monospace;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:12px;}
 .step-num::after{content:'';flex:1;height:1px;background:var(--border);}
 .step h3{font-size:15px;font-weight:500;margin-bottom:8px;}
 .step p{font-size:13px;color:var(--muted);line-height:1.7;}
-
-/* PRICING */
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start;}
 .price-card{border:1px solid var(--border);border-radius:16px;padding:28px;background:var(--card);position:relative;}
 .price-card.highlighted{border-color:rgba(237,237,237,0.3);box-shadow:0 0 0 1px rgba(201,168,76,0.12),0 1px 0 0 rgba(237,237,237,0.04) inset,0 30px 80px -32px rgba(201,168,76,0.18),0 24px 60px -24px rgba(0,0,0,0.8);}
 .price-popular{position:absolute;top:-12px;left:28px;background:var(--gold);color:var(--gold-fg);font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;}
-.price-name{font-size:14px;font-weight:500;margin-bottom:16px;}
 .price-amount{font-size:40px;font-weight:600;letter-spacing:-1.5px;margin-bottom:4px;}
 .price-amount span{font-size:14px;font-weight:400;color:var(--muted);}
 .price-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
 .price-btn{display:block;text-align:center;font-size:13px;font-weight:500;padding:10px 20px;border-radius:8px;transition:all 0.2s;margin-bottom:24px;}
 .price-btn.primary{background:var(--gold);color:var(--gold-fg);}
 .price-btn.primary:hover{opacity:0.9;}
-.price-btn.outline{border:1px solid var(--border2);background:rgba(21,19,14,0.4);color:var(--fg);}
-.price-btn.outline:hover{background:rgba(21,19,14,0.8);}
 .price-divider{height:1px;background:var(--border);margin-bottom:24px;}
 .price-feats{display:flex;flex-direction:column;gap:12px;}
 .price-feat{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted);}
 .check{width:16px;height:16px;flex-shrink:0;color:var(--gold);margin-top:1px;}
-
-/* SIGNUP */
 .signup-wrap{max-width:520px;margin:0 auto;}
 .signup-card{border:1px solid var(--border);border-radius:24px;padding:40px;background:var(--card);box-shadow:0 0 0 1px rgba(201,168,76,0.12),0 1px 0 0 rgba(237,237,237,0.04) inset,0 30px 80px -32px rgba(201,168,76,0.18),0 24px 60px -24px rgba(0,0,0,0.8);}
 .signup-glow{position:absolute;inset-x:0;bottom:0;height:400px;background:radial-gradient(ellipse 50% 60% at 50% 100%,rgba(201,168,76,0.1),transparent);pointer-events:none;}
-.signup-card h2{font-size:28px;font-weight:600;letter-spacing:-0.75px;margin-bottom:8px;}
-.signup-card>p{font-size:14px;color:var(--muted);margin-bottom:32px;}
 .fg{margin-bottom:16px;}
 .fg label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;}
 .fg input,.fg select{width:100%;background:rgba(21,19,14,0.4);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:14px;color:var(--fg);outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
@@ -157,8 +132,7 @@ nav.scrolled{background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);border-botto
 .submit-btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:var(--gold-fg);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;padding:13px;border:none;border-radius:8px;cursor:pointer;margin-top:8px;transition:opacity 0.2s;}
 .submit-btn:hover{opacity:0.9;}
 .form-note{font-size:12px;color:var(--muted);text-align:center;margin-top:12px;}
-
-/* FOOTER */
+#payment-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center;}
 footer{border-top:1px solid var(--border);}
 .footer-inner{max-width:1200px;margin:0 auto;padding:56px 20px 24px;}
 .footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;}
@@ -175,12 +149,10 @@ footer{border-top:1px solid var(--border);}
 .footer-bottom-links{display:flex;gap:24px;}
 .footer-bottom-links a{font-size:12px;color:var(--muted);transition:color 0.2s;}
 .footer-bottom-links a:hover{color:var(--fg);}
-
 @media(max-width:900px){
   .hero-inner{grid-template-columns:1fr;}
   .feat-grid{grid-template-columns:1fr 1fr;}
   .steps-grid{grid-template-columns:1fr 1fr;}
-  .pricing-grid{grid-template-columns:1fr;}
   .footer-top{grid-template-columns:1fr 1fr;}
   .nav-links{display:none;}
 }
@@ -192,10 +164,10 @@ footer{border-top:1px solid var(--border);}
   .hero{padding:120px 20px 60px;}
 }
 </style>
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 </head>
 <body>
 
-<!-- NAV -->
 <nav id="navbar">
   <div class="nav-inner">
     <a href="/" class="logo">
@@ -223,7 +195,6 @@ footer{border-top:1px solid var(--border);}
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
@@ -284,7 +255,6 @@ footer{border-top:1px solid var(--border);}
   </div>
 </section>
 
-<!-- MARQUEE -->
 <div class="marquee-section">
   <div class="marquee-label">Powering lead generation across India</div>
   <div class="marquee-wrap">
@@ -317,7 +287,6 @@ footer{border-top:1px solid var(--border);}
   </div>
 </div>
 
-<!-- FEATURES -->
 <section class="section" id="features">
   <div class="section-inner">
     <div class="text-center">
@@ -360,7 +329,6 @@ footer{border-top:1px solid var(--border);}
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
 <section class="section" id="how" style="background:#080808;">
   <div class="section-inner">
     <div class="text-center">
@@ -370,33 +338,25 @@ footer{border-top:1px solid var(--border);}
     </div>
     <div class="steps-grid">
       <div class="step">
-        <div class="step-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
-        </div>
+        <div class="step-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg></div>
         <div class="step-num">01</div>
         <h3>Connect your channels</h3>
         <p>Add EstateBotAI to your website and WhatsApp Business in minutes — no code, no developers.</p>
       </div>
       <div class="step">
-        <div class="step-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        </div>
+        <div class="step-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <div class="step-num">02</div>
         <h3>AI engages every lead</h3>
         <p>The moment a buyer enquires, the AI responds in seconds and qualifies budget, intent, and timeline.</p>
       </div>
       <div class="step">
-        <div class="step-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        </div>
+        <div class="step-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
         <div class="step-num">03</div>
         <h3>Site visits get booked</h3>
         <p>Qualified buyers are scheduled directly into your calendar and routed to the right advisor automatically.</p>
       </div>
       <div class="step">
-        <div class="step-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </div>
+        <div class="step-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
         <div class="step-num">04</div>
         <h3>You close more deals</h3>
         <p>Spend your time with serious buyers while the dashboard tracks every conversation and conversion.</p>
@@ -405,7 +365,6 @@ footer{border-top:1px solid var(--border);}
   </div>
 </section>
 
-<!-- PRICING -->
 <section class="section" id="pricing">
   <div class="section-inner">
     <div class="text-center">
@@ -432,7 +391,6 @@ footer{border-top:1px solid var(--border);}
   </div>
 </section>
 
-<!-- SIGNUP -->
 <section class="section" id="signup" style="position:relative;overflow:hidden;">
   <div class="signup-glow"></div>
   <div class="signup-wrap">
@@ -502,7 +460,16 @@ footer{border-top:1px solid var(--border);}
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- PAYMENT MODAL -->
+<div id="payment-modal">
+  <div style="background:#0b0b0c;border:1px solid rgba(201,168,76,0.2);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;">
+    <h3 style="font-size:20px;font-weight:600;margin-bottom:8px;color:#ededed;">Complete Payment</h3>
+    <p style="color:#8c887e;font-size:14px;margin-bottom:24px;">₹2,999/month — 7 days free trial</p>
+    <div id="cashfree-container"></div>
+    <button onclick="document.getElementById('payment-modal').style.display='none'" style="margin-top:16px;background:none;border:none;color:#8c887e;font-size:13px;cursor:pointer;">Cancel</button>
+  </div>
+</div>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-top">
@@ -559,12 +526,10 @@ footer{border-top:1px solid var(--border);}
 </footer>
 
 <script>
-// Nav scroll effect
 window.addEventListener('scroll',()=>{
   document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>12);
 });
 
-// Chat animation
 const script=[
   {from:'ai',text:'Hi! Thanks for your interest in the 3 BHK at Prestige Lakeside, Whitefield. Are you looking to buy for yourself or as an investment?'},
   {from:'user',text:'For my family, we want to move in soon.'},
@@ -605,7 +570,6 @@ function runChat(){
 }
 setTimeout(runChat,700);
 
-// Form submit
 async function submitForm(){
   const fields=['f-name','f-phone','f-biz','f-city','f-state','f-exp','f-props','f-spec','f-email','f-pass','f-pass2'];
   let ok=true;
@@ -616,36 +580,45 @@ async function submitForm(){
   if(pass!==pass2){alert('Passwords do not match.');return;}
   if(pass.length<6){alert('Password must be at least 6 characters.');return;}
   const btn=document.querySelector('.submit-btn');
-  btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Creating your account…';
+  btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Creating account…';
   btn.disabled=true;
   try{
     const res=await fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-      name:document.getElementById('f-name').value,phone:document.getElementById('f-phone').value,
-      business:document.getElementById('f-biz').value,city:document.getElementById('f-city').value,
-      state:document.getElementById('f-state').value,specialty:document.getElementById('f-spec').value,
-      email:document.getElementById('f-email').value,experience:document.getElementById('f-exp').value,
-      properties:document.getElementById('f-props').value,password:pass
+      name:document.getElementById('f-name').value,
+      phone:document.getElementById('f-phone').value,
+      business:document.getElementById('f-biz').value,
+      city:document.getElementById('f-city').value,
+      state:document.getElementById('f-state').value,
+      specialty:document.getElementById('f-spec').value,
+      email:document.getElementById('f-email').value,
+      experience:document.getElementById('f-exp').value,
+      properties:document.getElementById('f-props').value,
+      password:pass
     })});
     const data=await res.json();
-    if(data.success){
-      document.querySelector('.signup-card').innerHTML=`
-        <div style="text-align:center;padding:24px 0;">
-          <div style="width:56px;height:56px;border-radius:50%;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#c9a84c" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <h2 style="font-size:22px;font-weight:600;letter-spacing:-0.5px;margin-bottom:8px;">You're on the list!</h2>
-          <p style="color:var(--muted);font-size:14px;margin-bottom:24px;">Check your inbox for next steps.</p>
-          <div style="background:#080808;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
-            <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Your Bot Link</div>
-            <a href="${data.url}" style="color:var(--gold);font-size:13px;font-weight:500;word-break:break-all;">${data.url}</a>
-          </div>
-          <a href="${data.url}" style="display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--gold-fg);font-size:13px;font-weight:500;padding:12px 24px;border-radius:8px;text-decoration:none;">Open Your Bot →</a>
-        </div>`;
-    } else {btn.innerHTML='Error — Try Again';btn.style.background='#ef4444';btn.disabled=false;}
-  } catch(e){btn.innerHTML='Error — Try Again';btn.style.background='#ef4444';btn.disabled=false;}
+    if(data.payment_session_id){
+      btn.innerHTML='Claim your free trial →';
+      btn.disabled=false;
+      const cashfree=Cashfree({mode:'production'});
+      document.getElementById('payment-modal').style.display='flex';
+      cashfree.checkout({
+        paymentSessionId:data.payment_session_id,
+        returnUrl:'https://estatebotai.in/payment/status?order_id={order_id}',
+        components:['order-details','card','upi','app','netbanking'],
+        style:{backgroundColor:'#0b0b0c',color:'#ededed',fontFamily:'Inter',fontSize:'14px',errorColor:'#ef4444',theme:'dark'}
+      });
+    } else {
+      btn.innerHTML='Error — Try Again';
+      btn.style.background='#ef4444';
+      btn.disabled=false;
+    }
+  } catch(e){
+    btn.innerHTML='Error — Try Again';
+    btn.style.background='#ef4444';
+    btn.disabled=false;
+  }
 }
 </script>
 <style>@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}</style>
 </body>
 </html>
-                                    
