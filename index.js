@@ -738,6 +738,69 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   }
 });
 
+
+// ===== CREATE PAYMENT ORDER =====
+app.post('/api/create-payment', async (req, res) => {
+  const { broker_id } = req.body;
+  if (!broker_id) return res.status(400).json({ error: 'broker_id required' });
+
+  const { data: broker, error } = await supabase
+    .from('brokers').select('*').eq('broker_id', broker_id).single();
+  if (error || !broker) return res.status(404).json({ error: 'Broker not found' });
+
+  try {
+    const orderId = 'EB_' + broker_id + '_' + Date.now();
+    const cfRes = await fetch(CASHFREE_BASE + '/pg/orders', {
+      method: 'POST',
+      headers: {
+        'x-client-id': CASHFREE_APP_ID,
+        'x-client-secret': CASHFREE_SECRET,
+        'x-api-version': '2023-08-01',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        order_id: orderId,
+        order_amount: PLAN_AMOUNT,
+        order_currency: 'INR',
+        customer_details: {
+          customer_id: broker_id,
+          customer_name: broker.name,
+          customer_email: broker.email,
+          customer_phone: (broker.phone || '9999999999').replace(/\D/g, '').slice(-10)
+        },
+        order_meta: {
+          return_url: 'https://estatebotai.in/payment/status?order_id={order_id}&broker_id=' + broker_id,
+          notify_url: 'https://estatebotai.in/api/payment/webhook'
+        },
+        order_note: 'EstateBot subscription — ' + broker_id
+      })
+    });
+
+    const cfData = await cfRes.json();
+    console.log('Cashfree order:', JSON.stringify(cfData));
+
+    if (!cfData.payment_session_id) {
+      console.error('Cashfree error:', cfData);
+      return res.status(500).json({ error: 'Payment gateway error. Please try again.' });
+    }
+
+    await supabase.from('brokers')
+      .update({ cashfree_order_id: orderId })
+      .eq('broker_id', broker_id);
+
+    res.json({
+      success: true,
+      payment_session_id: cfData.payment_session_id,
+      order_id: orderId,
+      amount: PLAN_AMOUNT
+    });
+
+  } catch (err) {
+    console.error('Create payment error:', err);
+    res.status(500).json({ error: 'Payment gateway unreachable. Please try again.' });
+  }
+});
+
 // ===== STATIC PAGES =====
 app.get("/privacy", (req, res) => { res.sendFile(__dirname + "/privacy.html"); });
 app.get("/terms", (req, res) => { res.sendFile(__dirname + "/terms.html"); });
