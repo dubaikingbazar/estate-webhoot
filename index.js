@@ -1,10 +1,14 @@
 const express = require('express');
 const { Resend } = require('resend');
 const { createClient } = require('@supabase/supabase-js');
+const crypto = require('crypto');
 const app = express();
+
+// Raw body needed for Cashfree webhook signature verification
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 
-// ===== KEYS (from environment variables) =====
+// ===== KEYS =====
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const resend = new Resend(process.env.RESEND_API_KEY);
 const supabase = createClient(
@@ -12,14 +16,21 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-// ===== ADMIN AUTH MIDDLEWARE =====
-const ADMIN_SECRET = process.env.ADMIN_SECRET || 'change-me-please';
+// ===== CASHFREE CONFIG =====
+const CASHFREE_APP_ID = process.env.CASHFREE_APP_ID;
+const CASHFREE_SECRET = process.env.CASHFREE_SECRET;
+// Change to 'https://api.cashfree.com' for production
+const CASHFREE_BASE = process.env.CASHFREE_ENV === 'production'
+  ? 'https://api.cashfree.com'
+  : 'https://sandbox.cashfree.com';
 
+const PLAN_AMOUNT = 2999; // ₹2,999/month
+
+// ===== ADMIN AUTH =====
+const ADMIN_SECRET = process.env.ADMIN_SECRET || 'change-me-please';
 function adminAuth(req, res, next) {
   const secret = req.headers['x-admin-secret'] || req.query.secret;
-  if (!secret || secret !== ADMIN_SECRET) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+  if (!secret || secret !== ADMIN_SECRET) return res.status(401).json({ error: 'Unauthorized' });
   next();
 }
 
@@ -101,7 +112,6 @@ SELL / RENT OUT KARNA:
 SELL/RENT OUT mein KABHI MAT PUCHHO: Lift, Parking, Society
 
 IMPORTANT: Jo property details customer already bata chuka ho dobara mat puchna.
-Example: Customer bole "2 BHK furnished flat chahiye" - Wrong: "Furnished hai?" Correct: "Parking chahiye?"
 
 LOCATION:
 - Buy/Rent: "Kaunsa area ya locality prefer karenge?"
@@ -154,7 +164,7 @@ STRICTLY NEVER:
 - Agar customer kisi sawaal ka jawab na de aur topic badal de, to naye context ke hisaab se baat continue karo aur baad mein missing information politely collect karo.
 `;
 
-// ===== SEND LEAD EMAIL =====
+// ===== GENERATE SUMMARY =====
 async function generateSummary(messages) {
   try {
     const convo = messages.map(m => `${m.role === 'user' ? 'Customer' : 'Bot'}: ${m.content}`).join('\n');
@@ -172,11 +182,10 @@ async function generateSummary(messages) {
     });
     const data = await res.json();
     return data.choices?.[0]?.message?.content || '';
-  } catch (e) {
-    return '';
-  }
+  } catch (e) { return ''; }
 }
 
+// ===== SEND LEAD EMAIL =====
 async function sendLeadEmail(broker, leadData, conversationMessages) {
   const summary = conversationMessages ? await generateSummary(conversationMessages) : '';
   const summaryHtml = summary ? `
@@ -197,17 +206,13 @@ async function sendLeadEmail(broker, leadData, conversationMessages) {
     to: broker.email,
     subject: `Naya Lead — ${leadData.name} | ${broker.name}`,
     html: `<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><meta name="color-scheme" content="light"></head>
+<html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background-color:#f0f4f8;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:20px 0;">
 <tr><td align="center">
 <table width="580" cellpadding="0" cellspacing="0" style="max-width:580px;width:100%;">
-  <tr><td style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);border-radius:14px;padding:32px 24px;text-align:center;" align="center">
+  <tr><td style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);border-radius:14px;padding:32px 24px;text-align:center;">
     <p style="font-size:10px;color:#94a3b8;letter-spacing:3px;text-transform:uppercase;margin:0 0 12px;">${broker.name} &middot; New Lead</p>
-    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);margin:0 auto 14px;line-height:64px;text-align:center;">
-      <span style="font-size:28px;line-height:64px;">&#128100;</span>
-    </div>
     <h2 style="color:#ffffff;margin:0 0 6px;font-size:28px;font-weight:700;font-family:Arial,sans-serif;">${leadData.name}</h2>
     <p style="margin:0 0 16px;color:#94a3b8;font-size:13px;">${leadData.intent || 'Property Enquiry'}</p>
     <a href="tel:${leadData.phone}" style="background:#f59e0b;color:#000000;padding:13px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;font-family:Arial,sans-serif;">&#128222; ${leadData.phone}</a>
@@ -234,22 +239,6 @@ async function sendLeadEmail(broker, leadData, conversationMessages) {
       </td></tr>
     </table>
   </td></tr>
-  <tr><td height="12"></td></tr>
-  <tr><td style="background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr><td style="padding:14px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
-        <p style="margin:0;font-size:11px;font-weight:700;color:#1e3a5f;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;">Contact Details</p>
-      </td></tr>
-      <tr><td>
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr><td style="padding:14px 20px;width:44%;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Name</td>
-            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:15px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.name}</td></tr>
-          <tr><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;">Phone / WhatsApp</td>
-            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:22px;font-family:Arial,sans-serif;">${leadData.phone}</td></tr>
-        </table>
-      </td></tr>
-    </table>
-  </td></tr>
   ${summaryHtml}
   <tr><td height="16"></td></tr>
   <tr><td align="center">
@@ -262,14 +251,13 @@ async function sendLeadEmail(broker, leadData, conversationMessages) {
 </table>
 </td></tr>
 </table>
-</body>
-</html>`
+</body></html>`
   });
   if (error) console.error('Email error:', error);
   else console.log(`Email sent to ${broker.email} for lead: ${leadData.name}`);
 }
 
-// ===== SEND WELCOME EMAIL TO BROKER =====
+// ===== SEND WELCOME EMAIL =====
 async function sendWelcomeEmail(broker) {
   const { error } = await resend.emails.send({
     from: 'EstateBot <welcome@estatebotai.in>',
@@ -299,12 +287,14 @@ async function sendWelcomeEmail(broker) {
   else console.log(`Welcome email sent to ${broker.email}`);
 }
 
-// ===== BROKER SIGNUP API =====
+// ===== BROKER SIGNUP — NOW CREATES ORDER =====
 app.post('/api/signup', async (req, res) => {
-  const { name, business, city, state, specialty, email, phone, experience, properties } = req.body;
+  const { name, business, city, state, specialty, email, phone, experience, properties, password } = req.body;
   if (!name || !business || !city || !email || !phone) {
     return res.status(400).json({ error: 'Saari details bharo' });
   }
+
+  // Generate broker_id
   const broker_id = business.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '-')
@@ -315,63 +305,287 @@ app.post('/api/signup', async (req, res) => {
     .eq('broker_id', broker_id)
     .single();
   const finalId = existing ? `${broker_id}-${Date.now().toString().slice(-4)}` : broker_id;
-  const { error } = await supabase.from('brokers').insert([{
+
+  // Save broker with 'pending_payment' status
+  const { error: dbErr } = await supabase.from('brokers').insert([{
     broker_id: finalId,
     name: business,
     email,
     phone,
     city: city + (state ? ', ' + state : ''),
     specialty: specialty || 'Residential',
-    status: 'trial',
+    status: 'pending_payment',    // <-- blocked until payment done
+    password: password || null,
     stats: {
       experience: experience ? experience + ' Yrs' : '5 Yrs',
       properties: properties || '100+'
     }
   }]);
-  if (error) {
-    console.error('Supabase error:', error);
+  if (dbErr) {
+    console.error('Supabase error:', dbErr);
     return res.status(500).json({ error: 'Database error' });
   }
-  await sendWelcomeEmail({ name, broker_id: finalId, email });
-  res.json({ success: true, broker_id: finalId, url: `https://estatebotai.in/${finalId}` });
+
+  // Create Cashfree order
+  try {
+    const orderId = `EB_${finalId}_${Date.now()}`;
+    const cfRes = await fetch(`${CASHFREE_BASE}/pg/orders`, {
+      method: 'POST',
+      headers: {
+        'x-client-id': CASHFREE_APP_ID,
+        'x-client-secret': CASHFREE_SECRET,
+        'x-api-version': '2023-08-01',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        order_id: orderId,
+        order_amount: PLAN_AMOUNT,
+        order_currency: 'INR',
+        customer_details: {
+          customer_id: finalId,
+          customer_name: name,
+          customer_email: email,
+          customer_phone: phone.replace(/\D/g, '').slice(-10)
+        },
+        order_meta: {
+          return_url: `https://estatebotai.in/payment/status?order_id={order_id}&broker_id=${finalId}`,
+          notify_url: `https://estatebotai.in/api/payment/webhook`
+        },
+        order_note: `EstateBot subscription — ${finalId}`
+      })
+    });
+
+    const cfData = await cfRes.json();
+    console.log('Cashfree order response:', JSON.stringify(cfData));
+
+    if (!cfData.payment_session_id) {
+      console.error('Cashfree error:', cfData);
+      return res.status(500).json({ error: 'Payment gateway error. Please try again.' });
+    }
+
+    // Save order_id in broker record for reference
+    await supabase.from('brokers')
+      .update({ cashfree_order_id: orderId })
+      .eq('broker_id', finalId);
+
+    res.json({
+      success: true,
+      broker_id: finalId,
+      payment_session_id: cfData.payment_session_id,
+      order_id: orderId,
+      amount: PLAN_AMOUNT
+    });
+
+  } catch (cfErr) {
+    console.error('Cashfree fetch error:', cfErr);
+    return res.status(500).json({ error: 'Payment gateway unreachable. Please try again.' });
+  }
 });
 
-// ===== BROKER AUTH API =====
+// ===== CASHFREE WEBHOOK — ACTIVATES SUBSCRIPTION =====
+app.post('/api/payment/webhook', async (req, res) => {
+  try {
+    // Verify Cashfree signature
+    const rawBody = req.body.toString('utf8');
+    const signature = req.headers['x-webhook-signature'];
+    const timestamp = req.headers['x-webhook-timestamp'];
+
+    if (CASHFREE_SECRET && signature && timestamp) {
+      const signedPayload = timestamp + rawBody;
+      const expectedSig = crypto
+        .createHmac('sha256', CASHFREE_SECRET)
+        .update(signedPayload)
+        .digest('base64');
+      if (expectedSig !== signature) {
+        console.error('Webhook signature mismatch');
+        return res.status(400).json({ error: 'Invalid signature' });
+      }
+    }
+
+    const event = JSON.parse(rawBody);
+    console.log('Cashfree webhook event:', event.type, JSON.stringify(event).substring(0, 200));
+
+    if (event.type === 'PAYMENT_SUCCESS_WEBHOOK') {
+      const order = event.data?.order;
+      const payment = event.data?.payment;
+
+      if (!order?.order_id) return res.status(200).json({ status: 'ok' });
+
+      // Extract broker_id from order_id format: EB_brokerid_timestamp
+      const parts = order.order_id.split('_');
+      // broker_id could have dashes so join middle parts
+      const brokerId = parts.slice(1, -1).join('_');
+
+      console.log(`Payment SUCCESS for broker: ${brokerId}, order: ${order.order_id}`);
+
+      // Activate broker subscription
+      const validTill = new Date();
+      validTill.setMonth(validTill.getMonth() + 1);
+
+      const { data: broker, error: fetchErr } = await supabase
+        .from('brokers')
+        .select('*')
+        .eq('broker_id', brokerId)
+        .single();
+
+      if (fetchErr || !broker) {
+        console.error('Broker not found for webhook:', brokerId);
+        return res.status(200).json({ status: 'ok' }); // Return 200 to stop retries
+      }
+
+      await supabase.from('brokers').update({
+        status: 'active',
+        subscription_start: new Date().toISOString(),
+        subscription_valid_till: validTill.toISOString(),
+        cashfree_payment_id: payment?.cf_payment_id || null,
+        cashfree_order_id: order.order_id
+      }).eq('broker_id', brokerId);
+
+      console.log(`Broker ${brokerId} activated till ${validTill.toISOString()}`);
+
+      // Send welcome email
+      await sendWelcomeEmail({ name: broker.name, broker_id: brokerId, email: broker.email });
+    }
+
+    if (event.type === 'PAYMENT_FAILED_WEBHOOK') {
+      const order = event.data?.order;
+      if (order?.order_id) {
+        const parts = order.order_id.split('_');
+        const brokerId = parts.slice(1, -1).join('_');
+        await supabase.from('brokers').update({ status: 'payment_failed' }).eq('broker_id', brokerId);
+        console.log(`Payment FAILED for broker: ${brokerId}`);
+      }
+    }
+
+    res.status(200).json({ status: 'ok' });
+  } catch (err) {
+    console.error('Webhook error:', err);
+    res.status(200).json({ status: 'ok' }); // Always 200 to Cashfree
+  }
+});
+
+// ===== PAYMENT STATUS PAGE =====
+app.get('/payment/status', async (req, res) => {
+  const { order_id, broker_id } = req.query;
+
+  if (!order_id || !broker_id) {
+    return res.redirect('/');
+  }
+
+  // Verify payment status with Cashfree
+  try {
+    const cfRes = await fetch(`${CASHFREE_BASE}/pg/orders/${order_id}`, {
+      headers: {
+        'x-client-id': CASHFREE_APP_ID,
+        'x-client-secret': CASHFREE_SECRET,
+        'x-api-version': '2023-08-01'
+      }
+    });
+    const cfData = await cfRes.json();
+    const status = cfData.order_status;
+
+    console.log(`Payment status check: order=${order_id}, status=${status}`);
+
+    if (status === 'PAID') {
+      // Activate if not already done by webhook
+      const { data: broker } = await supabase
+        .from('brokers').select('status,name,email').eq('broker_id', broker_id).single();
+
+      if (broker && broker.status !== 'active') {
+        const validTill = new Date();
+        validTill.setMonth(validTill.getMonth() + 1);
+        await supabase.from('brokers').update({
+          status: 'active',
+          subscription_start: new Date().toISOString(),
+          subscription_valid_till: validTill.toISOString(),
+          cashfree_order_id: order_id
+        }).eq('broker_id', broker_id);
+        await sendWelcomeEmail({ name: broker.name, broker_id, email: broker.email });
+      }
+
+      return res.send(getPaymentStatusHTML('success', broker_id));
+    } else if (status === 'ACTIVE') {
+      return res.send(getPaymentStatusHTML('pending', broker_id));
+    } else {
+      return res.send(getPaymentStatusHTML('failed', broker_id));
+    }
+  } catch (err) {
+    console.error('Status check error:', err);
+    return res.send(getPaymentStatusHTML('pending', broker_id));
+  }
+});
+
+// ===== PAYMENT STATUS HTML =====
+function getPaymentStatusHTML(status, brokerId) {
+  const configs = {
+    success: {
+      icon: '✓',
+      color: '#22c55e',
+      bg: 'rgba(34,197,94,0.1)',
+      title: 'Payment Successful!',
+      msg: 'Aapka EstateBot account activate ho gaya hai. Welcome email check karein.',
+      btn: `<a href="https://estatebotai.in/${brokerId}" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Apna Bot Dekho →</a>`
+    },
+    failed: {
+      icon: '✕',
+      color: '#ef4444',
+      bg: 'rgba(239,68,68,0.1)',
+      title: 'Payment Failed',
+      msg: 'Payment process nahi ho payi. Dobara try karein.',
+      btn: `<a href="/#signup" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Dobara Try Karein →</a>`
+    },
+    pending: {
+      icon: '⏳',
+      color: '#f59e0b',
+      bg: 'rgba(245,158,11,0.1)',
+      title: 'Payment Processing…',
+      msg: 'Aapka payment process ho raha hai. Thodi der mein email aayegi.',
+      btn: `<a href="https://estatebotai.in/${brokerId}" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Dashboard Check Karein →</a>`
+    }
+  };
+  const c = configs[status];
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Payment ${status} — EstateBot</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,sans-serif;background:#000;color:#ededed;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}</style>
+</head>
+<body>
+<div style="text-align:center;max-width:400px;">
+  <div style="width:72px;height:72px;border-radius:50%;background:${c.bg};border:1px solid ${c.color};display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:32px;">${c.icon}</div>
+  <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.5px;margin-bottom:12px;">${c.title}</h1>
+  <p style="color:#8c887e;font-size:14px;line-height:1.7;margin-bottom:28px;">${c.msg}</p>
+  ${c.btn}
+  <p style="margin-top:20px;font-size:12px;color:#555;">Support: +91 86903 53003 &nbsp;·&nbsp; <a href="mailto:estatebotofficial@gmail.com" style="color:#c9a84c;">estatebotofficial@gmail.com</a></p>
+</div>
+</body></html>`;
+}
+
+// ===== BROKER AUTH =====
 app.post('/api/broker-auth', async (req, res) => {
   const { broker_id, password } = req.body;
-  if (!broker_id || !password) {
-    return res.status(400).json({ error: 'Broker ID aur password dono chahiye' });
-  }
-  const { data: broker, error } = await supabase
-    .from('brokers')
-    .select('*')
-    .eq('broker_id', broker_id)
-    .single();
-  if (error || !broker) {
-    return res.status(404).json({ error: 'Broker nahi mila' });
-  }
-  if (broker.password !== password) {
-    return res.status(401).json({ error: 'Password galat hai' });
-  }
+  if (!broker_id || !password) return res.status(400).json({ error: 'Broker ID aur password dono chahiye' });
+  const { data: broker, error } = await supabase.from('brokers').select('*').eq('broker_id', broker_id).single();
+  if (error || !broker) return res.status(404).json({ error: 'Broker nahi mila' });
+  if (broker.password !== password) return res.status(401).json({ error: 'Password galat hai' });
   res.json({ success: true, broker_id: broker.broker_id });
 });
 
 app.get('/broker-login', (req, res) => { res.redirect('/dashboard'); });
 app.get('/dashboard', (req, res) => { res.sendFile(__dirname + '/broker-dashboard.html'); });
 
-// ===== ADMIN API (protected) =====
+// ===== ADMIN APIs =====
 app.get('/api/admin/brokers', adminAuth, async (req, res) => {
   const { data, error } = await supabase.from('brokers').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error });
   res.json(data);
 });
-
 app.get('/api/admin/leads', adminAuth, async (req, res) => {
   const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error });
   res.json(data);
 });
-
 app.patch('/api/admin/brokers/:brokerId', adminAuth, async (req, res) => {
   const { brokerId } = req.params;
   const { status, password } = req.body;
@@ -382,7 +596,6 @@ app.patch('/api/admin/brokers/:brokerId', adminAuth, async (req, res) => {
   if (error) return res.status(500).json({ error });
   res.json({ success: true });
 });
-
 app.delete('/api/admin/delete/:brokerId', adminAuth, async (req, res) => {
   const { brokerId } = req.params;
   const { error } = await supabase.from('brokers').delete().eq('broker_id', brokerId);
@@ -392,17 +605,12 @@ app.delete('/api/admin/delete/:brokerId', adminAuth, async (req, res) => {
 
 // ===== STATE MACHINE =====
 const leadStates = {};
-
 function getLeadState(sessionId) {
   if (!leadStates[sessionId]) {
-    leadStates[sessionId] = {
-      intent: '', name: '', propertyType: '',
-      location: '', budget: '', timeline: '', phone: ''
-    };
+    leadStates[sessionId] = { intent: '', name: '', propertyType: '', location: '', budget: '', timeline: '', phone: '' };
   }
   return leadStates[sessionId];
 }
-
 function updateLeadState(sessionId, leadData) {
   const state = getLeadState(sessionId);
   if (leadData.intent) state.intent = leadData.intent;
@@ -413,7 +621,6 @@ function updateLeadState(sessionId, leadData) {
   if (leadData.timeline) state.timeline = leadData.timeline;
   if (leadData.phone) state.phone = leadData.phone;
 }
-
 function getMissingFields(sessionId) {
   const s = getLeadState(sessionId);
   const missing = [];
@@ -426,11 +633,10 @@ function getMissingFields(sessionId) {
   if (!s.phone) missing.push('phone number');
   return missing;
 }
-
 function buildSystemPromptWithState(brokerName, sessionId) {
   const state = getLeadState(sessionId);
   const missing = getMissingFields(sessionId);
-  let stateNote = '\n\nCURRENT LEAD STATE (jo pehle se collect ho chuka hai):\n';
+  let stateNote = '\n\nCURRENT LEAD STATE:\n';
   stateNote += `- Intent: ${state.intent || 'NOT YET COLLECTED'}\n`;
   stateNote += `- Customer Name: ${state.name || 'NOT YET COLLECTED'}\n`;
   stateNote += `- Property Type: ${state.propertyType || 'NOT YET COLLECTED'}\n`;
@@ -461,14 +667,13 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   const { brokerId } = req.params;
   const { message, sessionId } = req.body;
 
-  const { data: broker, error } = await supabase
-    .from('brokers')
-    .select('*')
-    .eq('broker_id', brokerId)
-    .single();
-
+  const { data: broker, error } = await supabase.from('brokers').select('*').eq('broker_id', brokerId).single();
   if (error || !broker) return res.status(404).json({ error: 'Broker not found' });
-  if (broker.status === 'inactive') return res.status(403).json({ error: 'Subscription expired' });
+
+  // Block if payment not done
+  if (broker.status === 'inactive' || broker.status === 'pending_payment' || broker.status === 'payment_failed') {
+    return res.status(403).json({ error: 'Subscription not active' });
+  }
 
   if (!conversations[sessionId]) conversations[sessionId] = [];
   conversations[sessionId].push({ role: 'user', content: message });
@@ -476,7 +681,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   try {
     let reply = '';
     let attempts = 0;
-
     while (attempts < 3) {
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
@@ -490,19 +694,12 @@ app.post('/api/chat/:brokerId', async (req, res) => {
         })
       });
       const data = await groqRes.json();
-      console.log('Groq response status:', groqRes.status, 'Attempt:', attempts + 1);
-      if (!data.choices || !data.choices[0]) {
-        console.error('Groq error response:', JSON.stringify(data));
-        break;
-      }
+      if (!data.choices || !data.choices[0]) { console.error('Groq error:', JSON.stringify(data)); break; }
       reply = data.choices[0].message.content || '';
       if (validateReply(reply, broker.name)) break;
-      console.log('Validation failed, retrying...', attempts + 1);
       attempts++;
     }
-
     if (!reply) reply = 'Kuch gadbad ho gayi, dobara try karein.';
-
     conversations[sessionId].push({ role: 'assistant', content: reply });
 
     let leadComplete = false;
@@ -514,26 +711,20 @@ app.post('/api/chat/:brokerId', async (req, res) => {
         try {
           leadData = JSON.parse(match[1]);
           updateLeadState(sessionId, leadData);
-
           const phoneDigits = (leadData.phone || '').replace(/\D/g, '');
           if (!leadData.phone || phoneDigits.length < 10) {
             reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
-            leadComplete = false;
-            leadData = null;
+            leadComplete = false; leadData = null;
           } else {
             reply = reply.replace(/\|\|\|LEAD\|\|\|.+?\|\|\|/s, '').trim();
-
             const state = getLeadState(sessionId);
             const missing = getMissingFields(sessionId);
             const criticalMissing = missing.filter(f => !f.includes('timeline'));
-
             if (criticalMissing.length > 1) {
-              console.log('Lead incomplete, missing:', criticalMissing);
-              leadComplete = false;
-              leadData = null;
+              leadComplete = false; leadData = null;
             } else {
               const uploadToken = Math.random().toString(36).substr(2,12) + Date.now().toString(36);
-              const { error: insertError } = await supabase.from('leads').insert([{
+              await supabase.from('leads').insert([{
                 broker_id: brokerId,
                 name: leadData.name || state.name,
                 phone: leadData.phone || state.phone,
@@ -546,8 +737,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
                 parking: leadData.details?.parking || null,
                 special_requirements: leadData.details?.special || null,
                 upload_token: uploadToken
-              }]).select().single();
-              if (insertError) console.error('Lead insert error:', JSON.stringify(insertError));
+              }]);
               await sendLeadEmail(broker, {
                 name: leadData.name || state.name,
                 phone: leadData.phone || state.phone,
@@ -573,7 +763,6 @@ app.post('/api/chat/:brokerId', async (req, res) => {
         else if (msgLower.includes('rent') && (msgLower.includes('dena') || msgLower.includes('tenant'))) state.intent = 'RENT_OUT';
       }
     }
-
     res.json({ reply, leadComplete, leadData });
   } catch (err) {
     console.error('Error:', err);
@@ -581,7 +770,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   }
 });
 
-// ===== LEGAL PAGES =====
+// ===== STATIC PAGES =====
 app.get("/privacy", (req, res) => { res.sendFile(__dirname + "/privacy.html"); });
 app.get("/terms", (req, res) => { res.sendFile(__dirname + "/terms.html"); });
 app.get('/admin', (req, res) => { res.sendFile(__dirname + '/admin.html'); });
@@ -590,18 +779,14 @@ app.get('/', (req, res) => { res.sendFile(__dirname + '/landing.html'); });
 // ===== BROKER PAGE =====
 app.get('/:brokerId', async (req, res) => {
   const { brokerId } = req.params;
-  const reserved = ['upload', 'privacy', 'terms', 'admin', 'dashboard', 'broker-login', 'api'];
+  const reserved = ['upload', 'privacy', 'terms', 'admin', 'dashboard', 'broker-login', 'api', 'payment'];
   if (reserved.includes(brokerId)) return res.status(404).send('<h1 style="font-family:Arial;text-align:center;margin-top:100px;">Page not found</h1>');
-  const { data: broker } = await supabase
-    .from('brokers')
-    .select('*')
-    .eq('broker_id', brokerId)
-    .single();
+  const { data: broker } = await supabase.from('brokers').select('*').eq('broker_id', brokerId).single();
   if (!broker) return res.status(404).send('<h1 style="font-family:Arial;text-align:center;margin-top:100px;">Page not found</h1>');
   res.send(getBrokerHTML(broker, brokerId));
 });
 
-// ===== HTML TEMPLATE =====
+// ===== BROKER HTML TEMPLATE (unchanged) =====
 function getBrokerHTML(broker, brokerId) {
   const specialties = broker.specialty ? broker.specialty.split(',') : [];
   const specIcons = [
@@ -647,7 +832,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .spec-name{font-size:10px;font-weight:600;color:#1e293b;}
 .spec-line{width:24px;height:2px;background:#c8a96e;border-radius:2px;}
 .chat-wrap{width:100%;max-width:100%;background:#F7F4ED;display:flex;flex-direction:column;position:relative;overflow:hidden;}
-.chat-wrap-inner{background:#F7F4ED;padding:20px 16px 16px;position:relative;z-index:1;background-image:radial-gradient(circle at 50% 100%,rgba(212,162,76,.07),transparent 60%);}
+.chat-wrap-inner{background:#F7F4ED;padding:20px 16px 16px;position:relative;z-index:1;}
 .skyline-wm{position:absolute;bottom:0;left:0;right:0;height:130px;opacity:.15;pointer-events:none;z-index:0;}
 .agent-card{width:calc(100% + 32px);margin-left:-16px;margin-right:-16px;margin-bottom:16px;background:#fff;border-radius:0;padding:14px 20px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 16px rgba(14,27,48,.08);border-top:1px solid #EDE7D8;border-bottom:1px solid #EDE7D8;position:relative;z-index:1;}
 .agent-av{width:38px;height:38px;border-radius:10px;background:#0E1B30;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#D4A24C;font-family:'Fraunces',serif;font-weight:700;font-size:16px;}
@@ -661,8 +846,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .day-chip{text-align:center;margin:14px 0 12px;position:relative;z-index:1;}
 .day-chip span{background:#EDE7D8;color:#6B6354;font-size:10px;padding:5px 14px;border-radius:100px;font-weight:600;}
 .msg{display:flex;flex-direction:column;max-width:88%;position:relative;z-index:1;}
-.msg.bot{align-self:flex-start;}
-.msg.user{align-self:flex-end;}
+.msg.bot{align-self:flex-start;}.msg.user{align-self:flex-end;}
 .bubble{font-size:12.5px;line-height:1.5;color:#2A2A2A;}
 .bot .bubble{background:#fff;border-left:3px solid #D4A24C;border-radius:4px 16px 16px 16px;padding:14px 16px;box-shadow:0 2px 12px rgba(14,27,48,.06);}
 .user .bubble{background:#0E1B30;color:#F4EFE6;border-radius:16px 16px 4px 16px;padding:10px 14px;}
@@ -670,8 +854,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .user .ts{align-self:flex-end;color:#A39B89;}
 .typing{display:flex;align-items:center;gap:4px;padding:12px 16px;background:#fff;border-left:3px solid #D4A24C;border-radius:4px 16px 16px 16px;box-shadow:0 2px 12px rgba(14,27,48,.06);width:fit-content;position:relative;z-index:1;}
 .typing span{width:6px;height:6px;background:#D4A24C;border-radius:50%;animation:bounce 1.2s infinite;}
-.typing span:nth-child(2){animation-delay:0.2s;}
-.typing span:nth-child(3){animation-delay:0.4s;}
+.typing span:nth-child(2){animation-delay:0.2s;}.typing span:nth-child(3){animation-delay:0.4s;}
 @keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
 .chat-footer{padding:14px 16px 18px;border-top:1px solid #EDE7D8;display:flex;gap:10px;align-items:center;background:#F7F4ED;position:relative;z-index:1;}
 .chat-footer input{flex:1;background:#fff;border:1.5px solid #D4A24C;border-radius:100px;padding:11px 16px;font-family:'Manrope',sans-serif;font-size:11.7px;color:#2A2A2A;outline:none;}
@@ -731,45 +914,28 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
   </div>
   <div class="stats-bar">
     <div class="stat-item">
-      <div class="stat-circle">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      </div>
+      <div class="stat-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <div class="stat-val">${(broker.stats && broker.stats.properties) ? broker.stats.properties : '100+'}</div>
       <div class="stat-lbl">Properties</div>
     </div>
     <div class="stat-item">
-      <div class="stat-circle">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><circle cx="12" cy="8" r="3"/><path d="M6.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/></svg>
-      </div>
+      <div class="stat-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><circle cx="12" cy="8" r="3"/><path d="M6.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/></svg></div>
       <div class="stat-val">${(broker.stats && broker.stats.experience) ? broker.stats.experience : '5 Yrs'}</div>
       <div class="stat-lbl">Experience</div>
     </div>
     <div class="stat-item">
-      <div class="stat-circle">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
-      </div>
+      <div class="stat-circle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></div>
       <div class="stat-val">24/7</div>
       <div class="stat-lbl">Active</div>
     </div>
   </div>
   <div class="badges-row">
-    <div class="badge-dark">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Trusted Agent
-    </div>
-    <div class="badge-gold">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-      Free Consultation
-    </div>
+    <div class="badge-dark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Trusted Agent</div>
+    <div class="badge-gold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Free Consultation</div>
   </div>
 </div>
 <div class="specialties">
-  ${specialties.map((s, i) => `
-  <div class="spec-card">
-    ${specIcons[i % specIcons.length]}
-    <div class="spec-name">${s.trim()}</div>
-    <div class="spec-line"></div>
-  </div>`).join('')}
+  ${specialties.map((s, i) => `<div class="spec-card">${specIcons[i % specIcons.length]}<div class="spec-name">${s.trim()}</div><div class="spec-line"></div></div>`).join('')}
 </div>
 <div class="chat-wrap">
   <div class="chat-wrap-inner">
@@ -790,17 +956,13 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
         <div class="agent-name">${broker.name}<br>Assistant</div>
         <div class="agent-status"><span class="online-dot"></span> Online</div>
       </div>
-      <div class="agent-meta">
-        <div class="badge1">24x7 Active</div>
-        <div class="badge2">AI Powered</div>
-      </div>
+      <div class="agent-meta"><div class="badge1">24x7 Active</div><div class="badge2">AI Powered</div></div>
     </div>
     <div class="day-chip"><span>Aaj</span></div>
     <div class="chat-body" id="chatBody">
       <div class="msg bot"><div class="bubble">Namaste ji! 😊 Aap property kharidna chahte hain, rent lena hai, ya apni property sell/rent pe deni hai?</div><div class="ts">Abhi</div></div>
     </div>
   </div>
-
   <div class="chat-footer">
     <input type="text" id="msgInput" placeholder="Apna message yahan likhein…" onkeypress="if(event.key==='Enter')sendMsg()"/>
     <button class="send-btn" onclick="sendMsg()">
@@ -809,27 +971,20 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
   </div>
 </div>
 <div class="powered">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V10.5Z" fill="#0E1B30"/>
-    <circle cx="12" cy="14.5" r="3.8" fill="#D4A24C"/>
-    <circle cx="10.8" cy="14.5" r="0.9" fill="white"/>
-    <circle cx="12" cy="14.5" r="0.9" fill="white"/>
-    <circle cx="13.2" cy="14.5" r="0.9" fill="white"/>
-    <path d="M10.2 17.2L9.2 19L11.5 18.1" fill="#D4A24C"/>
-  </svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V10.5Z" fill="#0E1B30"/><circle cx="12" cy="14.5" r="3.8" fill="#D4A24C"/><circle cx="10.8" cy="14.5" r="0.9" fill="white"/><circle cx="12" cy="14.5" r="0.9" fill="white"/><circle cx="13.2" cy="14.5" r="0.9" fill="white"/><path d="M10.2 17.2L9.2 19L11.5 18.1" fill="#D4A24C"/></svg>
   EstateBot · AI Lead Assistant
 </div>
 <script>
-const sessionId = Math.random().toString(36).substr(2,9);
-const brokerId = '${brokerId}';
-let leadDone = false;
+const sessionId=Math.random().toString(36).substr(2,9);
+const brokerId='${brokerId}';
+let leadDone=false;
 function getTime(){const n=new Date();return n.getHours()+':'+String(n.getMinutes()).padStart(2,'0');}
 function addMsg(text,role){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg '+role;d.innerHTML='<div class="bubble">'+text+'</div><div class="ts">'+getTime()+'</div>';body.appendChild(d);body.scrollTop=body.scrollHeight;}
 function showTyping(){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg bot';d.id='typing';d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';body.appendChild(d);body.scrollTop=body.scrollHeight;}
 function removeTyping(){const t=document.getElementById('typing');if(t)t.remove();}
 function typeMsg(text,role){const body=document.getElementById('chatBody');const d=document.createElement('div');d.className='msg '+role;const bubble=document.createElement('div');bubble.className='bubble';bubble.innerHTML='';const ts=document.createElement('div');ts.className='ts';ts.textContent=getTime();d.appendChild(bubble);d.appendChild(ts);body.appendChild(d);body.scrollTop=body.scrollHeight;let i=0;function typeNext(){if(i<text.length){bubble.innerHTML+=text.charAt(i);i++;body.scrollTop=body.scrollHeight;setTimeout(typeNext,20);}}typeNext();}
 function disableChat(){const inp=document.getElementById('msgInput');const sendBtn=document.querySelector('.send-btn');inp.disabled=true;inp.placeholder='Shukriya! Hamari team jald contact karegi.';inp.style.background='#f0fdf4';inp.style.borderColor='#22c55e';inp.style.color='#15803d';if(sendBtn)sendBtn.style.display='none';}
-async function sendMsg(){const input=document.getElementById('msgInput');const msg=input.value.trim();if(!msg)return;if(leadDone){const c=msg.toLowerCase();if(c.includes('galat')||c.includes('wrong')||c.includes('change')||c.includes('sahi')||c.includes('galti')){leadDone=false;input.disabled=false;input.placeholder='Apna message yahan likhein...';input.style.background='';input.style.borderColor='';input.style.color='';const sb=document.querySelector('.send-btn');if(sb)sb.style.display='flex';}else return;}input.value='';addMsg(msg,'user');showTyping();try{const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});const data=await res.json();removeTyping();typeMsg(data.reply,'bot');if(data.leadComplete){leadDone=true;disableChat();}}catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}}
+async function sendMsg(){const input=document.getElementById('msgInput');const msg=input.value.trim();if(!msg)return;if(leadDone)return;input.value='';addMsg(msg,'user');showTyping();try{const res=await fetch('/api/chat/'+brokerId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId})});const data=await res.json();removeTyping();typeMsg(data.reply,'bot');if(data.leadComplete){leadDone=true;disableChat();}}catch(e){removeTyping();addMsg('Kuch gadbad ho gayi, dobara try karein.','bot');}}
 </script>
 </body></html>`;
 }
