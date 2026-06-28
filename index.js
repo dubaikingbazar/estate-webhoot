@@ -203,7 +203,7 @@ app.get('/payment/status', async (req, res) => {
         await sendWelcomeEmail({ name: broker.name, broker_id, email: broker.email });
       }
 
-      return res.send(getPaymentStatusHTML('success', broker_id));
+      return res.redirect('https://estatebotai.in/dashboard');
     } else if (status === 'ACTIVE') {
       return res.send(getPaymentStatusHTML('pending', broker_id));
     } else {
@@ -474,7 +474,7 @@ app.post('/api/create-payment', async (req, res) => {
           customer_phone: (broker.phone || '9999999999').replace(/\D/g, '').slice(-10)
         },
         order_meta: {
-          return_url: 'https://estatebotai.in/payment/status?order_id={order_id}&broker_id=' + broker_id,
+          return_url: 'https://estatebotai.in/dashboard',
           notify_url: 'https://estatebotai.in/api/payment/webhook'
         },
         order_note: 'EstateBot subscription — ' + broker_id
