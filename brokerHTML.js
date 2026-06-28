@@ -81,33 +81,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
   <div class="hero-bg"></div>
   <div class="hero-overlay"></div>
   <div class="hero-top">
-    <svg width="36" height="44" viewBox="0 0 36 44" fill="none">
-      <line x1="18" y1="0" x2="18" y2="5" stroke="#c8a96e" stroke-width="1.2" stroke-linecap="round"/>
-      <circle cx="18" cy="0" r="1.2" fill="#c8a96e"/>
-      <polygon points="18,3 14,10 22,10" fill="rgba(200,169,110,0.2)" stroke="#c8a96e" stroke-width="0.8"/>
-      <rect x="14" y="10" width="8" height="7" fill="rgba(200,169,110,0.1)" stroke="#c8a96e" stroke-width="0.8" rx="0.3"/>
-      <rect x="15.5" y="11.5" width="2" height="2" fill="#c8a96e" opacity="0.7"/>
-      <rect x="18.5" y="11.5" width="2" height="2" fill="#c8a96e" opacity="0.4"/>
-      <rect x="15.5" y="14.5" width="2" height="1.5" fill="#c8a96e" opacity="0.4"/>
-      <rect x="18.5" y="14.5" width="2" height="1.5" fill="#c8a96e" opacity="0.7"/>
-      <rect x="11" y="17" width="14" height="10" fill="rgba(200,169,110,0.1)" stroke="#c8a96e" stroke-width="0.8" rx="0.3"/>
-      <rect x="12.5" y="18.5" width="2.5" height="2.5" fill="#c8a96e" opacity="0.6"/>
-      <rect x="16" y="18.5" width="2.5" height="2.5" fill="#c8a96e" opacity="0.3"/>
-      <rect x="19.5" y="18.5" width="2.5" height="2.5" fill="#c8a96e" opacity="0.6"/>
-      <rect x="12.5" y="22" width="2.5" height="2.5" fill="#c8a96e" opacity="0.3"/>
-      <rect x="16" y="22" width="2.5" height="2.5" fill="#c8a96e" opacity="0.6"/>
-      <rect x="19.5" y="22" width="2.5" height="2.5" fill="#c8a96e" opacity="0.3"/>
-      <rect x="7" y="27" width="22" height="16" fill="rgba(200,169,110,0.1)" stroke="#c8a96e" stroke-width="0.8" rx="0.3"/>
-      <rect x="9" y="29" width="3" height="3" fill="#c8a96e" opacity="0.5"/>
-      <rect x="13.5" y="29" width="3" height="3" fill="#c8a96e" opacity="0.3"/>
-      <rect x="18" y="29" width="3" height="3" fill="#c8a96e" opacity="0.5"/>
-      <rect x="22.5" y="29" width="3" height="3" fill="#c8a96e" opacity="0.3"/>
-      <rect x="9" y="33.5" width="3" height="3" fill="#c8a96e" opacity="0.3"/>
-      <rect x="13.5" y="33.5" width="3" height="3" fill="#c8a96e" opacity="0.5"/>
-      <rect x="18" y="33.5" width="3" height="3" fill="#c8a96e" opacity="0.3"/>
-      <rect x="22.5" y="33.5" width="3" height="3" fill="#c8a96e" opacity="0.5"/>
-      <rect x="4" y="43" width="28" height="1" fill="#c8a96e" opacity="0.4" rx="0.5"/>
-    </svg>
+    <img src="/logo.png" width="44" height="44" style="mix-blend-mode:multiply;filter:brightness(0) invert(1);"/>
     <div>
       <div class="logo-name">${broker.name.split(' ')[0]}</div>
       <div class="logo-sub">${broker.name.split(' ').slice(1).join(' ') || 'Realstate'}</div>
@@ -183,7 +157,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
   </div>
 </div>
 <div class="powered">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V10.5Z" fill="#0E1B30"/><circle cx="12" cy="14.5" r="3.8" fill="#D4A24C"/><circle cx="10.8" cy="14.5" r="0.9" fill="white"/><circle cx="12" cy="14.5" r="0.9" fill="white"/><circle cx="13.2" cy="14.5" r="0.9" fill="white"/><path d="M10.2 17.2L9.2 19L11.5 18.1" fill="#D4A24C"/></svg>
+  <img src="/logo.png" width="20" height="20" style="mix-blend-mode:multiply;"/>
   EstateBot · AI Lead Assistant
 </div>
 <script>
