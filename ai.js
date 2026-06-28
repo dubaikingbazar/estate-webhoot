@@ -130,7 +130,7 @@ STRICTLY NEVER:
 const leadStates = {};
 function getLeadState(sessionId) {
   if (!leadStates[sessionId]) {
-    leadStates[sessionId] = { intent: '', name: '', propertyType: '', location: '', budget: '', timeline: '', phone: '' };
+    leadStates[sessionId] = { intent: '', name: '', propertyType: '', location: '', budget: '', timeline: '', phone: '', purpose: '', bhk: '', rooms: '', plotSize: '', loanOrCash: '', floorPref: '' };
   }
   return leadStates[sessionId];
 }
@@ -143,16 +143,34 @@ function updateLeadState(sessionId, leadData) {
   if (leadData.budget) state.budget = leadData.budget;
   if (leadData.timeline) state.timeline = leadData.timeline;
   if (leadData.phone) state.phone = leadData.phone;
+  if (leadData.details) {
+    if (leadData.details.purpose) state.purpose = leadData.details.purpose;
+    if (leadData.details.bhk) state.bhk = leadData.details.bhk;
+    if (leadData.details.rooms) state.rooms = leadData.details.rooms;
+    if (leadData.details.area) state.plotSize = leadData.details.area;
+    if (leadData.details.loan) state.loanOrCash = leadData.details.loan;
+    if (leadData.details.floors) state.floorPref = leadData.details.floors;
+  }
 }
 function getMissingFields(sessionId) {
   const s = getLeadState(sessionId);
   const missing = [];
   if (!s.intent) missing.push('intent (kharidna/bechna/rent)');
   if (!s.propertyType) missing.push('property type');
-  if (!s.name) missing.push('customer name');
-  if (!s.location) missing.push('location');
+  if (!s.location) missing.push('city aur area/locality');
   if (!s.budget) missing.push('budget');
   if (!s.timeline) missing.push('timeline');
+  // Property specific fields
+  const pt = (s.propertyType || '').toLowerCase();
+  if (s.intent === 'BUY' || s.intent === 'RENT') {
+    if (!s.purpose) missing.push('self use ya investment');
+    if ((pt.includes('flat') || pt.includes('apartment')) && !s.bhk) missing.push('BHK');
+    if ((pt.includes('house') || pt.includes('kothi') || pt.includes('makan')) && !s.rooms) missing.push('kitne rooms chahiye');
+    if ((pt.includes('house') || pt.includes('kothi') || pt.includes('makan') || pt.includes('plot')) && !s.plotSize) missing.push('plot size (kitne gaj)');
+    if (!s.loanOrCash) missing.push('loan ya cash');
+    if (!s.floorPref) missing.push('ground floor chahiye ya upar');
+  }
+  if (!s.name) missing.push('customer name');
   if (!s.phone) missing.push('phone number');
   return missing;
 }
@@ -167,6 +185,12 @@ function buildSystemPromptWithState(brokerName, sessionId) {
   stateNote += `- Budget: ${state.budget || 'NOT YET COLLECTED'}\n`;
   stateNote += `- Timeline: ${state.timeline || 'NOT YET COLLECTED'}\n`;
   stateNote += `- Phone: ${state.phone || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Purpose (Self use/Investment): ${state.purpose || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- BHK: ${state.bhk || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Rooms: ${state.rooms || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Plot Size: ${state.plotSize || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Loan/Cash: ${state.loanOrCash || 'NOT YET COLLECTED'}\n`;
+  stateNote += `- Floor Preference: ${state.floorPref || 'NOT YET COLLECTED'}\n`;
   if (missing.length > 0) {
     stateNote += `\nABHI SIRF YE COLLECT KARNA HAI (ek ek karke): ${missing[0]}\n`;
     stateNote += `IMPORTANT: Jo already collected hai usse DOBARA MAT PUCHHO.\n`;
