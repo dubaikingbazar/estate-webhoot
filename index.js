@@ -12,7 +12,6 @@ app.use(express.static(__dirname));
 
 // ===== KEYS =====
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
-const resend = new Resend(process.env.RESEND_API_KEY);
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
