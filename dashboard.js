@@ -617,11 +617,15 @@ function showSubBanner(broker) {
     text.textContent = '🕐 Free Trial: ' + daysLeft + ' din bache hain';
     btn.style.display = 'block';
     banner.style.display = 'flex';
-  } else if (broker.status === 'active' && broker.subscription_valid_till) {
-    const validTill = new Date(broker.subscription_valid_till);
-    const daysLeft = Math.max(0, Math.ceil((validTill - new Date()) / (1000 * 60 * 60 * 24)));
+  } else if (broker.status === 'active') {
+    let daysText = '';
+    if (broker.subscription_valid_till) {
+      const validTill = new Date(broker.subscription_valid_till);
+      const daysLeft = Math.max(0, Math.ceil((validTill - new Date()) / (1000 * 60 * 60 * 24)));
+      daysText = ': ' + daysLeft + ' din bache hain';
+    }
     banner.className = 'sub-banner active';
-    text.textContent = '✅ Subscription Active: ' + daysLeft + ' din bache hain';
+    text.textContent = '✅ Subscription Active' + daysText;
     btn.style.display = 'none';
     banner.style.display = 'flex';
   } else if (broker.status === 'expired') {
