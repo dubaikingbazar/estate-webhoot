@@ -13,7 +13,7 @@ function getBrokerHTML(broker, brokerId) {
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${broker.name} â€” EstateBot</title>
+<title>${broker.name} — EstateBot</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -172,11 +172,11 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
     </div>
     <div class="day-chip"><span>Aaj</span></div>
     <div class="chat-body" id="chatBody">
-      <div class="msg bot"><div class="bubble">Namaste ji! ðŸ˜Š Aap property kharidna chahte hain, rent lena hai, ya apni property sell/rent pe deni hai?</div><div class="ts">Abhi</div></div>
+      <div class="msg bot"><div class="bubble">Namaste ji! 😊 Aap property kharidna chahte hain, rent lena hai, ya apni property sell/rent pe deni hai?</div><div class="ts">Abhi</div></div>
     </div>
   </div>
   <div class="chat-footer">
-    <input type="text" id="msgInput" placeholder="Apna message yahan likheinâ€¦" onkeypress="if(event.key==='Enter')sendMsg()"/>
+    <input type="text" id="msgInput" placeholder="Apna message yahan likhein…" onkeypress="if(event.key==='Enter')sendMsg()"/>
     <button class="send-btn" onclick="sendMsg()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="#D4A24C"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
     </button>
@@ -184,7 +184,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 </div>
 <div class="powered">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3L21 10.5V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V10.5Z" fill="#0E1B30"/><circle cx="12" cy="14.5" r="3.8" fill="#D4A24C"/><circle cx="10.8" cy="14.5" r="0.9" fill="white"/><circle cx="12" cy="14.5" r="0.9" fill="white"/><circle cx="13.2" cy="14.5" r="0.9" fill="white"/><path d="M10.2 17.2L9.2 19L11.5 18.1" fill="#D4A24C"/></svg>
-  EstateBot Â· AI Lead Assistant
+  EstateBot · AI Lead Assistant
 </div>
 <script>
 const sessionId=Math.random().toString(36).substr(2,9);
