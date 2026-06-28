@@ -1,7 +1,7 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
-const { generateSummary, sendLeadEmail, sendWelcomeEmail, sendTrialExpiryEmail } = require('./emails');
+const { generateSummary, sendLeadEmail, sendWelcomeEmail, sendTrialExpiryEmail, sendSubscriptionEmail } = require('./emails');
 const { buildSystemPromptWithState, validateReply, getLeadState, updateLeadState, getMissingFields, leadStates } = require('./ai');
 const { getBrokerHTML } = require('./brokerHTML');
 const app = express();
@@ -325,14 +325,19 @@ app.post('/api/chat/:brokerId', async (req, res) => {
     return res.status(403).json({ error: 'Subscription not active' });
   }
 
-  // CHANGE 3: Trial expire check
+  // Trial expire check
   if (broker.status === 'trial' && broker.trial_start) {
     const trialEnd = new Date(broker.trial_start);
     trialEnd.setDate(trialEnd.getDate() + (broker.trial_days || 7));
+    const daysLeft = Math.ceil((trialEnd - new Date()) / (1000 * 60 * 60 * 24));
     if (new Date() > trialEnd) {
       await supabase.from('brokers').update({ status: 'expired' }).eq('broker_id', brokerId);
-      sendTrialExpiryEmail(broker).catch(e => console.error('Trial email error:', e));
+      sendTrialExpiryEmail(broker, 0).catch(e => console.error('Trial expiry email error:', e));
       return res.status(403).json({ error: 'Trial expired', trial_expired: true });
+    }
+    // Send reminder emails 3, 2, 1 days before expiry
+    if (daysLeft <= 3 && daysLeft > 0) {
+      sendTrialExpiryEmail(broker, daysLeft).catch(e => console.error('Trial reminder email error:', e));
     }
   }
 
