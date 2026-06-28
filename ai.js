@@ -160,7 +160,7 @@ function getMissingFields(sessionId) {
   if (!s.location) missing.push('city aur area/locality');
   if (!s.budget) missing.push('budget');
   if (!s.timeline) missing.push('timeline');
-  if (s.intent === 'BUY') {
+  if (s.intent === 'BUY' || s.intent === 'buy' || s.intent === 'Buy') {
     if (!s.purpose) missing.push('self use ya investment');
     if (!s.loanOrCash) missing.push('loan ya cash');
     if (!s.rooms && !s.bhk) missing.push('kitne rooms ya BHK chahiye');
@@ -190,6 +190,7 @@ function buildSystemPromptWithState(brokerName, sessionId) {
   if (missing.length > 0) {
     stateNote += `\nABHI SIRF YE COLLECT KARNA HAI (ek ek karke): ${missing[0]}\n`;
     stateNote += `IMPORTANT: Jo already collected hai usse DOBARA MAT PUCHHO.\n`;
+    stateNote += `IMPORTANT: Agar intent already "BUY" hai toh "kharidna, bechna, ya rent" wala sawaal KABHI MAT PUCHHO.\n`;
   }
   return getSystemPrompt(brokerName) + stateNote;
 }
