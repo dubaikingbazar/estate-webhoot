@@ -7,13 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/dashboard.css">
 
-<style>
-.sub-banner{padding:10px 20px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;border-bottom:1px solid rgba(0,0,0,0.08);}
-.sub-banner.trial{background:#FEF3C7;color:#92400E;}
-.sub-banner.active{background:#D1FAE5;color:#065F46;}
-.sub-banner.expired{background:#FEE2E2;color:#991B1B;}
-.sub-btn{background:#C8952A;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
-</style>
+
 </head>
 <body>
 
@@ -63,10 +57,12 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
       Settings
     </button>
-    <button class="nav-item" onclick="openSubscribeModal()" style="background:rgba(200,149,42,0.15);color:#F0B84B;margin-top:4px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-      Subscribe ₹2,999/mo
-    </button>
+    <div id="sidebarSubCard" style="margin:8px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(200,149,42,0.25);border-radius:10px;padding:11px;">
+      <div id="sidebarSubStatus" style="font-size:10px;font-weight:700;color:#F0B84B;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Plan: Trial</div>
+      <div id="sidebarSubDays" style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:8px;">—</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.35);line-height:1.8;margin-bottom:8px;" id="sidebarSubFeatures"></div>
+      <button id="sidebarSubBtn" onclick="openSubscribeModal()" style="display:none;width:100%;background:linear-gradient(135deg,#C8952A,#a07830);color:#fff;border:none;padding:8px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Subscribe Now →</button>
+    </div>
     <div style="height:1px;background:rgba(255,255,255,0.06);margin:6px 4px;"></div>
     <button class="nav-item" onclick="showPage('properties')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -110,11 +106,7 @@
     </div>
   </div>
 
-  <!-- SUBSCRIPTION BANNER -->
-  <div class="sub-banner" id="subBanner" style="display:none;">
-    <span id="subBannerText"></span>
-    <button class="sub-btn" id="subBannerBtn" onclick="openSubscribeModal()" style="display:none;">Subscribe → ₹2,999/mo</button>
-  </div>
+
 
   <!-- SUBSCRIBE MODAL -->
   <div class="modal-overlay" id="subscribeModal">
