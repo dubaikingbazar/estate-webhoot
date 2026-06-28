@@ -8,6 +8,7 @@ const app = express();
 
 app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
+app.use(express.static(__dirname));
 
 // ===== KEYS =====
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
@@ -37,7 +38,7 @@ function adminAuth(req, res, next) {
 
 const conversations = {};
 
-// ===== BROKER SIGNUP â€” 7 DAY TRIAL =====
+// ===== BROKER SIGNUP — 7 DAY TRIAL =====
 app.post('/api/signup', async (req, res) => {
   const { name, business, city, state, specialty, email, phone, experience, properties, password } = req.body;
   if (!name || !business || !city || !email || !phone) {
@@ -89,7 +90,7 @@ app.post('/api/signup', async (req, res) => {
   });
 });
 
-// ===== CASHFREE WEBHOOK â€” ACTIVATES SUBSCRIPTION =====
+// ===== CASHFREE WEBHOOK — ACTIVATES SUBSCRIPTION =====
 app.post('/api/payment/webhook', async (req, res) => {
   try {
     const rawBody = req.body.toString('utf8');
@@ -219,35 +220,35 @@ app.get('/payment/status', async (req, res) => {
 function getPaymentStatusHTML(status, brokerId) {
   const configs = {
     success: {
-      icon: 'âœ“',
+      icon: '✓',
       color: '#22c55e',
       bg: 'rgba(34,197,94,0.1)',
       title: 'Payment Successful!',
       msg: 'Aapka EstateBot account activate ho gaya hai. Welcome email check karein.',
-      btn: `<a href="https://estatebotai.in/${brokerId}" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Apna Bot Dekho â†’</a>`
+      btn: `<a href="https://estatebotai.in/${brokerId}" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Apna Bot Dekho →</a>`
     },
     failed: {
-      icon: 'âœ•',
+      icon: '✕',
       color: '#ef4444',
       bg: 'rgba(239,68,68,0.1)',
       title: 'Payment Failed',
       msg: 'Payment process nahi ho payi. Dobara try karein.',
-      btn: `<a href="/#signup" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Dobara Try Karein â†’</a>`
+      btn: `<a href="/#signup" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Dobara Try Karein →</a>`
     },
     pending: {
-      icon: 'â³',
+      icon: '⏳',
       color: '#f59e0b',
       bg: 'rgba(245,158,11,0.1)',
-      title: 'Payment Processingâ€¦',
+      title: 'Payment Processing…',
       msg: 'Aapka payment process ho raha hai. Thodi der mein email aayegi.',
-      btn: `<a href="https://estatebotai.in/${brokerId}" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Dashboard Check Karein â†’</a>`
+      btn: `<a href="https://estatebotai.in/${brokerId}" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Dashboard Check Karein →</a>`
     }
   };
   const c = configs[status];
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Payment ${status} â€” EstateBot</title>
+<title>Payment ${status} — EstateBot</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,sans-serif;background:#000;color:#ededed;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}</style>
 </head>
@@ -257,7 +258,7 @@ function getPaymentStatusHTML(status, brokerId) {
   <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.5px;margin-bottom:12px;">${c.title}</h1>
   <p style="color:#8c887e;font-size:14px;line-height:1.7;margin-bottom:28px;">${c.msg}</p>
   ${c.btn}
-  <p style="margin-top:20px;font-size:12px;color:#555;">Support: +91 86903 53003 &nbsp;Â·&nbsp; <a href="mailto:estatebotofficial@gmail.com" style="color:#c9a84c;">estatebotofficial@gmail.com</a></p>
+  <p style="margin-top:20px;font-size:12px;color:#555;">Support: +91 86903 53003 &nbsp;·&nbsp; <a href="mailto:estatebotofficial@gmail.com" style="color:#c9a84c;">estatebotofficial@gmail.com</a></p>
 </div>
 </body></html>`;
 }
@@ -465,7 +466,7 @@ app.post('/api/create-payment', async (req, res) => {
           return_url: 'https://estatebotai.in/payment/status?order_id={order_id}&broker_id=' + broker_id,
           notify_url: 'https://estatebotai.in/api/payment/webhook'
         },
-        order_note: 'EstateBot subscription â€” ' + broker_id
+        order_note: 'EstateBot subscription — ' + broker_id
       })
     });
 
@@ -511,4 +512,4 @@ app.get('/:brokerId', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`ðŸ  EstateBot running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🏠 EstateBot running on port ${PORT}`));
