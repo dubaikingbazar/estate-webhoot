@@ -1,5 +1,6 @@
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 // ===== GENERATE SUMMARY =====
 async function generateSummary(messages) {
@@ -12,9 +13,9 @@ async function generateSummary(messages) {
         model: 'meta-llama/llama-4-scout-17b-16e-instruct',
         messages: [{
           role: 'user',
-          content: `Ye real estate chat conversation hai. Iska ek concise summary do broker ke liye â€” 3-5 bullet points mein, Hinglish mein. Sirf important property details aur customer requirements batao. Format:\nâ€¢ ...\nâ€¢ ...\n\nConversation:\n${convo}`
+          content: `Ye real estate chat conversation hai. Broker ke liye ek detailed summary banao. Niche diye format mein likho, Hinglish mein:\n\n1. Customer Intent (kya chahiye - buy/sell/rent)\n2. Property Details (type, BHK, area, floor, furnished, parking, lift)\n3. Location (city, locality, preferred area)\n4. Budget (exact amount ya range)\n5. Timeline (kab chahiye)\n6. Loan ya Cash\n7. Special Requirements (koi bhi important cheez jo customer ne boli)\n8. Customer Mood (serious/exploring/urgent)\n\nHar point ke liye jo bhi information mili woh likho. Agar koi information nahi mili toh "Not mentioned" likho.\n\nConversation:\n${convo}`
         }],
-        max_tokens: 300
+        max_tokens: 600
       })
     });
     const data = await res.json();
@@ -41,7 +42,7 @@ async function sendLeadEmail(broker, leadData, conversationMessages) {
   const { error } = await resend.emails.send({
     from: 'EstateBot <leads@estatebotai.in>',
     to: broker.email,
-    subject: `Naya Lead â€” ${leadData.name} | ${broker.name}`,
+    subject: `Naya Lead — ${leadData.name} | ${broker.name}`,
     html: `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background-color:#f0f4f8;">
@@ -99,7 +100,7 @@ async function sendWelcomeEmail(broker) {
   const { error } = await resend.emails.send({
     from: 'EstateBot <welcome@estatebotai.in>',
     to: broker.email,
-    subject: `EstateBot Setup Complete â€” ${broker.name} ka Bot Live Hai!`,
+    subject: `EstateBot Setup Complete — ${broker.name} ka Bot Live Hai!`,
     html: `
 <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#f8fafc;padding:20px;border-radius:16px;">
   <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e);padding:24px;border-radius:12px;text-align:center;margin-bottom:20px;">
@@ -117,7 +118,7 @@ async function sendWelcomeEmail(broker) {
     </div>
     <p style="color:#475569;">Is link ko apne Instagram bio, WhatsApp, ya visiting card pe lagaiye.</p>
   </div>
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:16px;">Powered by EstateBot â€¢ +91 86903 53003</p>
+  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:16px;">Powered by EstateBot • +91 86903 53003</p>
 </div>`
   });
   if (error) console.error('Welcome email error:', error);
@@ -130,8 +131,8 @@ async function sendTrialExpiryEmail(broker) {
   const { error } = await resend.emails.send({
     from: 'EstateBot <welcome@estatebotai.in>',
     to: broker.email,
-    subject: 'Aapka EstateBot Trial Khatam Ho Gaya â€” Subscribe Karein',
-    html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#f8fafc;padding:20px;border-radius:16px;"><div style="background:linear-gradient(135deg,#ef4444,#dc2626);padding:24px;border-radius:12px;text-align:center;margin-bottom:20px;"><h2 style="color:#fff;margin:0;">EstateBot</h2><p style="color:rgba(255,255,255,0.9);margin:6px 0 0;">Aapka 7 din ka free trial khatam ho gaya</p></div><div style="background:#fff;padding:20px;border-radius:12px;border:1px solid #e2e8f0;"><p style="color:#1e293b;">Namaste ${broker.name} ji,</p><p style="color:#475569;margin-top:12px;">Aapka bot band ho gaya hai. Subscribe karein â€” sirf <b>&#8377;2,999/month</b>.</p><div style="text-align:center;margin:24px 0;"><a href="https://estatebotai.in/dashboard" style="background:#c9a84c;color:#000;font-weight:700;padding:14px 32px;border-radius:8px;text-decoration:none;font-size:16px;display:inline-block;">Subscribe Now &#8594;</a></div></div></div>`
+    subject: 'Aapka EstateBot Trial Khatam Ho Gaya — Subscribe Karein',
+    html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#f8fafc;padding:20px;border-radius:16px;"><div style="background:linear-gradient(135deg,#ef4444,#dc2626);padding:24px;border-radius:12px;text-align:center;margin-bottom:20px;"><h2 style="color:#fff;margin:0;">EstateBot</h2><p style="color:rgba(255,255,255,0.9);margin:6px 0 0;">Aapka 7 din ka free trial khatam ho gaya</p></div><div style="background:#fff;padding:20px;border-radius:12px;border:1px solid #e2e8f0;"><p style="color:#1e293b;">Namaste ${broker.name} ji,</p><p style="color:#475569;margin-top:12px;">Aapka bot band ho gaya hai. Subscribe karein — sirf <b>&#8377;2,999/month</b>.</p><div style="text-align:center;margin:24px 0;"><a href="https://estatebotai.in/dashboard" style="background:#c9a84c;color:#000;font-weight:700;padding:14px 32px;border-radius:8px;text-decoration:none;font-size:16px;display:inline-block;">Subscribe Now &#8594;</a></div></div></div>`
   });
   if (error) console.error('Trial expiry email error:', error);
   else console.log(`Trial expiry email sent to ${broker.email}`);
