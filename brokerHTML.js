@@ -72,7 +72,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .chat-footer input{flex:1;background:#fff;border:1.5px solid #D4A24C;border-radius:100px;padding:11px 16px;font-family:'Manrope',sans-serif;font-size:11.7px;color:#2A2A2A;outline:none;}
 .chat-footer input:focus{border-color:#0E1B30;}
 .send-btn{width:44px;height:44px;background:#0E1B30;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.powered{width:100%;max-width:100%;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:10px;color:#6B6354;font-weight:700;}
+.powered{width:100%;max-width:100%;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;color:#6B6354;font-weight:700;}
 .chat-body{background:transparent;padding:0;min-height:180px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:360px;}
 </style>
 </head>
@@ -157,7 +157,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
   </div>
 </div>
 <div class="powered">
-  <img src="/logo.png" width="20" height="20" style="mix-blend-mode:multiply;"/>
+  <img src="/logo.png" width="28" height="28" style="mix-blend-mode:multiply;margin-right:2px;"/>
   EstateBot · AI Lead Assistant
 </div>
 <script>
