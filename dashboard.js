@@ -56,7 +56,27 @@ async function initDashboard(brokerId){
   document.getElementById('brokerNameTop').textContent=currentBroker.name;
   document.getElementById('greeting').textContent=getGreeting()+', '+currentBroker.name.split(' ')[0]+'! 👋';
   document.getElementById('botLinkText').textContent='estatebotai.in/'+brokerId;
-  document.getElementById('planInfo').textContent='Plan: '+(currentBroker.status==='active'?'Active':currentBroker.status==='trial'?'Trial':'Inactive');
+  // Plan info in sidebar
+  const broker = currentBroker;
+  let planText = '';
+  if (broker.status === 'active' && broker.subscription_valid_till) {
+    const validTill = new Date(broker.subscription_valid_till);
+    const daysLeft = Math.max(0, Math.ceil((validTill - new Date()) / (1000 * 60 * 60 * 24)));
+    const activeSince = broker.subscription_start ? Math.floor((new Date() - new Date(broker.subscription_start)) / (1000 * 60 * 60 * 24)) : null;
+    planText = '✅ Active' + (activeSince !== null ? ' · ' + activeSince + ' din ho gaye' : '') + '\n⏳ ' + daysLeft + ' din baaki';
+  } else if (broker.status === 'active') {
+    planText = '✅ Plan: Active';
+  } else if (broker.status === 'trial' && broker.trial_start) {
+    const trialEnd = new Date(broker.trial_start);
+    trialEnd.setDate(trialEnd.getDate() + (broker.trial_days || 7));
+    const daysLeft = Math.max(0, Math.ceil((trialEnd - new Date()) / (1000 * 60 * 60 * 24)));
+    planText = '🕐 Trial · ' + daysLeft + ' din baaki';
+  } else if (broker.status === 'expired') {
+    planText = '❌ Expired — Subscribe karo';
+  } else {
+    planText = 'Plan: ' + broker.status;
+  }
+  document.getElementById('planInfo').textContent = planText;
   showSubBanner(currentBroker);
   await loadLeads(brokerId);
   checkFollowUpNotifications();
@@ -668,10 +688,10 @@ async function startPayment() {
 
 async function loadCashfree() {
   return new Promise((resolve) => {
-    if (window.Cashfree) { resolve(window.Cashfree({ mode: 'production' })); return; }
+    if (window.Cashfree) { resolve(window.Cashfree({ mode: 'sandbox' })); return; }
     const s = document.createElement('script');
     s.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
-    s.onload = () => resolve(window.Cashfree({ mode: 'production' }));
+    s.onload = () => resolve(window.Cashfree({ mode: 'sandbox' }));
     document.head.appendChild(s);
   });
 }
