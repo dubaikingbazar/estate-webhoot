@@ -72,7 +72,7 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .chat-footer input{flex:1;background:#fff;border:1.5px solid #D4A24C;border-radius:100px;padding:11px 16px;font-family:'Manrope',sans-serif;font-size:11.7px;color:#2A2A2A;outline:none;}
 .chat-footer input:focus{border-color:#0E1B30;}
 .send-btn{width:44px;height:44px;background:#0E1B30;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.powered{width:100%;max-width:100%;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;color:#6B6354;font-weight:700;}
+.powered{width:100%;max-width:100%;background:#F7F4ED;border-top:1px solid #EDE7D8;padding:13px;display:flex;align-items:center;justify-content:center;gap:2px;font-size:10px;color:#6B6354;font-weight:700;}
 .chat-body{background:transparent;padding:0;min-height:180px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:360px;}
 </style>
 </head>
@@ -81,7 +81,33 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
   <div class="hero-bg"></div>
   <div class="hero-overlay"></div>
   <div class="hero-top">
-    <img src="/logo.png" width="44" height="44" style="mix-blend-mode:multiply;filter:brightness(0) invert(1);"/>
+    <svg width="36" height="44" viewBox="0 0 36 44" fill="none">
+      <line x1="18" y1="0" x2="18" y2="5" stroke="#c8a96e" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="18" cy="0" r="1.2" fill="#c8a96e"/>
+      <polygon points="18,3 14,10 22,10" fill="rgba(200,169,110,0.2)" stroke="#c8a96e" stroke-width="0.8"/>
+      <rect x="14" y="10" width="8" height="7" fill="rgba(200,169,110,0.1)" stroke="#c8a96e" stroke-width="0.8" rx="0.3"/>
+      <rect x="15.5" y="11.5" width="2" height="2" fill="#c8a96e" opacity="0.7"/>
+      <rect x="18.5" y="11.5" width="2" height="2" fill="#c8a96e" opacity="0.4"/>
+      <rect x="15.5" y="14.5" width="2" height="1.5" fill="#c8a96e" opacity="0.4"/>
+      <rect x="18.5" y="14.5" width="2" height="1.5" fill="#c8a96e" opacity="0.7"/>
+      <rect x="11" y="17" width="14" height="10" fill="rgba(200,169,110,0.1)" stroke="#c8a96e" stroke-width="0.8" rx="0.3"/>
+      <rect x="12.5" y="18.5" width="2.5" height="2.5" fill="#c8a96e" opacity="0.6"/>
+      <rect x="16" y="18.5" width="2.5" height="2.5" fill="#c8a96e" opacity="0.3"/>
+      <rect x="19.5" y="18.5" width="2.5" height="2.5" fill="#c8a96e" opacity="0.6"/>
+      <rect x="12.5" y="22" width="2.5" height="2.5" fill="#c8a96e" opacity="0.3"/>
+      <rect x="16" y="22" width="2.5" height="2.5" fill="#c8a96e" opacity="0.6"/>
+      <rect x="19.5" y="22" width="2.5" height="2.5" fill="#c8a96e" opacity="0.3"/>
+      <rect x="7" y="27" width="22" height="16" fill="rgba(200,169,110,0.1)" stroke="#c8a96e" stroke-width="0.8" rx="0.3"/>
+      <rect x="9" y="29" width="3" height="3" fill="#c8a96e" opacity="0.5"/>
+      <rect x="13.5" y="29" width="3" height="3" fill="#c8a96e" opacity="0.3"/>
+      <rect x="18" y="29" width="3" height="3" fill="#c8a96e" opacity="0.5"/>
+      <rect x="22.5" y="29" width="3" height="3" fill="#c8a96e" opacity="0.3"/>
+      <rect x="9" y="33.5" width="3" height="3" fill="#c8a96e" opacity="0.3"/>
+      <rect x="13.5" y="33.5" width="3" height="3" fill="#c8a96e" opacity="0.5"/>
+      <rect x="18" y="33.5" width="3" height="3" fill="#c8a96e" opacity="0.3"/>
+      <rect x="22.5" y="33.5" width="3" height="3" fill="#c8a96e" opacity="0.5"/>
+      <rect x="4" y="43" width="28" height="1" fill="#c8a96e" opacity="0.4" rx="0.5"/>
+    </svg>
     <div>
       <div class="logo-name">${broker.name.split(' ')[0]}</div>
       <div class="logo-sub">${broker.name.split(' ').slice(1).join(' ') || 'Realstate'}</div>
