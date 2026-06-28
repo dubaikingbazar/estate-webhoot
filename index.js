@@ -381,7 +381,7 @@ app.post('/api/chat/:brokerId', async (req, res) => {
             const state = getLeadState(sessionId);
             const missing = getMissingFields(sessionId);
             const criticalMissing = missing.filter(f => !f.includes('timeline'));
-            if (criticalMissing.length > 1) {
+            if (criticalMissing.length > 0) {
               leadComplete = false; leadData = null;
             } else {
               const uploadToken = Math.random().toString(36).substr(2,12) + Date.now().toString(36);
