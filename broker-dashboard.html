@@ -59,10 +59,10 @@
     </button>
     <div style="padding:6px 10px 2px;">
       <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:1.5px;padding:0 2px 6px;">Subscription</div>
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 11px;">
+      <div style="background:#080808;border:1px solid rgba(232,224,208,0.08);border-radius:8px;padding:9px 11px;">
         <div id="sidebarSubStatus" style="font-size:12px;font-weight:700;color:#F0B84B;margin-bottom:3px;">Trial</div>
         <div id="sidebarSubDays" style="font-size:11px;color:rgba(255,255,255,0.45);">—</div>
-        <button id="sidebarSubBtn" onclick="openSubscribeModal()" style="display:none;width:100%;margin-top:8px;background:linear-gradient(135deg,#C8952A,#a07830);color:#fff;border:none;padding:7px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Subscribe Now →</button>
+        <button id="sidebarSubBtn" onclick="openSubscribeModal()" style="display:none;width:100%;margin-top:8px;background:#E8E0D0;color:#080808;border:none;padding:7px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Subscribe Now →</button>
       </div>
     </div>
     <div style="height:1px;background:rgba(255,255,255,0.06);margin:8px 4px 4px;"></div>
@@ -119,9 +119,9 @@
       <div style="background:#F8FAFC;border-radius:10px;padding:14px;margin-bottom:16px;text-align:left;">
         <div style="font-size:12px;line-height:2;">✅ Unlimited AI leads<br>✅ Full broker dashboard<br>✅ Lead analytics<br>✅ Follow up reminders<br>✅ WhatsApp templates<br>✅ 24/7 bot active</div>
       </div>
-      <div style="font-size:28px;font-weight:800;color:var(--navy);margin-bottom:4px;">₹2,999<span style="font-size:14px;font-weight:400;color:var(--muted);">/month</span></div>
+      <div style="font-size:28px;font-weight:800;color:#E8E0D0;margin-bottom:4px;">₹2,999<span style="font-size:14px;font-weight:400;color:var(--muted);">/month</span></div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Cancel anytime</div>
-      <button onclick="startPayment()" id="payNowBtn" style="width:100%;background:var(--navy);color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px;">Pay ₹2,999 →</button>
+      <button onclick="startPayment()" id="payNowBtn" style="width:100%;background:#E8E0D0;color:#080808;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px;">Pay ₹2,999 →</button>
       <button onclick="document.getElementById('subscribeModal').classList.remove('show')" style="width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);padding:10px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;">Maybe later</button>
     </div>
   </div>
@@ -134,7 +134,7 @@
         <div class="stat-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;">
             <div class="stat-label">Total Leads</div>
-            <div class="stat-icon-wrap" style="background:#EDE9FE;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+            <div class="stat-icon-wrap" style="background:rgba(232,224,208,0.06);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a7f70" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
           </div>
           <div class="stat-value" id="statTotal">—</div>
           <div class="stat-change up" id="statTodaySub">Loading...</div>
@@ -142,33 +142,33 @@
         <div class="stat-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;">
             <div class="stat-label">Hot Leads</div>
-            <div class="stat-icon-wrap" style="background:#FEE2E2;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><path d="M12 2c0 6-6 10-6 14a6 6 0 0012 0c0-4-6-8-6-14z"/></svg></div>
+            <div class="stat-icon-wrap" style="background:rgba(232,224,208,0.04);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a7f70" stroke-width="2"><path d="M12 2c0 6-6 10-6 14a6 6 0 0012 0c0-4-6-8-6-14z"/></svg></div>
           </div>
-          <div class="stat-value" id="statHot" style="color:#EF4444;">—</div>
+          <div class="stat-value" id="statHot" style="color:#E8E0D0;">—</div>
           <div class="stat-change" style="color:var(--muted);">Score 70%+</div>
         </div>
         <div class="stat-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;">
             <div class="stat-label">Warm Leads</div>
-            <div class="stat-icon-wrap" style="background:#FEF3C7;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <div class="stat-icon-wrap" style="background:rgba(232,224,208,0.04);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a7f70" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
           </div>
-          <div class="stat-value" id="statWarm" style="color:#F59E0B;">—</div>
+          <div class="stat-value" id="statWarm" style="color:#E8E0D0;">—</div>
           <div class="stat-change" style="color:var(--muted);">Score 40-70%</div>
         </div>
         <div class="stat-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;">
             <div class="stat-label">Converted</div>
-            <div class="stat-icon-wrap" style="background:#D1FAE5;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="stat-icon-wrap" style="background:rgba(232,224,208,0.04);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a7f70" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
           </div>
-          <div class="stat-value" id="statConverted" style="color:#10B981;">—</div>
+          <div class="stat-value" id="statConverted" style="color:#4ade80;">—</div>
           <div class="stat-change up">Deal ho gayi</div>
         </div>
         <div class="stat-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;">
             <div class="stat-label">Aaj Aaye</div>
-            <div class="stat-icon-wrap" style="background:#EDE9FE;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
+            <div class="stat-icon-wrap" style="background:rgba(232,224,208,0.06);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a7f70" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
           </div>
-          <div class="stat-value" id="statToday" style="color:#7C3AED;">—</div>
+          <div class="stat-value" id="statToday" style="color:#E8E0D0;">—</div>
           <div class="stat-change up">Aaj ke naye leads</div>
         </div>
       </div>
@@ -197,7 +197,7 @@
 
     <!-- LEADS PAGE -->
     <div class="page" id="page-leads">
-      <div style="display:flex;gap:0;margin-bottom:16px;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content;">
+      <div style="display:flex;gap:0;margin-bottom:16px;background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;overflow:hidden;width:fit-content;">
         <button onclick="switchLeadsTab('active')" id="tab-active" style="padding:9px 20px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;background:var(--navy);color:#fff;">All Leads</button>
         <button onclick="switchLeadsTab('archived')" id="tab-archived" style="padding:9px 20px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;background:#fff;color:var(--muted);">🗄 Archived</button>
       </div>
@@ -250,20 +250,20 @@
       <div style="font-size:17px;font-weight:700;margin-bottom:16px;">Analytics</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;" id="analyticsStats"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:16px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:12px;">📊 Leads Per Day (Last 7 Days)</div>
           <div id="chartLeadsDay" style="display:flex;align-items:flex-end;gap:5px;height:100px;"></div>
           <div id="chartDayLabels" style="display:flex;gap:5px;margin-top:5px;"></div>
         </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:16px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:12px;">🏠 Property Type Split</div>
           <div id="propTypeSplit"></div>
         </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:16px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:12px;">💰 Intent Split</div>
           <div id="intentSplit"></div>
         </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:16px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:12px;">📍 Top Locations</div>
           <div id="topLocations"></div>
         </div>
@@ -282,23 +282,23 @@
     <!-- SETTINGS PAGE -->
     <div class="page" id="page-settings">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+        <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Your Bot Link</div>
           <div style="background:#F8FAFC;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--navy);font-weight:600;word-break:break-all;margin-bottom:10px;" id="settingsBotLink">—</div>
           <button onclick="copyBotLink()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:7px;">📋 Copy Link</button>
           <button onclick="previewBot()" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">⚡ Preview Bot</button>
         </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+        <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Account Info</div>
           <div id="settingsAccountInfo"></div>
         </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+        <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Change Password</div>
           <input type="password" id="newPass1" placeholder="New password" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:9px;color:var(--text);">
           <input type="password" id="newPass2" placeholder="Confirm new password" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:9px;color:var(--text);">
           <button onclick="changePassword()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Update Password</button>
         </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+        <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Notifications</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <div><div style="font-size:13px;font-weight:600;">Browser Notifications</div><div style="font-size:11px;color:var(--muted);">Naya lead aane pe notify karo</div></div>
@@ -319,8 +319,8 @@
         <button onclick="openAddProperty()" style="background:var(--navy);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Add Property</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;" id="propStats"></div>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-        <div style="padding:10px 14px;background:#F8FAFC;border-bottom:1px solid var(--border);display:flex;gap:8px;">
+      <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;overflow:hidden;">
+        <div style="padding:10px 14px;background:#080808;border-bottom:1px solid rgba(232,224,208,0.07);display:flex;gap:8px;">
           <select onchange="renderProperties()" id="propFilter" style="border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
             <option value="all">All</option><option value="available">Available</option><option value="sold">Sold</option><option value="rented">Rented</option>
           </select>
@@ -339,8 +339,8 @@
         <button onclick="openAddVisit()" style="background:var(--navy);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Schedule Visit</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;" id="visitStats"></div>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-        <div style="padding:10px 14px;background:#F8FAFC;border-bottom:1px solid var(--border);">
+      <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;overflow:hidden;">
+        <div style="padding:10px 14px;background:#080808;border-bottom:1px solid rgba(232,224,208,0.07);">
           <select onchange="renderVisits()" id="visitFilter" style="border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
             <option value="all">All Visits</option><option value="scheduled">Scheduled</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
           </select>
@@ -354,7 +354,7 @@
       <div style="font-size:17px;font-weight:700;margin-bottom:16px;">Revenue Tracker</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;" id="revenueStats"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+        <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">💰 Add Deal</div>
           <input class="modal-input" style="margin-bottom:9px;" id="dealClient" placeholder="Client Name">
           <input class="modal-input" style="margin-bottom:9px;" id="dealProperty" placeholder="Property (e.g. 3 BHK Mansarovar)">
@@ -363,7 +363,7 @@
           <input class="modal-input" type="date" style="margin-bottom:9px;" id="dealDate">
           <button onclick="addDeal()" style="width:100%;background:var(--green);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Save Deal</button>
         </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;">
+        <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">📊 Monthly Target</div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Target set karo</div>
           <input class="modal-input" id="monthlyTarget" placeholder="Monthly target (e.g. 50000)" type="number">
@@ -371,7 +371,7 @@
           <div id="targetProgress"></div>
         </div>
       </div>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;margin-top:14px;">
+      <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;margin-top:14px;">
         <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Recent Deals</div>
         <div id="dealsList"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">Koi deal nahi hai — Add karo upar!</div></div>
       </div>
