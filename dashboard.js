@@ -713,3 +713,13 @@ document.getElementById('subscribeModal').onclick = e => {
 
 const savedId=sessionStorage.getItem('broker_id');
 if(savedId)initDashboard(savedId);
+
+// Payment success check
+const urlParams = new URLSearchParams(window.location.search);
+if(urlParams.get('payment') === 'success') {
+  setTimeout(() => {
+    showToast('🎉 Payment Successful! Subscription active ho gayi!');
+    // Clean URL
+    window.history.replaceState({}, '', '/dashboard');
+  }, 1500);
+}
