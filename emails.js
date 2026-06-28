@@ -13,7 +13,10 @@ async function generateSummary(messages) {
         model: 'meta-llama/llama-4-scout-17b-16e-instruct',
         messages: [{
           role: 'user',
-          content: `Ye real estate chat conversation hai. Broker ke liye ek detailed summary banao. Niche diye format mein likho, Hinglish mein:\n\n1. Customer Intent (kya chahiye - buy/sell/rent)\n2. Property Details (type, BHK, area, floor, furnished, parking, lift)\n3. Location (city, locality, preferred area)\n4. Budget (exact amount ya range)\n5. Timeline (kab chahiye)\n6. Loan ya Cash\n7. Special Requirements (koi bhi important cheez jo customer ne boli)\n8. Customer Mood (serious/exploring/urgent)\n\nHar point ke liye jo bhi information mili woh likho. Agar koi information nahi mili toh "Not mentioned" likho.\n\nConversation:\n${convo}`
+          content: `Ye real estate chat conversation hai. Broker ke liye ek detailed summary banao. Niche diye format mein likho, Hinglish mein:\n\n1. Customer Intent (kya chahiye - buy/sell/rent)\n2. Property Details (type, BHK, area, floor, furnished, parking, lift)\n3. Location (city, locality, preferred area)\n4. Budget (exact amount ya range)\n5. Timeline (kab chahiye)\n6. Loan ya Cash\n7. Special Requirements (koi bhi important cheez jo customer ne boli)\n8. Self Use ya Investment (purpose kya hai)
+9. Loan ya Cash (payment method)
+10. Special Requirements (koi specific zaroorat)
+11. Customer Mood (serious/exploring/urgent)\n\nHar point ke liye jo bhi information mili woh likho. Agar koi information nahi mili toh "Not mentioned" likho.\n\nConversation:\n${convo}`
         }],
         max_tokens: 600
       })
@@ -71,8 +74,16 @@ async function sendLeadEmail(broker, leadData, conversationMessages) {
             <td style="padding:14px 20px;font-weight:700;color:#16a34a;font-size:18px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.budget || '&mdash;'}</td></tr>
           <tr style="background:#f8fafc;"><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Timeline</td>
             <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.timeline || 'Not specified'}</td></tr>
-          <tr><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;">Intent</td>
-            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;">${leadData.intent || '&mdash;'}</td></tr>
+          <tr><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Intent</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.intent || '&mdash;'}</td></tr>
+          <tr style="background:#f8fafc;"><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Self Use / Investment</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.details && leadData.details.purpose ? leadData.details.purpose : '&mdash;'}</td></tr>
+          <tr><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Loan / Cash</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.details && leadData.details.loan ? leadData.details.loan : '&mdash;'}</td></tr>
+          <tr style="background:#f8fafc;"><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">Locality / Area</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;border-bottom:1px solid #f1f5f9;">${leadData.details && leadData.details.locality ? leadData.details.locality : leadData.area || '&mdash;'}</td></tr>
+          <tr><td style="padding:14px 20px;color:#64748b;font-size:13px;font-family:Arial,sans-serif;">Special Requirements</td>
+            <td style="padding:14px 20px;font-weight:700;color:#1e293b;font-size:14px;font-family:Arial,sans-serif;">${leadData.details && leadData.details.special ? leadData.details.special : leadData.special_requirements || '&mdash;'}</td></tr>
         </table>
       </td></tr>
     </table>
