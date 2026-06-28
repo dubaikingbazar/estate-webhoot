@@ -623,51 +623,46 @@ showPage = function(page){
   if(page==='revenue')renderRevenue();
 };
 
-// ===== SIDEBAR SUBSCRIPTION CARD =====
+// ===== SIDEBAR SUBSCRIPTION SECTION =====
 function showSubBanner(broker) {
   const statusEl = document.getElementById('sidebarSubStatus');
   const daysEl = document.getElementById('sidebarSubDays');
-  const featEl = document.getElementById('sidebarSubFeatures');
   const btn = document.getElementById('sidebarSubBtn');
   if (!statusEl) return;
-
-  const features = '✅ Unlimited AI leads\n✅ Lead dashboard\n✅ WhatsApp templates\n✅ Follow up reminders\n✅ 24/7 bot active';
 
   if (broker.status === 'trial' && broker.trial_start) {
     const trialEnd = new Date(broker.trial_start);
     trialEnd.setDate(trialEnd.getDate() + (broker.trial_days || 7));
     const daysLeft = Math.max(0, Math.ceil((trialEnd - new Date()) / (1000 * 60 * 60 * 24)));
+    const daysUsed = (broker.trial_days || 7) - daysLeft;
     statusEl.textContent = '🕐 Free Trial';
     statusEl.style.color = '#F0B84B';
-    daysEl.textContent = daysLeft + ' din baaki hain';
-    featEl.innerHTML = features.replace(/\n/g, '<br>');
+    daysEl.textContent = daysUsed + ' din se chal raha · ' + daysLeft + ' din baaki';
     btn.style.display = 'block';
     btn.textContent = 'Subscribe Now →';
   } else if (broker.status === 'active') {
-    let daysLeft = '—';
-    if (broker.subscription_valid_till) {
-      const validTill = new Date(broker.subscription_valid_till);
-      daysLeft = Math.max(0, Math.ceil((validTill - new Date()) / (1000 * 60 * 60 * 24))) + ' din baaki';
+    let info = 'Active plan';
+    if (broker.subscription_start && broker.subscription_valid_till) {
+      const daysUsed = Math.floor((new Date() - new Date(broker.subscription_start)) / (1000*60*60*24));
+      const daysLeft = Math.max(0, Math.ceil((new Date(broker.subscription_valid_till) - new Date()) / (1000*60*60*24)));
+      info = daysUsed + ' din se chal raha · ' + daysLeft + ' din baaki';
     }
     statusEl.textContent = '✅ Active';
     statusEl.style.color = '#10B981';
-    daysEl.textContent = daysLeft;
-    featEl.innerHTML = features.replace(/\n/g, '<br>');
+    daysEl.textContent = info;
     btn.style.display = 'none';
   } else if (broker.status === 'expired') {
     statusEl.textContent = '❌ Expired';
     statusEl.style.color = '#EF4444';
-    daysEl.textContent = 'Subscription khatam ho gayi';
-    featEl.innerHTML = features.replace(/\n/g, '<br>');
+    daysEl.textContent = 'Plan khatam ho gaya';
     btn.style.display = 'block';
-    btn.textContent = '🔄 Renew Now →';
-  } else if (broker.status === 'inactive' || broker.status === 'pending_payment') {
+    btn.textContent = 'Renew Now →';
+  } else {
     statusEl.textContent = '⏳ Inactive';
     statusEl.style.color = '#F59E0B';
-    daysEl.textContent = 'Bot abhi active nahi';
-    featEl.innerHTML = features.replace(/\n/g, '<br>');
+    daysEl.textContent = 'Bot active nahi';
     btn.style.display = 'block';
-    btn.textContent = 'Activate Now →';
+    btn.textContent = 'Subscribe Now →';
   }
 }
 
