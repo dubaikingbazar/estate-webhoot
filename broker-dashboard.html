@@ -6,6 +6,14 @@
 <title>EstateBot — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/dashboard.css">
+
+<style>
+.sub-banner{padding:10px 20px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;border-bottom:1px solid rgba(0,0,0,0.08);}
+.sub-banner.trial{background:#FEF3C7;color:#92400E;}
+.sub-banner.active{background:#D1FAE5;color:#065F46;}
+.sub-banner.expired{background:#FEE2E2;color:#991B1B;}
+.sub-btn{background:#C8952A;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
+</style>
 </head>
 <body>
 
@@ -104,6 +112,29 @@
         <div class="broker-av" id="brokerAvatar">?</div>
         <div><div class="broker-name" id="brokerNameTop">—</div><div class="broker-role">Broker</div></div>
       </div>
+    </div>
+  </div>
+
+
+  <!-- SUBSCRIPTION BANNER -->
+  <div class="sub-banner" id="subBanner" style="display:none;">
+    <span id="subBannerText"></span>
+    <button class="sub-btn" id="subBannerBtn" onclick="openSubscribeModal()" style="display:none;">Subscribe → ₹2,999/mo</button>
+  </div>
+
+  <!-- SUBSCRIBE MODAL -->
+  <div class="modal-overlay" id="subscribeModal">
+    <div class="modal-box" style="max-width:340px;text-align:center;">
+      <div style="font-size:28px;margin-bottom:8px;">🚀</div>
+      <div class="modal-title">EstateBot Pro</div>
+      <div class="modal-sub">Unlimited leads, full dashboard access</div>
+      <div style="background:#F8FAFC;border-radius:10px;padding:14px;margin-bottom:16px;text-align:left;">
+        <div style="font-size:12px;line-height:2;">✅ Unlimited AI leads<br>✅ Full broker dashboard<br>✅ Lead analytics<br>✅ Follow up reminders<br>✅ WhatsApp templates<br>✅ 24/7 bot active</div>
+      </div>
+      <div style="font-size:28px;font-weight:800;color:var(--navy);margin-bottom:4px;">₹2,999<span style="font-size:14px;font-weight:400;color:var(--muted);">/month</span></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Cancel anytime</div>
+      <button onclick="startPayment()" id="payNowBtn" style="width:100%;background:var(--navy);color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px;">Pay ₹2,999 →</button>
+      <button onclick="document.getElementById('subscribeModal').classList.remove('show')" style="width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);padding:10px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;">Maybe later</button>
     </div>
   </div>
 
