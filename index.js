@@ -474,7 +474,7 @@ app.post('/api/create-payment', async (req, res) => {
           customer_phone: (broker.phone || '9999999999').replace(/\D/g, '').slice(-10)
         },
         order_meta: {
-          return_url: 'https://estatebotai.in/dashboard',
+          return_url: 'https://estatebotai.in/dashboard?payment=success',
           notify_url: 'https://estatebotai.in/api/payment/webhook'
         },
         order_note: 'EstateBot subscription — ' + broker_id
