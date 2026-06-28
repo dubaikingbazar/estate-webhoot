@@ -423,6 +423,18 @@ app.post('/api/chat/:brokerId', async (req, res) => {
         else if (msgLower.includes('rent') && (msgLower.includes('lena') || msgLower.includes('chahiye') || msgLower.includes('kiraye'))) state.intent = 'RENT';
         else if (msgLower.includes('rent') && (msgLower.includes('dena') || msgLower.includes('tenant') || msgLower.includes('kiraye pe dena'))) state.intent = 'RENT_OUT';
       }
+      // Property type auto-detection
+      if (!state.propertyType) {
+        if (msgLower.includes('ghar') || msgLower.includes('makan')) state.propertyType = 'House';
+        else if (msgLower.includes('flat') || msgLower.includes('apartment')) state.propertyType = 'Flat';
+        else if (msgLower.includes('kothi')) state.propertyType = 'Kothi';
+        else if (msgLower.includes('villa')) state.propertyType = 'Villa';
+        else if (msgLower.includes('plot') || msgLower.includes('zameen')) state.propertyType = 'Plot';
+        else if (msgLower.includes('dukan') || msgLower.includes('shop')) state.propertyType = 'Shop';
+        else if (msgLower.includes('office')) state.propertyType = 'Office';
+        else if (msgLower.includes('farmhouse') || msgLower.includes('farm house')) state.propertyType = 'Farm House';
+        else if (msgLower.includes('bangla') || msgLower.includes('bungalow')) state.propertyType = 'Bangla';
+      }
     }
     res.json({ reply, leadComplete, leadData });
   } catch (err) {
