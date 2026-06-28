@@ -160,14 +160,10 @@ function getMissingFields(sessionId) {
   if (!s.location) missing.push('city aur area/locality');
   if (!s.budget) missing.push('budget');
   if (!s.timeline) missing.push('timeline');
-  // Property specific fields
-  const pt = (s.propertyType || '').toLowerCase();
-  if (s.intent === 'BUY' || s.intent === 'RENT') {
+  if (s.intent === 'BUY') {
     if (!s.purpose) missing.push('self use ya investment');
-    if ((pt.includes('flat') || pt.includes('apartment')) && !s.bhk) missing.push('BHK');
-    if ((pt.includes('house') || pt.includes('kothi') || pt.includes('makan')) && !s.rooms) missing.push('kitne rooms chahiye');
-    if ((pt.includes('house') || pt.includes('kothi') || pt.includes('makan') || pt.includes('plot')) && !s.plotSize) missing.push('plot size (kitne gaj)');
     if (!s.loanOrCash) missing.push('loan ya cash');
+    if (!s.rooms && !s.bhk) missing.push('kitne rooms ya BHK chahiye');
     if (!s.floorPref) missing.push('ground floor chahiye ya upar');
   }
   if (!s.name) missing.push('customer name');
