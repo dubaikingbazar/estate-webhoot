@@ -149,7 +149,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .fu-done-btn{margin-left:auto;background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0;}
 .login-screen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:1000;}
 .login-card{background:#fff;border-radius:16px;padding:32px 28px;width:340px;text-align:center;}
-.login-logo{width:44px;height:44px;background:linear-gradient(135deg,var(--gold),#a07830);border-radius:11px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.login-logo{width:64px;height:64px;background:transparent;border-radius:11px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
 .login-title{font-size:19px;font-weight:700;margin-bottom:4px;}
 .login-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
 .login-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:9px;color:var(--text);}
