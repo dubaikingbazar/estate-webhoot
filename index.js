@@ -418,10 +418,10 @@ app.post('/api/chat/:brokerId', async (req, res) => {
       const state = getLeadState(sessionId);
       const msgLower = message.toLowerCase();
       if (!state.intent) {
-        if (msgLower.includes('kharid') || msgLower.includes('lena') || msgLower.includes('buy')) state.intent = 'BUY';
-        else if (msgLower.includes('sell') || msgLower.includes('bech') || msgLower.includes('nikalna')) state.intent = 'SELL';
-        else if (msgLower.includes('rent') && (msgLower.includes('lena') || msgLower.includes('chahiye'))) state.intent = 'RENT';
-        else if (msgLower.includes('rent') && (msgLower.includes('dena') || msgLower.includes('tenant'))) state.intent = 'RENT_OUT';
+        if (msgLower.includes('kharid') || msgLower.includes('lena') || msgLower.includes('buy') || msgLower.includes('khridna') || msgLower.includes('khareedna') || msgLower.includes('purchase') || msgLower.includes('leni') || msgLower.includes('chahiye') && (msgLower.includes('ghar') || msgLower.includes('flat') || msgLower.includes('house') || msgLower.includes('makan') || msgLower.includes('plot') || msgLower.includes('dukan') || msgLower.includes('office'))) state.intent = 'BUY';
+        else if (msgLower.includes('sell') || msgLower.includes('bech') || msgLower.includes('nikalna') || msgLower.includes('nikalni')) state.intent = 'SELL';
+        else if (msgLower.includes('rent') && (msgLower.includes('lena') || msgLower.includes('chahiye') || msgLower.includes('kiraye'))) state.intent = 'RENT';
+        else if (msgLower.includes('rent') && (msgLower.includes('dena') || msgLower.includes('tenant') || msgLower.includes('kiraye pe dena'))) state.intent = 'RENT_OUT';
       }
     }
     res.json({ reply, leadComplete, leadData });
