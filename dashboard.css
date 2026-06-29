@@ -56,7 +56,7 @@ body{font-family:'Inter',sans-serif;background:#080808;color:#E8E0D0;min-height:
 .search-wrap{position:relative;}
 .search-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);}
 .search-input{border:1px solid rgba(232,224,208,0.1);border-radius:7px;padding:6px 10px 6px 28px;font-size:12px;color:#E8E0D0;background:#0d0d0d;font-family:'Inter',sans-serif;width:175px;outline:none;}
-.sort-btn{border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--text);background:#fff;cursor:pointer;font-family:'Inter',sans-serif;}
+.sort-btn{border:1px solid rgba(232,224,208,0.1);border-radius:7px;padding:6px 10px;font-size:12px;color:#8a7f70;background:#0d0d0d;cursor:pointer;font-family:'Inter',sans-serif;}
 .export-btn{border:none;background:#E8E0D0;color:#080808;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px;}
 .leads-table{background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;overflow:hidden;}
 .table-loading{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
@@ -109,7 +109,7 @@ body{font-family:'Inter',sans-serif;background:#080808;color:#E8E0D0;min-height:
 .btn-call{background:#E8E0D0;color:#080808;border:none;padding:11px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:'Inter',sans-serif;width:100%;}
 .btn-wa{background:#0d0d0d;color:#25D366;border:1.5px solid rgba(37,211,102,0.3);padding:10px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:'Inter',sans-serif;width:100%;}
 .btn-secondary{background:#0d0d0d;color:#E8E0D0;border:1px solid rgba(232,224,208,0.1);padding:10px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Inter',sans-serif;width:100%;}
-.btn-gold{background:var(--gold);color:#fff;border:none;padding:10px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Inter',sans-serif;width:100%;}
+.btn-gold{background:transparent;color:#8a7f70;border:1px solid rgba(232,224,208,0.12);padding:10px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Inter',sans-serif;width:100%;}
 .status-select{border:1.5px solid rgba(232,224,208,0.1);border-radius:8px;padding:8px 10px;font-size:12px;color:#E8E0D0;background:#0d0d0d;cursor:pointer;font-family:'Inter',sans-serif;width:100%;outline:none;margin-top:3px;}
 .notes-area{width:100%;border:1.5px solid rgba(232,224,208,0.1);border-radius:8px;padding:9px 10px;font-size:12px;font-family:'Inter',sans-serif;outline:none;resize:vertical;min-height:70px;color:#E8E0D0;background:#080808;margin-top:3px;}
 .notes-area:focus{border-color:rgba(232,224,208,0.3);}
@@ -146,7 +146,7 @@ body{font-family:'Inter',sans-serif;background:#080808;color:#E8E0D0;min-height:
 .fu-date .day{font-size:17px;font-weight:800;line-height:1;}
 .fu-name{font-size:13px;font-weight:600;}
 .fu-note{font-size:11px;color:var(--muted);margin-top:2px;}
-.fu-done-btn{margin-left:auto;background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0;}
+.fu-done-btn{margin-left:auto;background:transparent;color:#4ade80;border:1px solid rgba(74,222,128,0.2);padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0;}
 .login-screen{position:fixed;inset:0;background:#050505;display:flex;align-items:center;justify-content:center;z-index:1000;}
 .login-card{background:#0d0d0d;border:1px solid rgba(232,224,208,0.1);border-radius:16px;padding:32px 28px;width:340px;text-align:center;}
 .login-logo{width:64px;height:64px;background:transparent;border-radius:11px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
