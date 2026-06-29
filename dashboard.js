@@ -301,8 +301,8 @@ function openDetail(leadId){
         <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         WhatsApp
       </button>
-      <button class="btn-gold" onclick="openAddFollowUp('${lead.id}','${lead.name||''}')">⏰ Set Follow Up Reminder</button>
-      <button class="btn-secondary" style="color:#EF4444;border-color:rgba(239,68,68,0.3);" onclick="if(confirm('Is lead ko archive karo?'))archiveLead('${lead.id}')">🗄 Archive Lead</button>
+      <button class="btn-gold" style="background:transparent;border:1px solid rgba(232,224,208,0.15);color:#8a7f70;" onclick="openAddFollowUp('${lead.id}','${lead.name||''}')">⏰ Set Follow Up Reminder</button>
+      <button class="btn-secondary" style="color:rgba(239,68,68,0.5);border-color:rgba(239,68,68,0.15);background:transparent;" onclick="if(confirm('Is lead ko archive karo?'))archiveLead('${lead.id}')">🗄 Archive Lead</button>
     </div>
     ${renderTagsSection(lead.id)}
     <div class="detail-section" style="margin-top:14px;">
@@ -344,22 +344,22 @@ function renderAnalytics(){
   const days=[],counts=[];
   for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toLocaleDateString('en-IN',{weekday:'short'}));counts.push(allLeads.filter(l=>new Date(l.created_at).toDateString()===d.toDateString()).length);}
   const maxC=Math.max(...counts,1);
-  document.getElementById('chartLeadsDay').innerHTML=counts.map(c=>`<div class="bar-wrap"><div class="bar" style="height:${Math.max((c/maxC)*95,4)}px;" title="${c}"></div></div>`).join('');
+  document.getElementById('chartLeadsDay').innerHTML=counts.map(c=>`<div class="bar-wrap"><div class="bar" style="background:#E8E0D0;" style="height:${Math.max((c/maxC)*95,4)}px;" title="${c}"></div></div>`).join('');
   document.getElementById('chartDayLabels').innerHTML=days.map(d=>`<div class="bar-lbl" style="flex:1;text-align:center;">${d}</div>`).join('');
   const props={};allLeads.forEach(l=>{const p=l.property_type||'Other';props[p]=(props[p]||0)+1;});
   const sp=Object.entries(props).sort((a,b)=>b[1]-a[1]).slice(0,6);
   const maxP=Math.max(...sp.map(x=>x[1]),1);
   const pc=['#5B3DF5','#10B981','#F59E0B','#EF4444','#06B6D4','#EC4899'];
-  document.getElementById('propTypeSplit').innerHTML=sp.map(([p,n],i)=>`<div class="split-row"><div class="split-label">${p}</div><div class="split-count">${n}</div><div class="split-bar-bg"><div class="split-bar-fill" style="width:${(n/maxP)*100}%;background:${pc[i%pc.length]};"></div></div></div>`).join('')||'<div style="color:var(--muted);font-size:13px;">No data</div>';
+  document.getElementById('propTypeSplit').innerHTML=sp.map(([p,n],i)=>`<div class="split-row"><div class="split-label">${p}</div><div class="split-count">${n}</div><div class="split-bar-bg" style="background:rgba(232,224,208,0.06);"><div class="split-bar-fill" style="width:${(n/maxP)*100}%;background:${pc[i%pc.length]};"></div></div></div>`).join('')||'<div style="color:var(--muted);font-size:13px;">No data</div>';
   const intents={Kharidna:0,Bechna:0,'Rent Lena':0,'Rent Dena':0};
   allLeads.forEach(l=>{const i=(l.intent||'').toLowerCase();if(i.includes('kharid')||i.includes('buy'))intents.Kharidna++;else if(i.includes('sell')||i.includes('bech'))intents.Bechna++;else if(i.includes('rent lena'))intents['Rent Lena']++;else if(i.includes('rent dena'))intents['Rent Dena']++;});
   const ic={Kharidna:'#5B3DF5',Bechna:'#10B981','Rent Lena':'#F59E0B','Rent Dena':'#EF4444'};
   const ti=Object.values(intents).reduce((a,b)=>a+b,1);
-  document.getElementById('intentSplit').innerHTML=Object.entries(intents).map(([k,v])=>`<div class="split-row"><div style="width:9px;height:9px;border-radius:50%;background:${ic[k]};flex-shrink:0;"></div><div class="split-label">${k}</div><div class="split-count">${Math.round((v/ti)*100)}%</div><div class="split-bar-bg"><div class="split-bar-fill" style="width:${(v/ti)*100}%;background:${ic[k]};"></div></div></div>`).join('');
+  document.getElementById('intentSplit').innerHTML=Object.entries(intents).map(([k,v])=>`<div class="split-row"><div style="width:9px;height:9px;border-radius:50%;background:${ic[k]};flex-shrink:0;"></div><div class="split-label">${k}</div><div class="split-count">${Math.round((v/ti)*100)}%</div><div class="split-bar-bg" style="background:rgba(232,224,208,0.06);"><div class="split-bar-fill" style="width:${(v/ti)*100}%;background:${ic[k]};"></div></div></div>`).join('');
   const locs={};allLeads.forEach(l=>{const a=(l.area||'').split(',')[0].trim()||'Unknown';locs[a]=(locs[a]||0)+1;});
   const sl=Object.entries(locs).sort((a,b)=>b[1]-a[1]).slice(0,6);
   const maxL=Math.max(...sl.map(x=>x[1]),1);
-  document.getElementById('topLocations').innerHTML=sl.map(([l,n])=>`<div class="split-row"><div class="split-label">📍 ${l}</div><div class="split-count">${n}</div><div class="split-bar-bg"><div class="split-bar-fill" style="width:${(n/maxL)*100}%;background:var(--navy);"></div></div></div>`).join('')||'<div style="color:var(--muted);font-size:13px;">No data</div>';
+  document.getElementById('topLocations').innerHTML=sl.map(([l,n])=>`<div class="split-row"><div class="split-label">📍 ${l}</div><div class="split-count">${n}</div><div class="split-bar-bg" style="background:rgba(232,224,208,0.06);"><div class="split-bar-fill" style="width:${(n/maxL)*100}%;background:var(--navy);"></div></div></div>`).join('')||'<div style="color:var(--muted);font-size:13px;">No data</div>';
 }
 
 function renderFollowUps(){
