@@ -1,3 +1,4 @@
+/* v3 */
 
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -67,7 +68,7 @@ body{font-family:'Inter',sans-serif;background:#080808;color:#E8E0D0;min-height:
 .lead-row:hover{background:rgba(232,224,208,0.03);}
 .lead-row.duplicate{border-left:3px solid var(--warm);}
 .lead-col-badge{flex-shrink:0;}
-.lead-av{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#E8E0D0;flex-shrink:0;background:rgba(232,224,208,0.06);border:1px solid rgba(232,224,208,0.1);}
+.lead-av{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#E8E0D0!important;flex-shrink:0;background:rgba(232,224,208,0.06)!important;border:1px solid rgba(232,224,208,0.1)!important;}
 .lead-main-info{flex:1;min-width:0;overflow:hidden;}
 .lead-name{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px;color:#E8E0D0;}
 .lead-sub{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -76,9 +77,9 @@ body{font-family:'Inter',sans-serif;background:#080808;color:#E8E0D0;min-height:
 .lead-score-val{font-size:11px;font-weight:700;}
 .lead-time-val{font-size:10px;color:var(--muted);}
 .badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;font-size:8px;font-weight:800;letter-spacing:1px;}
-.badge.hot{background:transparent;color:#E8E0D0;border:1px solid rgba(232,224,208,0.2);}
-.badge.warm{background:transparent;color:#8a7f70;border:1px solid rgba(232,224,208,0.1);}
-.badge.cold{background:transparent;color:#3d3830;border:1px solid rgba(232,224,208,0.06);}
+.badge.hot{background:transparent!important;color:#E8E0D0!important;border:1px solid rgba(232,224,208,0.2)!important;}
+.badge.warm{background:transparent!important;color:#8a7f70!important;border:1px solid rgba(232,224,208,0.1)!important;}
+.badge.cold{background:transparent!important;color:#3d3830!important;border:1px solid rgba(232,224,208,0.06)!important;}
 .dup-badge{background:#FEF3C7;color:#D97706;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;}
 .pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border);}
 .page-info{font-size:11px;color:var(--muted);}
