@@ -116,7 +116,7 @@
       <div style="font-size:28px;margin-bottom:8px;">🚀</div>
       <div class="modal-title">EstateBot Pro</div>
       <div class="modal-sub">Unlimited leads, full dashboard access</div>
-      <div style="background:#F8FAFC;border-radius:10px;padding:14px;margin-bottom:16px;text-align:left;">
+      <div style="background:#080808;border:1px solid rgba(232,224,208,0.08);border-radius:10px;padding:14px;margin-bottom:16px;text-align:left;">
         <div style="font-size:12px;line-height:2;">✅ Unlimited AI leads<br>✅ Full broker dashboard<br>✅ Lead analytics<br>✅ Follow up reminders<br>✅ WhatsApp templates<br>✅ 24/7 bot active</div>
       </div>
       <div style="font-size:28px;font-weight:800;color:#E8E0D0;margin-bottom:4px;">₹2,999<span style="font-size:14px;font-weight:400;color:var(--muted);">/month</span></div>
@@ -198,8 +198,8 @@
     <!-- LEADS PAGE -->
     <div class="page" id="page-leads">
       <div style="display:flex;gap:0;margin-bottom:16px;background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;overflow:hidden;width:fit-content;">
-        <button onclick="switchLeadsTab('active')" id="tab-active" style="padding:9px 20px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;background:var(--navy);color:#fff;">All Leads</button>
-        <button onclick="switchLeadsTab('archived')" id="tab-archived" style="padding:9px 20px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;background:#fff;color:var(--muted);">🗄 Archived</button>
+        <button onclick="switchLeadsTab('active')" id="tab-active" style="padding:9px 20px;font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:'Inter',sans-serif;background:#E8E0D0;color:#080808;letter-spacing:0.5px;">All Leads</button>
+        <button onclick="switchLeadsTab('archived')" id="tab-archived" style="padding:9px 20px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;background:transparent;color:#3d3830;letter-spacing:0.5px;">Archived</button>
       </div>
       <div class="section-header">
         <div class="section-title">All Leads</div>
@@ -274,7 +274,7 @@
     <div class="page" id="page-followups">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div style="font-size:17px;font-weight:700;">Follow Ups</div>
-        <button onclick="openAddFollowUp()" style="background:var(--navy);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Add Reminder</button>
+        <button onclick="openAddFollowUp()" style="background:#E8E0D0;color:#080808;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">+ Add Reminder</button>
       </div>
       <div id="followUpsContainer"></div>
     </div>
@@ -284,9 +284,9 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
         <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Your Bot Link</div>
-          <div style="background:#F8FAFC;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--navy);font-weight:600;word-break:break-all;margin-bottom:10px;" id="settingsBotLink">—</div>
-          <button onclick="copyBotLink()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:7px;">📋 Copy Link</button>
-          <button onclick="previewBot()" style="width:100%;background:transparent;border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">⚡ Preview Bot</button>
+          <div style="background:#080808;border:1px solid rgba(232,224,208,0.08);border-radius:8px;padding:10px 12px;font-size:12px;color:#8a7f70;font-weight:600;word-break:break-all;margin-bottom:10px;" id="settingsBotLink">—</div>
+          <button onclick="copyBotLink()" style="width:100%;background:#E8E0D0;color:#080808;border:none;padding:9px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:7px;">📋 Copy Link</button>
+          <button onclick="previewBot()" style="width:100%;background:transparent;border:1px solid rgba(232,224,208,0.1);color:#8a7f70;padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">⚡ Preview Bot</button>
         </div>
         <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Account Info</div>
@@ -294,15 +294,15 @@
         </div>
         <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Change Password</div>
-          <input type="password" id="newPass1" placeholder="New password" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:9px;color:var(--text);">
-          <input type="password" id="newPass2" placeholder="Confirm new password" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:9px;color:var(--text);">
-          <button onclick="changePassword()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:9px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Update Password</button>
+          <input type="password" id="newPass1" placeholder="New password" style="width:100%;border:1.5px solid rgba(232,224,208,0.1);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:9px;color:#E8E0D0;background:#080808;">
+          <input type="password" id="newPass2" placeholder="Confirm new password" style="width:100%;border:1.5px solid rgba(232,224,208,0.1);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:9px;color:#E8E0D0;background:#080808;">
+          <button onclick="changePassword()" style="width:100%;background:#E8E0D0;color:#080808;border:none;padding:9px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Update Password</button>
         </div>
         <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Notifications</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <div><div style="font-size:13px;font-weight:600;">Browser Notifications</div><div style="font-size:11px;color:var(--muted);">Naya lead aane pe notify karo</div></div>
-            <button onclick="requestNotifPermission()" id="notifBtn" style="background:var(--navy);color:#fff;border:none;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Enable</button>
+            <button onclick="requestNotifPermission()" id="notifBtn" style="background:#E8E0D0;color:#080808;border:none;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Enable</button>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <div><div style="font-size:13px;font-weight:600;">Danger Zone</div><div style="font-size:11px;color:var(--muted);">Account se logout karo</div></div>
@@ -316,7 +316,7 @@
     <div class="page" id="page-properties">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div style="font-size:17px;font-weight:700;">Property Inventory</div>
-        <button onclick="openAddProperty()" style="background:var(--navy);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Add Property</button>
+        <button onclick="openAddProperty()" style="background:#E8E0D0;color:#080808;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">+ Add Property</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;" id="propStats"></div>
       <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;overflow:hidden;">
@@ -336,7 +336,7 @@
     <div class="page" id="page-visits">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div style="font-size:17px;font-weight:700;">Site Visit Tracker</div>
-        <button onclick="openAddVisit()" style="background:var(--navy);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Schedule Visit</button>
+        <button onclick="openAddVisit()" style="background:#E8E0D0;color:#080808;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">+ Schedule Visit</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;" id="visitStats"></div>
       <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;overflow:hidden;">
@@ -367,7 +367,7 @@
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">📊 Monthly Target</div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Target set karo</div>
           <input class="modal-input" id="monthlyTarget" placeholder="Monthly target (e.g. 50000)" type="number">
-          <button onclick="saveTarget()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:12px;">Set Target</button>
+          <button onclick="saveTarget()" style="width:100%;background:#E8E0D0;color:#080808;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:12px;">Set Target</button>
           <div id="targetProgress"></div>
         </div>
       </div>
