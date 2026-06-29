@@ -23,9 +23,9 @@ function getScore(lead){
   if((lead.intent||'').toLowerCase().includes('kharid'))s+=5;return Math.min(s,99);
 }
 function getScoreType(s){return s>=70?'hot':s>=40?'warm':'cold';}
-function getScoreColor(t){return t==='hot'?'#EF4444':t==='warm'?'#F59E0B':'#3B82F6';}
+function getScoreColor(t){return t==='hot'?'#E8E0D0':t==='warm'?'#8a7f70':'#3d3830';}
 function getInitials(n){return(n||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();}
-function getAvColor(n){const c=['linear-gradient(135deg,#F97316,#DC2626)','linear-gradient(135deg,#8B5CF6,#6D28D9)','linear-gradient(135deg,#06B6D4,#0891B2)','linear-gradient(135deg,#EC4899,#BE185D)','linear-gradient(135deg,#10B981,#059669)','linear-gradient(135deg,#F59E0B,#D97706)'];return c[(n||'').charCodeAt(0)%c.length];}
+function getAvColor(n){return 'rgba(232,224,208,0.08)';}
 function timeAgo(d){if(!d)return'';const m=Math.floor((Date.now()-new Date(d))/60000);if(m<1)return'Abhi';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
 function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.style.background=type==='error'?'#EF4444':'#0E1B30';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('mobile-open');}
@@ -127,29 +127,29 @@ const leadStore = {};
 function buildLeadRow(lead, onclick){
   leadStore[lead.id] = lead;
   const score=lead.score,scoreType=lead.scoreType,scoreColor=getScoreColor(scoreType);
-  const av=getInitials(lead.name),avColor=getAvColor(lead.name);
+  const av=getInitials(lead.name),avColor="rgba(232,224,208,0.08)";
   const intentShort=(lead.intent||'').replace(' Chahte Hain','').replace(' Chahte Hai','');
-  const statusLabels={new:'New',in_progress:'In Progress',converted:'Converted',not_interested:'Not Interested',follow_up:'Follow Up'};
-  const statusColors={new:'#7C3AED',in_progress:'#D97706',converted:'#065F46',not_interested:'#DC2626',follow_up:'#1D4ED8'};
-  const statusBg={new:'#EDE9FE',in_progress:'#FEF3C7',converted:'#D1FAE5',not_interested:'#FEE2E2',follow_up:'#DBEAFE'};
-  const hasNote=notes[lead.id]?'💬':'';
-  const hasLog=callLogs[lead.id]&&callLogs[lead.id].length?'📞':'';
+  const statusLabels={new:'NEW',in_progress:'IN PROGRESS',converted:'DONE',not_interested:'COLD',follow_up:'FOLLOW UP'};
+  const hasNote=notes[lead.id]?'·':'';
+  const hasLog=callLogs[lead.id]&&callLogs[lead.id].length?'·':'';
+  const scoreLabel=scoreType==='hot'?'HOT':scoreType==='warm'?'WARM':'COLD';
   return `<div class="lead-row${lead.isDuplicate?' duplicate':''}" onclick="openDetail('${lead.id}')">
-    <div class="lead-col-badge"><span class="badge ${scoreType}">${scoreType.toUpperCase()}</span></div>
-    <div class="lead-av" style="background:${avColor};">${av}</div>
+    <div style="min-width:38px;text-align:center;flex-shrink:0;">
+      <div style="font-size:8px;font-weight:800;color:${scoreColor};letter-spacing:1.5px;">${scoreLabel}</div>
+      <div style="font-size:13px;font-weight:700;color:${scoreColor};margin-top:1px;">${score}%</div>
+    </div>
+    <div class="lead-av" style="background:rgba(232,224,208,0.06);border:1px solid rgba(232,224,208,0.1);color:#E8E0D0;">${av}</div>
     <div class="lead-main-info">
-      <div class="lead-name">${lead.name||'—'}${lead.isDuplicate?'<span class="dup-badge">DUP</span>':''}${hasNote}${hasLog}</div>
+      <div class="lead-name">${lead.name||'—'}${lead.isDuplicate?'<span class="dup-badge" style="background:rgba(232,224,208,0.08);color:#8a7f70;border-radius:3px;padding:1px 5px;font-size:8px;margin-left:4px;">DUP</span>':''}</div>
       <div class="lead-sub">${lead.phone||'—'}</div>
-      <div class="lead-sub">${intentShort} · ${lead.property_type||'—'}</div>
-      <div class="lead-sub">${lead.area||'—'}</div>
+      <div class="lead-sub">${intentShort} · ${lead.property_type||'—'} · ${lead.area||'—'}</div>
     </div>
     <div class="lead-right">
       <div class="lead-budget-val">${lead.budget||'—'}</div>
-      <div class="lead-score-val" style="color:${scoreColor};">${score}%</div>
-      <span style="background:${statusBg[lead.status||'new']};color:${statusColors[lead.status||'new']};padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;">${statusLabels[lead.status||'new']||'New'}</span>
+      <span style="border:1px solid rgba(232,224,208,0.12);color:#8a7f70;padding:2px 6px;border-radius:3px;font-size:8px;font-weight:700;letter-spacing:1px;">${statusLabels[lead.status||'new']||'NEW'}</span>
       <div class="lead-time-val">${timeAgo(lead.created_at)}</div>
     </div>
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#CBD5E0" stroke-width="2" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(232,224,208,0.2)" stroke-width="2" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
   </div>`;
 }
 
@@ -237,7 +237,7 @@ function openDetail(leadId){
   const score=lead.score||getScore(lead);
   const scoreType=lead.scoreType||getScoreType(score);
   const scoreColor=getScoreColor(scoreType);
-  const av=getInitials(lead.name),avColor=getAvColor(lead.name);
+  const av=getInitials(lead.name),avColor="rgba(232,224,208,0.08)";
   const phone=(lead.phone||'').replace(/\s/g,'');
   const savedNote=notes[lead.id]||'';
   const logs=callLogs[lead.id]||[];
@@ -249,18 +249,18 @@ function openDetail(leadId){
     `Namaste ${lead.name||'ji'}, bas ek baar check karna tha — kya aap abhi bhi ${lead.property_type||'property'} dhundh rahe hain?`
   ];
   document.getElementById('detailBody').innerHTML=`
-    <div style="margin-bottom:12px;"><span class="badge ${scoreType}" style="font-size:11px;padding:4px 10px;">${scoreType.toUpperCase()} LEAD</span>${lead.isDuplicate?'<span class="dup-badge" style="margin-left:6px;">⚠️ Duplicate Number</span>':''}</div>
+    <div style="margin-bottom:12px;"><span style="font-size:9px;font-weight:800;letter-spacing:2px;color:#8a7f70;border:1px solid rgba(232,224,208,0.12);padding:4px 10px;border-radius:3px;">${scoreType.toUpperCase()} LEAD</span>${lead.isDuplicate?'<span class="dup-badge" style="margin-left:6px;">⚠️ Duplicate Number</span>':''}</div>
     <div class="detail-top">
       <div class="detail-av" style="background:${avColor};">${av}</div>
       <div style="flex:1;min-width:0;"><div class="detail-name">${lead.name||'—'}</div><div class="detail-phone">${lead.phone||'—'}</div></div>
-      <div class="score-wrap"><div class="score-num" style="color:${scoreColor};">${score}%</div><div class="score-lbl">Score</div><div class="score-bar" style="width:50px;margin-top:4px;"><div class="score-bar-fill" style="width:${score}%;background:${scoreColor};"></div></div></div>
+      <div class="score-wrap"><div class="score-num" style="color:#E8E0D0;">${score}%</div><div class="score-lbl">Score</div><div class="score-bar" style="width:50px;margin-top:4px;"><div class="score-bar-fill" style="width:${score}%;background:rgba(232,224,208,0.4);"></div></div></div>
     </div>
     <div class="detail-section">
       <div class="detail-section-title">Property Details</div>
       <div class="detail-row"><span class="detail-key">Intent</span><span class="detail-val">${(lead.intent||'—').replace(' Chahte Hain','')}</span></div>
       <div class="detail-row"><span class="detail-key">Property</span><span class="detail-val">${lead.property_type||'—'}</span></div>
       <div class="detail-row"><span class="detail-key">Location</span><span class="detail-val">${lead.area||'—'}</span></div>
-      <div class="detail-row"><span class="detail-key">Budget</span><span class="detail-val" style="color:#10B981;font-weight:700;">${lead.budget||'—'}</span></div>
+      <div class="detail-row"><span class="detail-key">Budget</span><span class="detail-val" style="color:#E8E0D0;font-weight:700;">${lead.budget||'—'}</span></div>
       <div class="detail-row"><span class="detail-key">Timeline</span><span class="detail-val">${lead.timeline||'—'}</span></div>
       ${lead.furnished&&lead.furnished!=='NA'?`<div class="detail-row"><span class="detail-key">Furnished</span><span class="detail-val">${lead.furnished}</span></div>`:''}
       ${lead.parking&&lead.parking!=='NA'?`<div class="detail-row"><span class="detail-key">Parking</span><span class="detail-val">${lead.parking}</span></div>`:''}
@@ -269,7 +269,7 @@ function openDetail(leadId){
     </div>
     <div class="detail-section">
       <div class="detail-section-title">Score Breakdown (${score}%)</div>
-      <div style="margin-bottom:6px;"><div class="score-bar"><div class="score-bar-fill" style="width:${score}%;background:${scoreColor};"></div></div></div>
+      <div style="margin-bottom:6px;"><div class="score-bar"><div class="score-bar-fill" style="width:${score}%;background:rgba(232,224,208,0.4);"></div></div></div>
       ${getScoreExplain(lead).map(r=>`<div style="font-size:11px;color:var(--muted);padding:3px 0;">${r}</div>`).join('')}
     </div>
     <div class="detail-section">
@@ -462,7 +462,7 @@ function renderArchivedLeads(){
   if(!archived.length){body.innerHTML='<div class="empty-state"><h3>Koi archived lead nahi hai</h3></div>';wrap.style.display='none';return;}
   body.innerHTML=archived.map(lead=>{
     const score=lead.score||getScore(lead);const scoreType=lead.scoreType||getScoreType(score);const scoreColor=getScoreColor(scoreType);
-    const av=getInitials(lead.name),avColor=getAvColor(lead.name);
+    const av=getInitials(lead.name),avColor="rgba(232,224,208,0.08)";
     const intentShort=(lead.intent||'').replace(' Chahte Hain','').replace(' Chahte Hai','');
     return `<div class="lead-row" style="opacity:0.6;"><div class="lead-col-badge"><span class="badge ${scoreType}">${scoreType.toUpperCase()}</span></div><div class="lead-av" style="background:${avColor};">${av}</div><div class="lead-main-info"><div class="lead-name">${lead.name||'—'} <span style="font-size:9px;background:#F3F4F6;color:var(--muted);padding:2px 6px;border-radius:4px;font-weight:600;">ARCHIVED</span></div><div class="lead-sub">${lead.phone||'—'}</div><div class="lead-sub">${intentShort} · ${lead.property_type||'—'}</div></div><div class="lead-right"><div class="lead-budget-val">${lead.budget||'—'}</div><div class="lead-score-val" style="color:${scoreColor};">${score}%</div></div><button onclick="unarchiveLead('${lead.id}')" style="background:rgba(16,185,129,0.1);color:#10B981;border:1px solid rgba(16,185,129,0.2);padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0;">Restore</button></div>`;
   }).join('');
