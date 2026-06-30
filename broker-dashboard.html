@@ -97,7 +97,7 @@
       <button class="hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
       <div class="topbar-left">
         <h1 id="pageTitle">Dashboard</h1>
-        <p id="greeting">Aapke leads ka latest update</p>
+        <p id="greeting">Latest update on your leads</p>
       </div>
     </div>
     <div class="topbar-right">
@@ -161,15 +161,15 @@
             <div class="stat-icon-wrap" style="background:rgba(232,224,208,0.04);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a7f70" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
           </div>
           <div class="stat-value" id="statConverted" style="color:#4ade80;">—</div>
-          <div class="stat-change up">Deal ho gayi</div>
+          <div class="stat-change up">Deals closed</div>
         </div>
         <div class="stat-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div class="stat-label">Aaj Aaye</div>
+            <div class="stat-label">Today's Leads</div>
             <div class="stat-icon-wrap" style="background:rgba(232,224,208,0.06);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a7f70" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
           </div>
           <div class="stat-value" id="statToday" style="color:#E8E0D0;">—</div>
-          <div class="stat-change up">Aaj ke naye leads</div>
+          <div class="stat-change up">New leads today</div>
         </div>
       </div>
       <div class="section-header">
@@ -178,16 +178,16 @@
           <select class="filter-select" id="filterType" onchange="applyFilter()">
             <option value="all">All Leads</option>
             <option value="hot">🔥 Hot</option><option value="warm">⭐ Warm</option><option value="cold">❄️ Cold</option>
-            <option value="buy">Kharidna</option><option value="sell">Bechna</option><option value="rent">Rent</option>
+            <option value="buy">Buy</option><option value="sell">Sell</option><option value="rent">Rent</option>
           </select>
           <div class="search-wrap">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input" id="searchInput" placeholder="Search naam, phone..." oninput="applyFilter()">
+            <input class="search-input" id="searchInput" placeholder="Search by name, phone..." oninput="applyFilter()">
           </div>
         </div>
       </div>
       <div class="leads-table">
-        <div id="leadsBody"><div class="table-loading">⏳ Leads load ho rahe hain...</div></div>
+        <div id="leadsBody"><div class="table-loading">⏳ Loading leads...</div></div>
         <div class="pagination" id="paginationWrap" style="display:none;">
           <div class="page-info" id="pageInfo"></div>
           <div class="page-btns" id="pageBtns"></div>
@@ -207,7 +207,7 @@
           <select class="filter-select" id="filterType2" onchange="applyFilter2()">
             <option value="all">All Leads</option>
             <option value="hot">🔥 Hot</option><option value="warm">⭐ Warm</option><option value="cold">❄️ Cold</option>
-            <option value="buy">Kharidna</option><option value="sell">Bechna</option><option value="rent">Rent</option>
+            <option value="buy">Buy</option><option value="sell">Sell</option><option value="rent">Rent</option>
             <option value="new">New</option><option value="in_progress">In Progress</option>
             <option value="converted">Converted</option><option value="follow_up">Follow Up</option>
           </select>
@@ -220,7 +220,7 @@
           </select>
           <div class="search-wrap">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input" id="searchInput2" placeholder="Search naam, phone, area..." oninput="applyFilter2()" style="width:200px;">
+            <input class="search-input" id="searchInput2" placeholder="Search by name, phone, area..." oninput="applyFilter2()" style="width:200px;">
           </div>
           <select class="filter-select" id="budgetFilter" onchange="applyFilter2()">
             <option value="all">All Budgets</option>
@@ -301,11 +301,11 @@
         <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Notifications</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <div><div style="font-size:13px;font-weight:600;">Browser Notifications</div><div style="font-size:11px;color:var(--muted);">Naya lead aane pe notify karo</div></div>
+            <div><div style="font-size:13px;font-weight:600;">Browser Notifications</div><div style="font-size:11px;color:var(--muted);">Get notified when a new lead arrives</div></div>
             <button onclick="requestNotifPermission()" id="notifBtn" style="background:#E8E0D0;color:#080808;border:none;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Enable</button>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div><div style="font-size:13px;font-weight:600;">Danger Zone</div><div style="font-size:11px;color:var(--muted);">Account se logout karo</div></div>
+            <div><div style="font-size:13px;font-weight:600;">Danger Zone</div><div style="font-size:11px;color:var(--muted);">Sign out of your account</div></div>
             <button onclick="doLogout()" style="background:rgba(239,68,68,0.1);color:#EF4444;border:1px solid rgba(239,68,68,0.2);padding:7px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Logout</button>
           </div>
         </div>
@@ -325,7 +325,7 @@
             <option value="all">All</option><option value="available">Available</option><option value="sold">Sold</option><option value="rented">Rented</option>
           </select>
           <select onchange="renderProperties()" id="propTypeFilter" style="border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:12px;font-family:'Inter',sans-serif;outline:none;">
-            <option value="all">All Types</option><option value="flat">Flat</option><option value="house">House/Makan</option><option value="plot">Plot</option><option value="shop">Shop/Office</option>
+            <option value="all">All Types</option><option value="flat">Flat</option><option value="house">House</option><option value="plot">Plot</option><option value="shop">Shop/Office</option>
           </select>
         </div>
         <div id="propList"><div class="table-loading">No properties yet — Add one!</div></div>
@@ -393,11 +393,11 @@
 <div class="modal-overlay" id="propModal">
   <div class="modal-box">
     <div class="modal-title">Add Property</div>
-    <div class="modal-sub">Apni property inventory mein add karo</div>
+    <div class="modal-sub">Add to your property inventory</div>
     <input class="modal-input" id="propTitle" placeholder="Property Title (e.g. 3 BHK Flat Mansarovar)">
     <select class="modal-input" id="propType">
       <option value="flat">Flat / Apartment</option>
-      <option value="house">House / Makan</option>
+      <option value="house">House</option>
       <option value="plot">Plot / Land</option>
       <option value="shop">Shop / Office</option>
     </select>
@@ -420,8 +420,8 @@
 <div class="modal-overlay" id="visitModal">
   <div class="modal-box">
     <div class="modal-title">Schedule Site Visit</div>
-    <div class="modal-sub">Customer ke saath property visit schedule karo</div>
-    <select class="modal-input" id="visitLeadSelect"><option value="">-- Lead Select Karo --</option></select>
+    <div class="modal-sub">Schedule a property visit with the customer</div>
+    <select class="modal-input" id="visitLeadSelect"><option value="">-- Select Lead --</option></select>
     <input class="modal-input" id="visitProperty" placeholder="Property (e.g. 3 BHK Mansarovar)">
     <input class="modal-input" type="date" id="visitDate">
     <input class="modal-input" type="time" id="visitTime">
@@ -463,10 +463,10 @@
 <div class="modal-overlay" id="fuModal">
   <div class="modal-box">
     <div class="modal-title">Add Follow Up Reminder</div>
-    <div class="modal-sub">Lead ke liye reminder set karo</div>
-    <select class="modal-input" id="fuLeadSelect"><option value="">-- Lead Select Karo --</option></select>
+    <div class="modal-sub">Set a reminder for this lead</div>
+    <select class="modal-input" id="fuLeadSelect"><option value="">-- Select Lead --</option></select>
     <input class="modal-input" type="date" id="fuDate">
-    <input class="modal-input" type="text" id="fuNote" placeholder="Note (e.g. Call karna hai, site visit discuss)">
+    <input class="modal-input" type="text" id="fuNote" placeholder="Note (e.g. Need to call, discuss site visit)">
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeFuModal()">Cancel</button>
       <button class="modal-ok" onclick="saveFollowUp()">Save Reminder</button>
