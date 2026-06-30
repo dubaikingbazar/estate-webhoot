@@ -36,12 +36,12 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
 .stat-circle{width:40px;height:40px;border-radius:50%;border:1px solid rgba(200,169,110,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
 .stat-val{font-size:21px;font-weight:700;color:#c8a96e;line-height:1;}
 .stat-lbl{font-size:10px;color:rgba(255,255,255,0.4);margin-top:3px;letter-spacing:0.5px;}
-.badges-row{position:relative;z-index:2;display:flex;gap:10px;padding:0 14px 24px;}
+.badges-row{position:relative;z-index:2;display:flex;gap:10px;padding:0 14px 16px;}
 .badge-dark{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;font-size:13px;font-weight:600;background:rgba(8,8,18,0.85);border:1px solid rgba(200,169,110,0.3);color:#fff;backdrop-filter:blur(8px);}
 .badge-gold{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;font-size:13px;font-weight:600;background:linear-gradient(135deg,#c8a96e,#a07840);border:none;color:#0a0a0a;}
-.specialties{width:100%;max-width:480px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:#fff;}
-.spec-card{background:#fff;border:1px solid #f0ede8;border-radius:10px;padding:14px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;}
-.spec-name{font-size:10px;font-weight:600;color:#1e293b;}
+.specialties{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:repeat(${Math.max(specialties.length,1)},1fr);gap:8px;padding:0 14px 22px;}
+.spec-card{background:rgba(8,8,18,0.82);backdrop-filter:blur(16px);border:1px solid rgba(200,169,110,0.18);border-radius:12px;padding:14px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.spec-name{font-size:10px;font-weight:600;color:#fff;}
 .spec-line{width:24px;height:2px;background:#c8a96e;border-radius:2px;}
 .chat-wrap{width:100%;max-width:100%;background:#F7F4ED;display:flex;flex-direction:column;position:relative;overflow:hidden;}
 .chat-wrap-inner{background:#F7F4ED;padding:20px 16px 16px;position:relative;z-index:1;}
@@ -142,12 +142,11 @@ body{font-family:'Poppins',sans-serif;background:#0a0a0a;display:flex;flex-direc
     </div>
   </div>
   <div class="badges-row">
-    <div class="badge-dark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8a96e" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Trusted Agent</div>
     <div class="badge-gold"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Free Consultation</div>
   </div>
-</div>
-<div class="specialties">
-  ${specialties.map((s, i) => `<div class="spec-card">${specIcons[i % specIcons.length]}<div class="spec-name">${s.trim()}</div><div class="spec-line"></div></div>`).join('')}
+  <div class="specialties">
+    ${specialties.map((s, i) => `<div class="spec-card">${specIcons[i % specIcons.length]}<div class="spec-name">${s.trim()}</div><div class="spec-line"></div></div>`).join('')}
+  </div>
 </div>
 <div class="chat-wrap">
   <div class="chat-wrap-inner">
