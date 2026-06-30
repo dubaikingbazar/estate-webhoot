@@ -43,7 +43,7 @@ const completedSessions = new Set();
 app.post('/api/signup', async (req, res) => {
   const { name, business, city, state, specialty, email, phone, experience, properties, password } = req.body;
   if (!name || !business || !city || !email || !phone) {
-    return res.status(400).json({ error: 'Saari details bharo' });
+    return res.status(400).json({ error: 'Please fill in all the details' });
   }
 
   const broker_id = business.toLowerCase()
@@ -225,24 +225,24 @@ function getPaymentStatusHTML(status, brokerId) {
       color: '#22c55e',
       bg: 'rgba(34,197,94,0.1)',
       title: 'Payment Successful!',
-      msg: 'Aapka EstateBot account activate ho gaya hai. Welcome email check karein.',
-      btn: `<a href="https://estatebotai.in/${brokerId}" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Apna Bot Dekho →</a>`
+      msg: 'Your EstateBot account has been activated. Please check your welcome email.',
+      btn: `<a href="https://estatebotai.in/${brokerId}" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">View Your Bot →</a>`
     },
     failed: {
       icon: '✕',
       color: '#ef4444',
       bg: 'rgba(239,68,68,0.1)',
       title: 'Payment Failed',
-      msg: 'Payment process nahi ho payi. Dobara try karein.',
-      btn: `<a href="/#signup" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Dobara Try Karein →</a>`
+      msg: 'We could not process your payment. Please try again.',
+      btn: `<a href="/#signup" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Try Again →</a>`
     },
     pending: {
       icon: '⏳',
       color: '#f59e0b',
       bg: 'rgba(245,158,11,0.1)',
       title: 'Payment Processing…',
-      msg: 'Aapka payment process ho raha hai. Thodi der mein email aayegi.',
-      btn: `<a href="https://estatebotai.in/${brokerId}" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Dashboard Check Karein →</a>`
+      msg: 'Your payment is being processed. You will receive an email shortly.',
+      btn: `<a href="https://estatebotai.in/${brokerId}" style="display:inline-flex;align-items:center;gap:8px;background:#c9a84c;color:#000;font-weight:600;padding:13px 28px;border-radius:8px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px;">Check Dashboard →</a>`
     }
   };
   const c = configs[status];
@@ -267,10 +267,10 @@ function getPaymentStatusHTML(status, brokerId) {
 // ===== BROKER AUTH =====
 app.post('/api/broker-auth', async (req, res) => {
   const { broker_id, password } = req.body;
-  if (!broker_id || !password) return res.status(400).json({ error: 'Broker ID aur password dono chahiye' });
+  if (!broker_id || !password) return res.status(400).json({ error: 'Broker ID and password are both required' });
   const { data: broker, error } = await supabase.from('brokers').select('*').eq('broker_id', broker_id).single();
-  if (error || !broker) return res.status(404).json({ error: 'Broker nahi mila' });
-  if (broker.password !== password) return res.status(401).json({ error: 'Password galat hai' });
+  if (error || !broker) return res.status(404).json({ error: 'Broker not found' });
+  if (broker.password !== password) return res.status(401).json({ error: 'Incorrect password' });
 
   // CHANGE 2: Trial days remaining calculate karo
   let trialDaysLeft = null;
