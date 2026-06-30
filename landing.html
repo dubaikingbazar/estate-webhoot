@@ -473,8 +473,8 @@ async function submitForm(){
   if(!ok)return;
   var pass=document.getElementById('f-pass').value;
   var pass2=document.getElementById('f-pass2').value;
-  if(pass!==pass2){showError('Passwords match nahi kar rahe.');return;}
-  if(pass.length<6){showError('Password kam se kam 6 characters ka hona chahiye.');return;}
+  if(pass!==pass2){showError('Passwords do not match.');return;}
+  if(pass.length<6){showError('Password must be at least 6 characters long.');return;}
   var btn=document.getElementById('submitBtn');
   btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Creating your account...';
   btn.disabled=true;
@@ -498,15 +498,15 @@ async function submitForm(){
         '<div style="text-align:center;padding:24px 0;">'
         +'<div style="width:56px;height:56px;border-radius:50%;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">'
         +'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#c9a84c" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>'
-        +'<h2 style="font-size:22px;font-weight:600;letter-spacing:-0.5px;margin-bottom:8px;">Trial Shuru Ho Gaya!</h2>'
-        +'<p style="color:var(--muted);font-size:14px;margin-bottom:24px;">7 din ka free trial. Welcome email check karein.</p>'
+        +'<h2 style="font-size:22px;font-weight:600;letter-spacing:-0.5px;margin-bottom:8px;">Your Trial Has Started!</h2>'
+        +'<p style="color:var(--muted);font-size:14px;margin-bottom:24px;">7-day free trial activated. Please check your welcome email.</p>'
         +'<div style="background:#080808;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">'
         +'<div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Your Bot Link</div>'
         +'<a href="'+botUrl+'" style="color:var(--gold);font-size:13px;font-weight:500;word-break:break-all;">'+botUrl+'</a></div>'
-        +'<a href="'+botUrl+'" style="display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--gold-fg);font-size:13px;font-weight:500;padding:12px 24px;border-radius:8px;text-decoration:none;">Apna Bot Dekho &#8594;</a>'
+        +'<a href="'+botUrl+'" style="display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--gold-fg);font-size:13px;font-weight:500;padding:12px 24px;border-radius:8px;text-decoration:none;">View Your Bot &#8594;</a>'
         +'</div>';
     } else {
-      var errMsg=data.error||'Kuch gadbad ho gayi. Dobara try karo.';
+      var errMsg=data.error||'Something went wrong. Please try again.';
       btn.innerHTML='Claim your free trial <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
       btn.style.background='#ef4444';
       btn.disabled=false;
@@ -516,7 +516,7 @@ async function submitForm(){
     btn.innerHTML='Claim your free trial <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
     btn.style.background='var(--gold)';
     btn.disabled=false;
-    showError('Network error. Internet check karo aur dobara try karo.');
+    showError('Network error. Please check your internet connection and try again.');
   }
 }
 </script>
