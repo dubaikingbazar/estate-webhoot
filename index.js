@@ -36,6 +36,8 @@ function adminAuth(req, res, next) {
 
 
 const conversations = {};
+// CHANGE A: tracks sessions where the lead has already been completed
+const completedSessions = new Set();
 
 // ===== BROKER SIGNUP — 7 DAY TRIAL =====
 app.post('/api/signup', async (req, res) => {
@@ -317,6 +319,15 @@ app.post('/api/chat/:brokerId', async (req, res) => {
   const { brokerId } = req.params;
   const { message, sessionId } = req.body;
 
+  // CHANGE B: If this session already completed a lead, don't process further messages
+  if (completedSessions.has(sessionId)) {
+    return res.json({
+      reply: 'Bahut shukriya! Aapki details hamari team ke paas pahunch chuki hain. Hum jaldi hi aapse contact karenge. 😊',
+      leadComplete: true,
+      leadData: null
+    });
+  }
+
   const { data: broker, error } = await supabase.from('brokers').select('*').eq('broker_id', brokerId).single();
   if (error || !broker) return res.status(404).json({ error: 'Broker not found' });
 
@@ -414,6 +425,8 @@ app.post('/api/chat/:brokerId', async (req, res) => {
                 timeline: leadData.timeline || state.timeline
               }, conversations[sessionId]);
               leadComplete = true;
+              // CHANGE C: mark this session as completed so it won't continue chatting
+              completedSessions.add(sessionId);
               delete leadStates[sessionId];
             }
           }
