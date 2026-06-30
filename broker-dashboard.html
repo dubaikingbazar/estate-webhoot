@@ -17,11 +17,11 @@
       <img src="/logo.png" width="28" height="28" style="filter:invert(1);border-radius:6px;"/>
     </div>
     <div class="login-title">EstateBot AI</div>
-    <div class="login-sub">Apne dashboard mein login karein</div>
+    <div class="login-sub">Log in to your dashboard</div>
     <input class="login-input" id="loginEmail" type="email" placeholder="Email address"/>
     <input class="login-input" id="loginPass" type="password" placeholder="Password" onkeypress="if(event.key==='Enter')doLogin()"/>
     <button class="login-btn" onclick="doLogin()">Login →</button>
-    <div class="login-err" id="loginErr">Email ya password galat hai</div>
+    <div class="login-err" id="loginErr">Incorrect email or password</div>
   </div>
 </div>
 
@@ -328,7 +328,7 @@
             <option value="all">All Types</option><option value="flat">Flat</option><option value="house">House/Makan</option><option value="plot">Plot</option><option value="shop">Shop/Office</option>
           </select>
         </div>
-        <div id="propList"><div class="table-loading">Koi property nahi hai — Add karo!</div></div>
+        <div id="propList"><div class="table-loading">No properties yet — Add one!</div></div>
       </div>
     </div>
 
@@ -345,7 +345,7 @@
             <option value="all">All Visits</option><option value="scheduled">Scheduled</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
           </select>
         </div>
-        <div id="visitList"><div class="table-loading">Koi visit nahi hai — Schedule karo!</div></div>
+        <div id="visitList"><div class="table-loading">No visits yet — Schedule one!</div></div>
       </div>
     </div>
 
@@ -365,7 +365,7 @@
         </div>
         <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">📊 Monthly Target</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Target set karo</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Set your target</div>
           <input class="modal-input" id="monthlyTarget" placeholder="Monthly target (e.g. 50000)" type="number">
           <button onclick="saveTarget()" style="width:100%;background:#E8E0D0;color:#080808;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:12px;">Set Target</button>
           <div id="targetProgress"></div>
@@ -373,7 +373,7 @@
       </div>
       <div style="background:#0d0d0d;border:1px solid rgba(232,224,208,0.07);border-radius:10px;padding:18px;margin-top:14px;">
         <div style="font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">Recent Deals</div>
-        <div id="dealsList"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">Koi deal nahi hai — Add karo upar!</div></div>
+        <div id="dealsList"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No deals yet — Add one above!</div></div>
       </div>
     </div></div>
 </div>
